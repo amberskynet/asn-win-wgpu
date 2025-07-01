@@ -1,14 +1,7 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+pub mod state;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub use state::{AsnWindow, State};
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn get_state() -> State {
+    State::default()
 }

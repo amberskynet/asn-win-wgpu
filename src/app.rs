@@ -1,6 +1,7 @@
 use crate::data::LOG_MODULE_NAME;
 
 use asn_logger::{info, trace};
+use asn_wgpu::{get_state, State};
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
@@ -9,6 +10,7 @@ use winit::window::{Window, WindowId};
 #[derive(Default)]
 pub struct App {
     window: Option<Window>,
+    state: Option<State>,
 }
 
 impl ApplicationHandler for App {
@@ -18,6 +20,7 @@ impl ApplicationHandler for App {
                 .create_window(Window::default_attributes())
                 .unwrap(),
         );
+        self.state = Some(get_state());
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
