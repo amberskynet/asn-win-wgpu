@@ -1,6 +1,7 @@
 use crate::data::LOG_MODULE_NAME;
+use std::fmt::format;
 
-use asn_logger::info;
+use asn_logger::{info, trace};
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
@@ -42,7 +43,10 @@ impl ApplicationHandler for App {
                 // can render here instead.
                 self.window.as_ref().unwrap().request_redraw();
             }
-            _ => (),
+            _ => {
+                let mess = format!("{id:?} {event:?}");
+                trace(LOG_MODULE_NAME, mess.as_str());
+            }
         }
     }
 }
