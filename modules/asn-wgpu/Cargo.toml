@@ -4,4 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+winit = { version = "0.30" }
 wgpu = { version = "25.0", default-features = false, features = [] }
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "2.1.1", features = [] }

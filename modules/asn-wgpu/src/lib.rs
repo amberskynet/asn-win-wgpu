@@ -1,7 +1,5 @@
 pub mod state;
 
-pub use state::{AsnWindow, State};
+mod data;
 
-pub fn get_state() -> State {
-    State::default()
-}
+pub use state::State;
