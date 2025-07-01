@@ -1,7 +1,8 @@
 use crate::data::LOG_MODULE_NAME;
+use std::fmt::format;
 use std::sync::Arc;
 
-use asn_logger::{info, trace};
+use asn_logger::{error, info, trace};
 use asn_wgpu::State;
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
@@ -50,7 +51,22 @@ impl ApplicationHandler for App {
                 // applications which do not always need to. Applications that redraw continuously
                 // can render here instead.
                 // self.window.as_ref().request_redraw();
-                self.state.as_mut().unwrap().render();
+                match self.state.as_mut().unwrap().render() {
+                    Ok(_) => {}
+                    // Reconfigure the surface if it's lost or outdated
+                    Err(e) => {
+                        error(LOG_MODULE_NAME, format!("Unable to render {e}").as_str());
+                        match self.state.as_mut().unwrap().restore() {
+                            Ok(_) => {}
+                            Err(e) => {
+                                error(LOG_MODULE_NAME, format!("Unable to render {e}").as_str());
+                            }
+                        }
+                    }
+                }
+            }
+            WindowEvent::Resized(size) => {
+                self.state.as_mut().unwrap().resize(size.width, size.height)
             }
             _ => {
                 let mess = format!("{id:?} {event:?}");
