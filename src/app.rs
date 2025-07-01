@@ -1,5 +1,4 @@
 use crate::data::LOG_MODULE_NAME;
-use std::fmt::format;
 
 use asn_logger::{info, trace};
 use winit::application::ApplicationHandler;
