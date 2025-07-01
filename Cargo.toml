@@ -7,3 +7,5 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+winit = { version = "0.30" }
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "2.1.1", features = [] }
