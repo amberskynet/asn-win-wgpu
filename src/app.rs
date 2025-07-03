@@ -1,5 +1,4 @@
 use crate::data::LOG_MODULE_NAME;
-use std::fmt::format;
 use std::sync::Arc;
 
 use asn_logger::{error, info, trace};
@@ -9,27 +8,27 @@ use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
 use winit::window::{Window, WindowId};
 
+/// Main application struct that handles window events and rendering
 #[derive(Default)]
 pub struct App {
-    // window: Arc<Window>,
     state: Option<State>,
 }
 
 impl ApplicationHandler for App {
+    /// Called when the application is resumed (e.g., when a window is created)
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        let w = Arc::new(
+        let window = Arc::new(
             event_loop
                 .create_window(Window::default_attributes())
-                .unwrap(),
+                .expect("Failed to create window"),
         );
 
-        let s = pollster::block_on(State::new(Arc::clone(&w)));
-
-        // self.window = w;
-
-        self.state = Some(s);
+        self.state = Some(
+            pollster::block_on(State::new(Arc::clone(&window)))
+        );
     }
 
+    /// Handles window events like close, redraw, resize, etc.
     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
         match event {
             WindowEvent::CloseRequested => {
@@ -37,41 +36,43 @@ impl ApplicationHandler for App {
                 event_loop.exit();
             }
             WindowEvent::RedrawRequested => {
-                // Redraw the application.
-                //
-                // It's preferable for applications that do not render continuously to render in
-                // this event rather than in AboutToWait, since rendering in here allows
-                // the program to gracefully handle redraws requested by the OS.
-
-                // Draw.
-
-                // Queue a RedrawRequested event.
-                //
-                // You only need to call this if you've determined that you need to redraw in
-                // applications which do not always need to. Applications that redraw continuously
-                // can render here instead.
-                // self.window.as_ref().request_redraw();
-                match self.state.as_mut().unwrap().render() {
-                    Ok(_) => {}
-                    // Reconfigure the surface if it's lost or outdated
-                    Err(e) => {
-                        error(LOG_MODULE_NAME, format!("Unable to render {e}").as_str());
-                        match self.state.as_mut().unwrap().restore() {
-                            Ok(_) => {}
-                            Err(e) => {
-                                error(LOG_MODULE_NAME, format!("Unable to render {e}").as_str());
-                            }
-                        }
-                    }
-                }
+                self.handle_redraw();
             }
             WindowEvent::Resized(size) => {
-                self.state.as_mut().unwrap().resize(size.width, size.height)
+                self.handle_resize(size.width, size.height);
             }
             _ => {
-                let mess = format!("{id:?} {event:?}");
-                trace(LOG_MODULE_NAME, mess.as_str());
+                trace(LOG_MODULE_NAME, &format!("Window {id:?} event: {event:?}"));
             }
         }
+    }
+}
+
+impl App {
+    /// Handles the redraw event by rendering the current state
+    fn handle_redraw(&mut self) {
+        let Some(state) = self.state.as_mut() else {
+            error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
+            return;
+        };
+
+        if let Err(render_error) = state.render() {
+            error(LOG_MODULE_NAME, &format!("Render failed: {render_error}"));
+            
+            // Try to restore the surface if rendering failed
+            if let Err(restore_error) = state.restore() {
+                error(LOG_MODULE_NAME, &format!("Surface restore failed: {restore_error}"));
+            }
+        }
+    }
+
+    /// Handles window resize events
+    fn handle_resize(&mut self, width: u32, height: u32) {
+        let Some(state) = self.state.as_mut() else {
+            error(LOG_MODULE_NAME, "Cannot resize: state is not initialized");
+            return;
+        };
+
+        state.resize(width, height);
     }
 }
