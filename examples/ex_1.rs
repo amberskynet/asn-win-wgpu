@@ -4,26 +4,19 @@ extern crate asn_win_wgpu;
 
 use asn_logger::{init_log, AsnLogConfig, AsnLogLevel};
 use asn_node_quad::AsnNodeQuad;
-use asn_win_wgpu::run;
+use asn_win_wgpu::{run, run_with_config, custom_config};
 
-fn main() {
-    let mut c = AsnLogConfig {
-        global_level: AsnLogLevel::Trace,
-        module_levels: Default::default(),
-    };
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Example 1: Run with default configuration
+    // run()?;
 
-    let node = AsnNodeQuad::new();
-
-    c.module_levels
-        .insert(String::from("wgpu_core"), AsnLogLevel::Off);
-    c.module_levels
-        .insert(String::from("wgpu_hal"), AsnLogLevel::Off);
-    c.module_levels
-        .insert(String::from("naga"), AsnLogLevel::Off);
-    c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Off);
-
-    init_log(&c);
-
-    run()
+    // Example 2: Run with custom configuration
+    let config = custom_config(
+        "My Custom WGPU App",
+        1024,
+        768,
+        true, // vsync enabled
+    );
+    
+    run_with_config(config)
 }
