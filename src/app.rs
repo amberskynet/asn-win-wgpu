@@ -6,7 +6,7 @@ use asn_wgpu::State;
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
-use winit::window::{Window, WindowId};
+use winit::window::WindowId;
 
 /// Configuration for the application
 #[derive(Debug, Clone)]
@@ -63,20 +63,10 @@ impl ApplicationHandler for App {
                 .expect("Failed to create window"),
         );
 
-        let stateFuture =  pollster::block_on(State::new(Arc::clone(&window)));
-
-
-
-        //     Ok(state) => {
-        //         self.state = Some(state);
-        //         self.is_running = true;
-        //         info(LOG_MODULE_NAME, "Application initialized successfully");
-        //     }
-        //     Err(e) => {
-        //         error(LOG_MODULE_NAME, &format!("Failed to initialize application: {e}"));
-        //         event_loop.exit();
-        //     }
-        // }
+        let state = pollster::block_on(State::new(Arc::clone(&window)));
+        self.state = Some(state);
+        self.is_running = true;
+        info(LOG_MODULE_NAME, "Application initialized successfully");
     }
 
     /// Handles window events like close, redraw, resize, etc.
@@ -162,15 +152,15 @@ impl App {
 
     /// Handles keyboard input events
     fn handle_keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
-        use winit::event::{ElementState, KeyCode};
+        use winit::event::ElementState;
         
         if event.state == ElementState::Pressed {
             match event.logical_key.as_ref() {
-                KeyCode::Escape => {
+                winit::keyboard::Key::Character("Escape") => {
                     info(LOG_MODULE_NAME, "Escape key pressed - closing application");
                     self.handle_close(event_loop);
                 }
-                KeyCode::F11 => {
+                winit::keyboard::Key::Named(winit::keyboard::NamedKey::F11) => {
                     info(LOG_MODULE_NAME, "F11 key pressed - toggling fullscreen");
                     // TODO: Implement fullscreen toggle
                 }
