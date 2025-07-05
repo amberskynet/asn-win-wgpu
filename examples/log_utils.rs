@@ -13,8 +13,8 @@ pub fn setup_log() {
         .insert(String::from("wgpu_hal"), AsnLogLevel::Off);
     c.module_levels
         .insert(String::from("naga"), AsnLogLevel::Off);
-    // c.module_levels
-    //     .insert(String::from("asn-win-wgpu"), AsnLogLevel::Off);
+    c.module_levels
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Off);
 
     init_log(&c);
 
