@@ -95,6 +95,7 @@ impl ApplicationHandler for App {
     }
 }
 
+#[allow(dead_code)]
 impl App {
     /// Creates a new App with custom configuration
     pub fn with_config(config: AppConfig) -> Self {
@@ -106,6 +107,7 @@ impl App {
     }
 
     /// Returns whether the application is currently running
+
     pub fn is_running(&self) -> bool {
         self.is_running
     }

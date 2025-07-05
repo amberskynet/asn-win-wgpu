@@ -8,12 +8,12 @@ use log_utils::setup_log;
 
 
 use asn_node_quad::AsnNodeQuad;
-use asn_win_wgpu::{run, run_with_config, custom_config};
+use asn_win_wgpu::{run_with_config, custom_config};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
-    let node = AsnNodeQuad::new();
+    let _node = AsnNodeQuad::new();
 
     // Example 2: Run with custom configuration
     let config = custom_config(
