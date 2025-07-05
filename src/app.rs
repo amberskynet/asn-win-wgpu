@@ -1,3 +1,4 @@
+use crate::asn_win_config::AppConfig;
 use crate::data::LOG_MODULE_NAME;
 use std::sync::Arc;
 
@@ -7,26 +8,6 @@ use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
 use winit::window::WindowId;
-
-/// Configuration for the application
-#[derive(Debug, Clone)]
-pub struct AppConfig {
-    pub window_title: String,
-    pub window_width: u32,
-    pub window_height: u32,
-    pub vsync: bool,
-}
-
-impl Default for AppConfig {
-    fn default() -> Self {
-        Self {
-            window_title: "ASN WGPU Application".to_string(),
-            window_width: 800,
-            window_height: 600,
-            vsync: true,
-        }
-    }
-}
 
 /// Main application struct that handles window events and rendering
 pub struct App {
@@ -48,8 +29,11 @@ impl Default for App {
 impl ApplicationHandler for App {
     /// Called when the application is resumed (e.g., when a window is created)
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        info(LOG_MODULE_NAME, "Application resumed - initializing window and state");
-        
+        info(
+            LOG_MODULE_NAME,
+            "Application resumed - initializing window and state",
+        );
+
         let window_attributes = winit::window::WindowAttributes::default()
             .with_title(&self.config.window_title)
             .with_inner_size(winit::dpi::LogicalSize::new(
@@ -133,10 +117,13 @@ impl App {
 
         if let Err(render_error) = state.render() {
             error(LOG_MODULE_NAME, &format!("Render failed: {render_error}"));
-            
+
             // Try to restore the surface if rendering failed
             if let Err(restore_error) = state.restore() {
-                error(LOG_MODULE_NAME, &format!("Surface restore failed: {restore_error}"));
+                error(
+                    LOG_MODULE_NAME,
+                    &format!("Surface restore failed: {restore_error}"),
+                );
             }
         }
     }
@@ -148,14 +135,21 @@ impl App {
             return;
         };
 
-        trace(LOG_MODULE_NAME, &format!("Resizing window to {}x{}", width, height));
+        trace(
+            LOG_MODULE_NAME,
+            &format!("Resizing window to {}x{}", width, height),
+        );
         state.resize(width, height);
     }
 
     /// Handles keyboard input events
-    fn handle_keyboard_input(&mut self, event_loop: &ActiveEventLoop, event: winit::event::KeyEvent) {
+    fn handle_keyboard_input(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        event: winit::event::KeyEvent,
+    ) {
         use winit::event::ElementState;
-        
+
         if event.state == ElementState::Pressed {
             match event.logical_key.as_ref() {
                 winit::keyboard::Key::Character("Escape") => {
@@ -167,7 +161,10 @@ impl App {
                     // TODO: Implement fullscreen toggle
                 }
                 _ => {
-                    trace(LOG_MODULE_NAME, &format!("Key pressed: {:?}", event.logical_key));
+                    trace(
+                        LOG_MODULE_NAME,
+                        &format!("Key pressed: {:?}", event.logical_key),
+                    );
                 }
             }
         }
