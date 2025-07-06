@@ -10,20 +10,11 @@ use winit::event_loop::ActiveEventLoop;
 use winit::window::WindowId;
 
 /// Main application struct that handles window events and rendering
+#[derive(Default)]
 pub struct App {
     state: Option<State>,
     config: AppConfig,
     is_running: bool,
-}
-
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            state: None,
-            config: AppConfig::default(),
-            is_running: false,
-        }
-    }
 }
 
 impl ApplicationHandler for App {
@@ -91,8 +82,6 @@ impl App {
         }
     }
 
-    /// Returns whether the application is currently running
-
     pub fn is_running(&self) -> bool {
         self.is_running
     }
@@ -138,9 +127,9 @@ impl App {
 
         trace(
             LOG_MODULE_NAME,
-            &format!("Resizing window to {}x{}", width, height),
+            &format!("Resizing window to {width}x{height}"),
         );
-        
+
         if let Err(resize_error) = state.resize(width, height) {
             error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
         }
