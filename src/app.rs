@@ -47,7 +47,8 @@ impl ApplicationHandler for App {
                 .expect("Failed to create window"),
         );
 
-        let state = pollster::block_on(State::new(Arc::clone(&window)));
+        let state = pollster::block_on(State::new(Arc::clone(&window)))
+            .expect("Failed to create GPU state");
         self.state = Some(state);
         self.is_running = true;
         info(LOG_MODULE_NAME, "Application initialized successfully");
@@ -139,7 +140,10 @@ impl App {
             LOG_MODULE_NAME,
             &format!("Resizing window to {}x{}", width, height),
         );
-        state.resize(width, height);
+        
+        if let Err(resize_error) = state.resize(width, height) {
+            error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
+        }
     }
 
     /// Handles keyboard input events

@@ -3,8 +3,14 @@ use std::sync::Arc;
 use asn_logger::trace;
 use winit::window::Window;
 
-use crate::{data::LOG_MODULE_NAME, wgpu_utils::get_render_pipeline};
+use crate::{
+    data::{DEFAULT_CLEAR_COLOR, MIN_WINDOW_SIZE},
+    data::LOG_MODULE_NAME,
+    wgpu_utils::get_render_pipeline,
+    state_error::StateError,
+};
 
+/// Состояние GPU и рендеринга
 pub struct State {
     surface: wgpu::Surface<'static>,
     device: wgpu::Device,
@@ -16,18 +22,31 @@ pub struct State {
 }
 
 impl State {
-    pub async fn new(window: Arc<Window>) -> Self {
-        trace(LOG_MODULE_NAME, "new State");
+    /// Создает новое состояние GPU с указанным окном
+    /// 
+    /// # Arguments
+    /// * `window` - Окно для рендеринга
+    /// 
+    /// # Returns
+    /// * `Result<Self, StateError>` - Новое состояние или ошибка
+    pub async fn new(window: Arc<Window>) -> Result<Self, StateError> {
+        trace(LOG_MODULE_NAME, "Creating new State");
 
         let size = window.inner_size();
+        trace(LOG_MODULE_NAME, &format!("window size: {size:?}"));
 
-        trace(LOG_MODULE_NAME, format!("window size: {size:?}").as_str());
+        // Валидация размера окна
+        if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
+            return Err(StateError::InvalidWindowSize {
+                width: size.width,
+                height: size.height,
+            });
+        }
 
-        let b = wgpu::Instance::enabled_backend_features();
-        trace(LOG_MODULE_NAME, format!("backend_features: {b:?}").as_str());
+        let backend_features = wgpu::Instance::enabled_backend_features();
+        trace(LOG_MODULE_NAME, &format!("backend_features: {backend_features:?}"));
 
-        // The instance is a handle to our GPU
-        // BackendBit::PRIMARY => Vulkan + Metal + DX12 + Browser WebGPU
+        // Создание экземпляра GPU
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
             #[cfg(not(target_arch = "wasm32"))]
             backends: wgpu::Backends::PRIMARY,
@@ -36,25 +55,26 @@ impl State {
             ..Default::default()
         });
 
-        let surface = instance.create_surface(window.clone()).unwrap();
+        // Создание поверхности
+        let surface = instance
+            .create_surface(window.clone())
+            .map_err(|e| StateError::SurfaceCreation(e.to_string()))?;
 
-        let Ok(adapter) = instance
+        // Поиск подходящего адаптера
+        let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
             })
             .await
-        else {
-            todo!()
-        };
+            .map_err(|_| StateError::NoAdapter)?;
 
-        let Ok((device, queue)) = adapter
+        // Создание устройства и очереди
+        let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
-                label: None,
+                label: Some("ASN WGPU Device"),
                 required_features: wgpu::Features::empty(),
-                // WebGL doesn't support all of wgpu's features, so if
-                // we're building for the web we'll have to disable some.
                 required_limits: if cfg!(target_arch = "wasm32") {
                     wgpu::Limits::downlevel_webgl2_defaults()
                 } else {
@@ -64,14 +84,10 @@ impl State {
                 trace: wgpu::Trace::Off,
             })
             .await
-        else {
-            todo!()
-        };
+            .map_err(|e| StateError::DeviceCreation(e.to_string()))?;
 
+        // Настройка поверхности
         let surface_caps = surface.get_capabilities(&adapter);
-        // Shader code in this tutorial assumes an sRGB surface texture. Using a different
-        // one will result in all the colors coming out darker. If you want to support non
-        // sRGB surfaces, you'll need to account for that when drawing to the frame.
         let surface_format = surface_caps
             .formats
             .iter()
@@ -92,7 +108,9 @@ impl State {
 
         let render_pipeline = get_render_pipeline(&device, surface_format);
 
-        Self {
+        trace(LOG_MODULE_NAME, "State created successfully");
+
+        Ok(Self {
             surface,
             device,
             queue,
@@ -100,38 +118,49 @@ impl State {
             is_surface_configured: false,
             render_pipeline,
             window,
-        }
+        })
     }
 
-    pub fn resize(&mut self, width: u32, height: u32) {
-        trace(LOG_MODULE_NAME, format!("resize {width} {height}").as_str());
+    /// Изменяет размер поверхности рендеринга
+    /// 
+    /// # Arguments
+    /// * `width` - Новая ширина
+    /// * `height` - Новая высота
+    pub fn resize(&mut self, width: u32, height: u32) -> Result<(), StateError> {
+        trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
 
-        if width > 0 && height > 0 {
-            self.config.width = width;
-            self.config.height = height;
-            self.surface.configure(&self.device, &self.config);
-            self.is_surface_configured = true;
+        // Валидация размеров
+        if width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE {
+            return Err(StateError::InvalidWindowSize { width, height });
         }
-        // We'll do stuff here in the next tutorial
-    }
 
-    pub fn restore(&mut self) -> Result<(), String> {
-        let size = self.window.inner_size();
-        self.resize(size.width, size.height);
+        self.config.width = width;
+        self.config.height = height;
+        self.surface.configure(&self.device, &self.config);
+        self.is_surface_configured = true;
 
         Ok(())
     }
 
-    pub fn render(&mut self) -> Result<(), String> {
-        // trace(LOG_MODULE_NAME, "render");
+    /// Восстанавливает состояние после потери контекста
+    pub fn restore(&mut self) -> Result<(), StateError> {
+        let size = self.window.inner_size();
+        self.resize(size.width, size.height)
+    }
+
+    /// Рендерит кадр
+    pub fn render(&mut self) -> Result<(), StateError> {
         self.window.request_redraw();
 
-        // We can't render unless the surface is configured
+        // Проверка готовности поверхности
         if !self.is_surface_configured {
             return Ok(());
         }
 
-        let output = self.surface.get_current_texture().unwrap();
+        let output = self
+            .surface
+            .get_current_texture()
+            .map_err(|e| StateError::TextureError(e.to_string()))?;
 
         let view = output
             .texture
@@ -150,12 +179,7 @@ impl State {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
+                        load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
@@ -164,15 +188,23 @@ impl State {
                 timestamp_writes: None,
             });
 
-            // NEW!
-            render_pass.set_pipeline(&self.render_pipeline); // 2.
-            render_pass.draw(0..3, 0..1); // 3.
+            render_pass.set_pipeline(&self.render_pipeline);
+            render_pass.draw(0..3, 0..1);
         }
 
-        // submit will accept anything that implements IntoIter
         self.queue.submit(std::iter::once(encoder.finish()));
         output.present();
 
         Ok(())
+    }
+
+    /// Возвращает размер окна
+    pub fn window_size(&self) -> winit::dpi::PhysicalSize<u32> {
+        self.window.inner_size()
+    }
+
+    /// Проверяет, настроена ли поверхность
+    pub fn is_configured(&self) -> bool {
+        self.is_surface_configured
     }
 }
