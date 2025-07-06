@@ -4,10 +4,10 @@ use asn_logger::trace;
 use winit::window::Window;
 
 use crate::{
-    data::{DEFAULT_CLEAR_COLOR, MIN_WINDOW_SIZE},
     data::LOG_MODULE_NAME,
-    wgpu_utils::get_render_pipeline,
+    data::{DEFAULT_CLEAR_COLOR, MIN_WINDOW_SIZE},
     state_error::StateError,
+    wgpu_utils::get_render_pipeline,
 };
 
 /// Состояние GPU и рендеринга
@@ -23,10 +23,10 @@ pub struct State {
 
 impl State {
     /// Создает новое состояние GPU с указанным окном
-    /// 
+    ///
     /// # Arguments
     /// * `window` - Окно для рендеринга
-    /// 
+    ///
     /// # Returns
     /// * `Result<Self, StateError>` - Новое состояние или ошибка
     pub async fn new(window: Arc<Window>) -> Result<Self, StateError> {
@@ -44,7 +44,10 @@ impl State {
         }
 
         let backend_features = wgpu::Instance::enabled_backend_features();
-        trace(LOG_MODULE_NAME, &format!("backend_features: {backend_features:?}"));
+        trace(
+            LOG_MODULE_NAME,
+            &format!("backend_features: {backend_features:?}"),
+        );
 
         // Создание экземпляра GPU
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
@@ -122,7 +125,7 @@ impl State {
     }
 
     /// Изменяет размер поверхности рендеринга
-    /// 
+    ///
     /// # Arguments
     /// * `width` - Новая ширина
     /// * `height` - Новая высота

@@ -13,4 +13,4 @@ pub enum StateError {
     TextureError(String),
     #[error("Invalid window size: {width}x{height}")]
     InvalidWindowSize { width: u32, height: u32 },
-} 
+}
