@@ -35,10 +35,9 @@ pub fn run_with_config(config: AppConfig) -> Result<(), Box<dyn std::error::Erro
         }
         Err(e) => {
             error(LOG_MODULE_NAME, &e.to_string());
-            Err(Box::new(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Application error: {e}"),
-            )))
+            Err(Box::new(std::io::Error::other(format!(
+                "Application error: {e}"
+            ))))
         }
     }
 }
