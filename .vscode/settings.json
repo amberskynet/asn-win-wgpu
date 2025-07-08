@@ -23,6 +23,7 @@
   },
   
   "rust-analyzer.assist.emitMustUse": true,
+  "rust-analyzer.checkOnSave": true,
   "rust-analyzer.checkOnSave.command": "clippy",
   "rust-analyzer.cargo.buildScripts.enable": true,
   "rust-analyzer.lens.enable": true,

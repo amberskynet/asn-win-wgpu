@@ -19,4 +19,4 @@ pub const SHADER_LABEL: &str = "ASN Shader";
 pub const PIPELINE_LAYOUT_LABEL: &str = "ASN Render Pipeline Layout";
 pub const PIPELINE_LABEL: &str = "ASN Render Pipeline";
 pub const ENCODER_LABEL: &str = "ASN Render Encoder";
-pub const RENDER_PASS_LABEL: &str = "ASN Render Pass"; 
+pub const RENDER_PASS_LABEL: &str = "ASN Render Pass";
