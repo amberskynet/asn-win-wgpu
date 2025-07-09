@@ -21,6 +21,13 @@ pub struct State {
     window: Arc<Window>,
 }
 
+/// Контекст рендера для split pass
+pub struct RenderContext {
+    pub output: wgpu::SurfaceTexture,
+    pub encoder: wgpu::CommandEncoder,
+    pub view: wgpu::TextureView,
+}
+
 impl State {
     /// Создает новое состояние GPU с указанным окном
     ///
@@ -151,53 +158,52 @@ impl State {
         self.resize(size.width, size.height)
     }
 
-    /// Рендерит кадр
-    pub fn render(&mut self) -> Result<(), StateError> {
+    /// Начинает рендер-проход, возвращает RenderContext
+    pub fn draw_start(&mut self) -> Result<RenderContext, StateError> {
         self.window.request_redraw();
-
-        // Проверка готовности поверхности
         if !self.is_surface_configured {
-            return Ok(());
+            return Err(StateError::TextureError("Surface not configured".to_string()));
         }
-
         let output = self
             .surface
             .get_current_texture()
             .map_err(|e| StateError::TextureError(e.to_string()))?;
-
         let view = output
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
-
-        let mut encoder = self
+        let encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
+        Ok(RenderContext { output, encoder, view })
+    }
 
-        {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: None,
-                occlusion_query_set: None,
-                timestamp_writes: None,
-            });
+    /// Завершает рендер-проход, сабмитит команды и презентует output
+    pub fn draw_end(&mut self, ctx: RenderContext) -> Result<(), StateError> {
+        self.queue.submit(std::iter::once(ctx.encoder.finish()));
+        ctx.output.present();
+        Ok(())
+    }
 
-            render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.draw(0..3, 0..1);
-        }
+    pub fn draw(&mut self, ctx: &mut RenderContext) -> Result<(), StateError> {
+        let mut render_pass = ctx.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("Render Pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &ctx.view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
+                    store: wgpu::StoreOp::Store,
+                },
+            })],
+            depth_stencil_attachment: None,
+            occlusion_query_set: None,
+            timestamp_writes: None,
+        });
 
-        self.queue.submit(std::iter::once(encoder.finish()));
-        output.present();
-
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.draw(0..3, 0..1);
         Ok(())
     }
 
