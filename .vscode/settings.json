@@ -26,7 +26,7 @@
   "rust-analyzer.checkOnSave": true,
   "rust-analyzer.checkOnSave.command": "clippy",
   "rust-analyzer.cargo.buildScripts.enable": true,
-  "rust-analyzer.lens.enable": true,
+  "rust-analyzer.lens.enable": false,
   "rust-analyzer.lens.implementations.enable": true,
   "rust-analyzer.lens.references.adt.enable": true,
   "rust-analyzer.lens.references.trait.enable": true,
