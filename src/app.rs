@@ -105,15 +105,36 @@ impl App {
             return;
         };
 
-        if let Err(render_error) = state.render() {
-            error(LOG_MODULE_NAME, &format!("Render failed: {render_error}"));
-
-            // Try to restore the surface if rendering failed
-            if let Err(restore_error) = state.restore() {
-                error(
-                    LOG_MODULE_NAME,
-                    &format!("Surface restore failed: {restore_error}"),
-                );
+        match state.draw_start() {
+            Ok(mut ctx) => {
+                if let Err(draw_error) = state.draw(&mut ctx) {
+                    error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
+                    if let Err(restore_error) = state.restore() {
+                        error(
+                            LOG_MODULE_NAME,
+                            &format!("Surface restore failed: {restore_error}"),
+                        );
+                    }
+                    return;
+                }
+                if let Err(end_error) = state.draw_end(ctx) {
+                    error(LOG_MODULE_NAME, &format!("Draw end failed: {end_error}"));
+                    if let Err(restore_error) = state.restore() {
+                        error(
+                            LOG_MODULE_NAME,
+                            &format!("Surface restore failed: {restore_error}"),
+                        );
+                    }
+                }
+            }
+            Err(start_error) => {
+                error(LOG_MODULE_NAME, &format!("Draw start failed: {start_error}"));
+                if let Err(restore_error) = state.restore() {
+                    error(
+                        LOG_MODULE_NAME,
+                        &format!("Surface restore failed: {restore_error}"),
+                    );
+                }
             }
         }
     }
