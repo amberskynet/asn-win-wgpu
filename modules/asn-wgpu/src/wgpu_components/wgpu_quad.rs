@@ -1,5 +1,6 @@
 use asn_logger::trace;
-use crate::data::LOG_MODULE_NAME;
+
+const LOG_MODULE_NAME: &str = "wgpu_quad";
 
 pub struct WgpuQuad {
     render_pipeline: wgpu::RenderPipeline,
