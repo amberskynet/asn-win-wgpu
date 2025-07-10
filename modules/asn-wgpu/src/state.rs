@@ -18,7 +18,6 @@ pub struct State {
     config: wgpu::SurfaceConfiguration,
     is_surface_configured: bool,
     window: Arc<Window>,
-    render_pipeline: wgpu::RenderPipeline,
     quad: wgpu_quad::WgpuQuad,
 }
 
@@ -121,7 +120,7 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_quad::WgpuQuad::new(render_pipeline.clone());
+        let quad = wgpu_quad::WgpuQuad::new(render_pipeline);
         
         Ok(Self {
             surface,
@@ -129,7 +128,6 @@ impl State {
             queue,
             config,
             is_surface_configured: false,
-            render_pipeline,
             window,
             quad,
         })
@@ -212,8 +210,7 @@ impl State {
             timestamp_writes: None,
         });
 
-        render_pass.set_pipeline(&self.render_pipeline);
-        render_pass.draw(0..3, 0..1);
+        self.quad.draw(&mut render_pass);
         Ok(())
     }
 
