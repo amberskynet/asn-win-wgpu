@@ -4,9 +4,9 @@ use asn_logger::trace;
 use winit::window::Window;
 
 use crate::{
-    data::LOG_MODULE_NAME,
-    data::{DEFAULT_CLEAR_COLOR, MIN_WINDOW_SIZE},
+    data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
+    wgpu_components::wgpu_quad,
     wgpu_utils::get_render_pipeline,
 };
 
@@ -17,8 +17,9 @@ pub struct State {
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     is_surface_configured: bool,
-    render_pipeline: wgpu::RenderPipeline,
     window: Arc<Window>,
+    render_pipeline: wgpu::RenderPipeline,
+    quad: wgpu_quad::WgpuQuad,
 }
 
 /// Контекст рендера для split pass
@@ -120,6 +121,8 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
+        let quad = wgpu_quad::WgpuQuad::new(render_pipeline.clone());
+        
         Ok(Self {
             surface,
             device,
@@ -128,6 +131,7 @@ impl State {
             is_surface_configured: false,
             render_pipeline,
             window,
+            quad,
         })
     }
 
@@ -162,7 +166,9 @@ impl State {
     pub fn draw_start(&mut self) -> Result<RenderContext, StateError> {
         self.window.request_redraw();
         if !self.is_surface_configured {
-            return Err(StateError::TextureError("Surface not configured".to_string()));
+            return Err(StateError::TextureError(
+                "Surface not configured".to_string(),
+            ));
         }
         let output = self
             .surface
@@ -176,7 +182,11 @@ impl State {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
-        Ok(RenderContext { output, encoder, view })
+        Ok(RenderContext {
+            output,
+            encoder,
+            view,
+        })
     }
 
     /// Завершает рендер-проход, сабмитит команды и презентует output
