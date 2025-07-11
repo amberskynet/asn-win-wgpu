@@ -12,3 +12,9 @@ impl AsnNodeQuad {
         trace(LOG_MODULE_NAME, format!("draw").as_str());
     }
 }
+
+impl AsnNodeQuad {
+    pub fn update(&mut self) {
+        trace(LOG_MODULE_NAME, format!("update").as_str());
+    }
+}
