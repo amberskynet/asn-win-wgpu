@@ -7,7 +7,6 @@ use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
     wgpu_components::wgpu_quad,
-    wgpu_utils::get_render_pipeline,
 };
 
 /// Состояние GPU и рендеринга
@@ -119,7 +118,7 @@ impl State {
         trace(LOG_MODULE_NAME, "State created successfully");
 
         let quad = wgpu_quad::WgpuQuad::new(&device, surface_format, include_str!("shader.wgsl"));
-        
+
         Ok(Self {
             surface,
             device,
@@ -178,6 +177,7 @@ impl State {
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
+
         Ok(RenderContext {
             output,
             encoder,
