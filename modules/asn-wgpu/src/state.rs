@@ -7,7 +7,6 @@ use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
     wgpu_components::wgpu_quad,
-    wgpu_utils::get_render_pipeline,
 };
 
 /// Состояние GPU и рендеринга
@@ -19,13 +18,6 @@ pub struct State {
     is_surface_configured: bool,
     window: Arc<Window>,
     quad: wgpu_quad::WgpuQuad,
-}
-
-/// Контекст рендера для split pass
-pub struct RenderContext {
-    pub output: wgpu::SurfaceTexture,
-    pub encoder: wgpu::CommandEncoder,
-    pub view: wgpu::TextureView,
 }
 
 /// Контекст рендера для split pass
