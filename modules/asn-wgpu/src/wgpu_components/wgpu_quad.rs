@@ -1,4 +1,5 @@
 use asn_logger::trace;
+use crate::wgpu_utils::get_render_pipeline;
 
 const LOG_MODULE_NAME: &str = "wgpu_quad";
 
@@ -7,7 +8,12 @@ pub struct WgpuQuad {
 }
 
 impl WgpuQuad {
-    pub fn new(render_pipeline: wgpu::RenderPipeline) -> Self {
+    pub fn new(
+        device: &wgpu::Device,
+        format: wgpu::TextureFormat,
+        shader_source: &str,
+    ) -> Self {
+        let render_pipeline = get_render_pipeline(device, format, shader_source);
         WgpuQuad { render_pipeline }
     }
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {

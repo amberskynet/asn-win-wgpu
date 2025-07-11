@@ -116,11 +116,9 @@ impl State {
             desired_maximum_frame_latency: 2,
         };
 
-        let render_pipeline = get_render_pipeline(&device, surface_format, include_str!("shader.wgsl"));
-
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_quad::WgpuQuad::new(render_pipeline);
+        let quad = wgpu_quad::WgpuQuad::new(&device, surface_format, include_str!("shader.wgsl"));
         
         Ok(Self {
             surface,
