@@ -3,16 +3,18 @@
 /// # Arguments
 /// * `device` - GPU устройство
 /// * `format` - Формат текстуры поверхности
+/// * `shader_source` - Исходный код шейдера в формате WGSL
 /// 
 /// # Returns
 /// * `wgpu::RenderPipeline` - Созданный рендер пайплайн
 pub fn get_render_pipeline(
     device: &wgpu::Device,
     format: wgpu::TextureFormat,
+    shader_source: &str,
 ) -> wgpu::RenderPipeline {
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
         label: Some("ASN Shader"),
-        source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+        source: wgpu::ShaderSource::Wgsl(shader_source.into()),
     });
 
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
