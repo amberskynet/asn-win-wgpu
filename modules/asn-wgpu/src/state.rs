@@ -117,7 +117,8 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_quad::WgpuQuad::new(&device, surface_format, include_str!("shader.wgsl"));
+        let quad =
+            wgpu_quad::WgpuQuad::new(&device, surface_format, include_str!("color_triangle.wgsl"));
 
         Ok(Self {
             surface,

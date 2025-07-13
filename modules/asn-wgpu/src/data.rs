@@ -1,3 +1,5 @@
+use crate::vertex::Vertex;
+
 pub const LOG_MODULE_NAME: &str = "asn-wgpu";
 /// Константы для настройки рендеринга
 pub const DEFAULT_CLEAR_COLOR: wgpu::Color = wgpu::Color {
@@ -6,6 +8,21 @@ pub const DEFAULT_CLEAR_COLOR: wgpu::Color = wgpu::Color {
     b: 0.3,
     a: 1.0,
 };
+
+pub const VERTICES: &[Vertex] = &[
+    Vertex {
+        position: [0.0, 0.5, 0.0],
+        color: [1.0, 0.0, 0.0],
+    },
+    Vertex {
+        position: [-0.5, -0.5, 0.0],
+        color: [0.0, 1.0, 0.0],
+    },
+    Vertex {
+        position: [0.5, -0.5, 0.0],
+        color: [0.0, 0.0, 1.0],
+    },
+];
 
 /// Минимальный размер окна
 pub const MIN_WINDOW_SIZE: u32 = 1;

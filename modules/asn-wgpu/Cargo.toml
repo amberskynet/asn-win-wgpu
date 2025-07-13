@@ -8,6 +8,7 @@ winit = { version = "0.30" }
 asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "2.1.1", features = [] }
 asn-node-quad = { path = "../asn-node-quad" }
 thiserror = "1.0"
+bytemuck = { version = "1.16", features = [ "derive" ] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 wgpu = { version = "25.0" }

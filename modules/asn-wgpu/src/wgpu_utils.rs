@@ -1,10 +1,12 @@
+use crate::vertex::Vertex;
+
 /// Создает рендер пайплайн для GPU
-/// 
+///
 /// # Arguments
 /// * `device` - GPU устройство
 /// * `format` - Формат текстуры поверхности
 /// * `shader_source` - Исходный код шейдера в формате WGSL
-/// 
+///
 /// # Returns
 /// * `wgpu::RenderPipeline` - Созданный рендер пайплайн
 pub fn get_render_pipeline(
@@ -29,7 +31,7 @@ pub fn get_render_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
-            buffers: &[],
+            buffers: &[Vertex::desc()],
             compilation_options: wgpu::PipelineCompilationOptions::default(),
         },
         fragment: Some(wgpu::FragmentState {
@@ -61,6 +63,6 @@ pub fn get_render_pipeline(
         multiview: None,
         cache: None,
     });
-    
+
     render_pipeline
 }
