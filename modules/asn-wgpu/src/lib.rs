@@ -2,7 +2,6 @@ pub mod state;
 pub mod state_error;
 
 mod data;
-mod vertex;
 mod wgpu_components;
 mod wgpu_utils;
 

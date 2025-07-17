@@ -1,11 +1,11 @@
-use crate::{
-    data::{INDICES, VERTICES},
-    wgpu_utils::get_render_pipeline,
-};
-use asn_logger::trace;
-use wgpu::util::DeviceExt;
+mod data;
+mod utils;
+mod vertex;
 
-const LOG_MODULE_NAME: &str = "wgpu_quad";
+use asn_logger::trace;
+use data::{INDICES, LOG_MODULE_NAME, VERTICES};
+use utils::get_render_pipeline;
+use wgpu::util::DeviceExt;
 
 pub struct WgpuQuad {
     render_pipeline: wgpu::RenderPipeline,
