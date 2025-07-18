@@ -7,14 +7,14 @@ use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
 
-pub struct WgpuQuad {
+pub struct WgpuQuadTextured {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
     num_indices: u32,
 }
 
-impl WgpuQuad {
+impl WgpuQuadTextured {
     pub fn new(device: &wgpu::Device, format: wgpu::TextureFormat, shader_source: &str) -> Self {
         let render_pipeline = get_render_pipeline(device, format, shader_source);
 
@@ -32,7 +32,7 @@ impl WgpuQuad {
 
         let num_indices = INDICES.len() as u32;
 
-        WgpuQuad {
+        Self {
             render_pipeline,
             vertex_buffer,
             index_buffer,

@@ -9,3 +9,4 @@ pub use state::State;
 pub use state_error::StateError;
 
 pub use wgpu_components::wgpu_mesh_color::WgpuQuad;
+pub use wgpu_components::wgpu_mesh_textured::WgpuQuadTextured;
