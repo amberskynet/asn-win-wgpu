@@ -6,7 +6,7 @@ use winit::window::Window;
 use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
-    wgpu_components::wgpu_color_mesh,
+    wgpu_components::wgpu_mesh_color,
 };
 
 /// Состояние GPU и рендеринга
@@ -17,7 +17,7 @@ pub struct State {
     config: wgpu::SurfaceConfiguration,
     is_surface_configured: bool,
     window: Arc<Window>,
-    quad: wgpu_color_mesh::WgpuQuad,
+    quad: wgpu_mesh_color::WgpuQuad,
 }
 
 /// Контекст рендера для split pass
@@ -117,7 +117,7 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_color_mesh::WgpuQuad::new(
+        let quad = wgpu_mesh_color::WgpuQuad::new(
             &device,
             surface_format,
             include_str!("color_triangle.wgsl"),

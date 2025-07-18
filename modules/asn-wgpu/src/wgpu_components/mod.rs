@@ -1,1 +1,1 @@
-pub mod wgpu_color_mesh;
+pub mod wgpu_mesh_color;
