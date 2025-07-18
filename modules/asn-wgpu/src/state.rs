@@ -124,11 +124,14 @@ impl State {
             include_str!("color_triangle.wgsl"),
         );
 
+        let diffuse_bytes = include_bytes!("happy-tree.png");
+
         let quad_textured = wgpu_mesh_textured::WgpuQuadTextured::new(
             &device,
             &queue,
             surface_format,
             include_str!("textured_triangle.wgsl"),
+            diffuse_bytes,
         );
 
         Ok(Self {

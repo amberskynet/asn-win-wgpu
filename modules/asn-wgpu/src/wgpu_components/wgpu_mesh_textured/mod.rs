@@ -2,18 +2,20 @@ mod data;
 mod utils;
 mod vertex;
 
+use crate::texture;
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
 
-use crate::wgpu_utils::{get_texture_bind_group, get_texture_bind_group_layout};
+use crate::wgpu_utils::get_texture_bind_group_layout;
 
 pub struct WgpuQuadTextured {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
+    diffuse_texture: texture::Texture,
     num_indices: u32,
 }
 
@@ -23,7 +25,11 @@ impl WgpuQuadTextured {
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         shader_source: &str,
+        texture_bytes: &[u8],
     ) -> Self {
+        let diffuse_texture =
+            texture::Texture::from_bytes(&device, &queue, texture_bytes, "happy-tree.png").unwrap();
+
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
             contents: bytemuck::cast_slice(VERTICES),
@@ -40,8 +46,20 @@ impl WgpuQuadTextured {
 
         let texture_bind_group_layout = get_texture_bind_group_layout(&device);
 
-        let diffuse_bind_group =
-            get_texture_bind_group(&device, &queue, &texture_bind_group_layout);
+        let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &texture_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                },
+            ],
+            label: Some("diffuse_bind_group"),
+        });
 
         let render_pipeline =
             get_render_pipeline(device, format, &texture_bind_group_layout, shader_source);
@@ -52,6 +70,7 @@ impl WgpuQuadTextured {
             index_buffer,
             num_indices,
             diffuse_bind_group,
+            diffuse_texture,
         }
     }
 
