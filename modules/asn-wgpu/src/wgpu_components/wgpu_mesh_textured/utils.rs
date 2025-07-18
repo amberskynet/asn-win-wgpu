@@ -12,6 +12,7 @@ use super::vertex::Vertex;
 pub fn get_render_pipeline(
     device: &wgpu::Device,
     format: wgpu::TextureFormat,
+    texture_bind_group_layout: &wgpu::BindGroupLayout,
     shader_source: &str,
 ) -> wgpu::RenderPipeline {
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -21,7 +22,7 @@ pub fn get_render_pipeline(
 
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("ASN Render Pipeline Layout"),
-        bind_group_layouts: &[],
+        bind_group_layouts: &[&texture_bind_group_layout], // NEW!
         push_constant_ranges: &[],
     });
 

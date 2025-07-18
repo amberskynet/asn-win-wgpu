@@ -1,13 +1,38 @@
-use wgpu::util::DeviceExt;
+use wgpu::BindGroup;
 
-pub fn get_texture(
+pub fn get_texture_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLayout {
+    let texture_bind_group_layout =
+        device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    // This should match the filterable field of the
+                    // corresponding Texture entry above.
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+            label: Some("texture_bind_group_layout"),
+        });
+    texture_bind_group_layout
+}
+
+pub fn get_texture_bind_group(
     device: &wgpu::Device,
-    config: &wgpu::SurfaceConfiguration,
-    size: wgpu::Extent3d,
     queue: &wgpu::Queue,
-    format: wgpu::TextureFormat,
-    usage: wgpu::TextureUsages,
-) -> wgpu::Texture {
+    texture_bind_group_layout: &wgpu::BindGroupLayout,
+) -> wgpu::BindGroup {
     let diffuse_bytes = include_bytes!("happy-tree.png");
     let diffuse_image = image::load_from_memory(diffuse_bytes).unwrap();
     let diffuse_rgba = diffuse_image.to_rgba8();
@@ -63,36 +88,6 @@ pub fn get_texture(
         texture_size,
     );
 
-    let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Temp Buffer"),
-        contents: &diffuse_rgba,
-        usage: wgpu::BufferUsages::COPY_SRC,
-    });
-
-    let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-        label: Some("texture_buffer_copy_encoder"),
-    });
-
-    encoder.copy_buffer_to_texture(
-        wgpu::TexelCopyBufferInfo {
-            buffer: &buffer,
-            layout: wgpu::TexelCopyBufferLayout {
-                offset: 0,
-                bytes_per_row: Some(4 * dimensions.0),
-                rows_per_image: Some(dimensions.1),
-            },
-        },
-        wgpu::TexelCopyTextureInfo {
-            texture: &diffuse_texture,
-            mip_level: 0,
-            origin: wgpu::Origin3d::ZERO,
-            aspect: wgpu::TextureAspect::All,
-        },
-        texture_size,
-    );
-
-    queue.submit(std::iter::once(encoder.finish()));
-
     // We don't need to configure the texture view much, so let's
     // let wgpu define it.
     let diffuse_texture_view = diffuse_texture.create_view(&wgpu::TextureViewDescriptor::default());
@@ -105,31 +100,6 @@ pub fn get_texture(
         mipmap_filter: wgpu::FilterMode::Nearest,
         ..Default::default()
     });
-
-    let texture_bind_group_layout =
-        device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Texture {
-                        multisampled: false,
-                        view_dimension: wgpu::TextureViewDimension::D2,
-                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                    },
-                    count: None,
-                },
-                wgpu::BindGroupLayoutEntry {
-                    binding: 1,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    // This should match the filterable field of the
-                    // corresponding Texture entry above.
-                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                    count: None,
-                },
-            ],
-            label: Some("texture_bind_group_layout"),
-        });
 
     let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
         layout: &texture_bind_group_layout,
@@ -146,5 +116,5 @@ pub fn get_texture(
         label: Some("diffuse_bind_group"),
     });
 
-    diffuse_texture
+    diffuse_bind_group
 }

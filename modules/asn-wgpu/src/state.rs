@@ -126,6 +126,7 @@ impl State {
 
         let quad_textured = wgpu_mesh_textured::WgpuQuadTextured::new(
             &device,
+            &queue,
             surface_format,
             include_str!("textured_triangle.wgsl"),
         );
@@ -220,7 +221,9 @@ impl State {
             timestamp_writes: None,
         });
 
-        self.quad.draw(&mut render_pass);
+        // self.quad.draw(&mut render_pass);
+        self.quad_textured.draw(&mut render_pass);
+
         Ok(())
     }
 
