@@ -1,4 +1,4 @@
-use crate::wgpu_components::wgpu_quad::vertex::Vertex;
+use crate::wgpu_components::wgpu_color_mesh::vertex::Vertex;
 
 pub const LOG_MODULE_NAME: &str = "wgpu_quad";
 

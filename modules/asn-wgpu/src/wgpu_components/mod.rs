@@ -1,1 +1,1 @@
-pub mod wgpu_quad;
+pub mod wgpu_color_mesh;
