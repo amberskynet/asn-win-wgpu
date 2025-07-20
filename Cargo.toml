@@ -2,6 +2,12 @@
 name = "asn-win-wgpu"
 version = "0.1.0"
 edition = "2024"
+authors = ["Amberskynet Team"]
+description = "Modern window system implementation using Winit + WGPU"
+license = "MIT"
+repository = "https://github.com/amberskynet/asn-win-wgpu"
+keywords = ["wgpu", "winit", "graphics", "window", "rendering"]
+categories = ["rendering", "gui"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -12,3 +18,16 @@ asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = 
 asn-wgpu = { path = "./modules/asn-wgpu" }
 asn-node-quad = { path = "./modules/asn-node-quad" }
 pollster = "0.4"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

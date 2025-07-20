@@ -32,3 +32,42 @@ pub fn custom_config(title: impl Into<String>, width: u32, height: u32, vsync: b
         vsync,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_config() {
+        let config = AppConfig::default();
+        assert_eq!(config.window_title, "ASN WGPU Application");
+        assert_eq!(config.window_width, 800);
+        assert_eq!(config.window_height, 600);
+        assert!(config.vsync);
+    }
+
+    #[test]
+    fn test_custom_config() {
+        let config = AppConfig {
+            window_title: "Test App".to_string(),
+            window_width: 1024,
+            window_height: 768,
+            vsync: false,
+        };
+        
+        assert_eq!(config.window_title, "Test App");
+        assert_eq!(config.window_width, 1024);
+        assert_eq!(config.window_height, 768);
+        assert!(!config.vsync);
+    }
+
+    #[test]
+    fn test_custom_config_builder() {
+        let config = custom_config("Builder Test", 1920, 1080, false);
+        
+        assert_eq!(config.window_title, "Builder Test");
+        assert_eq!(config.window_width, 1920);
+        assert_eq!(config.window_height, 1080);
+        assert!(!config.vsync);
+    }
+}

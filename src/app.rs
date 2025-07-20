@@ -105,37 +105,38 @@ impl App {
             return;
         };
 
+        // Start render pass
         match state.draw_start() {
             Ok(mut ctx) => {
+                // Perform rendering
                 if let Err(draw_error) = state.draw(&mut ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
-                    if let Err(restore_error) = state.restore() {
-                        error(
-                            LOG_MODULE_NAME,
-                            &format!("Surface restore failed: {restore_error}"),
-                        );
-                    }
+                    Self::try_restore(state);
                     return;
                 }
+                
+                // End render pass
                 if let Err(end_error) = state.draw_end(ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw end failed: {end_error}"));
-                    if let Err(restore_error) = state.restore() {
-                        error(
-                            LOG_MODULE_NAME,
-                            &format!("Surface restore failed: {restore_error}"),
-                        );
-                    }
+                    Self::try_restore(state);
                 }
             }
             Err(start_error) => {
                 error(LOG_MODULE_NAME, &format!("Draw start failed: {start_error}"));
-                if let Err(restore_error) = state.restore() {
-                    error(
-                        LOG_MODULE_NAME,
-                        &format!("Surface restore failed: {restore_error}"),
-                    );
-                }
+                Self::try_restore(state);
             }
+        }
+    }
+
+    /// Handles render errors by attempting to restore the surface
+    fn try_restore(state: &mut State) {
+        if let Err(restore_error) = state.restore() {
+            error(
+                LOG_MODULE_NAME,
+                &format!("Surface restore failed: {restore_error}"),
+            );
+        } else {
+            info(LOG_MODULE_NAME, "Surface restored successfully after error");
         }
     }
 
