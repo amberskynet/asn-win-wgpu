@@ -1,3 +1,10 @@
+/// Creates a texture bind group layout for texture rendering
+///
+/// # Arguments
+/// * `device` - GPU device
+///
+/// # Returns
+/// * `wgpu::BindGroupLayout` - Texture bind group layout
 pub fn get_texture_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLayout {
     let texture_bind_group_layout =
         device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
