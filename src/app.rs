@@ -2,7 +2,7 @@ use crate::asn_win_config::AppConfig;
 use crate::data::LOG_MODULE_NAME;
 use std::sync::Arc;
 
-use asn_logger::{error, info, trace};
+use asn_logger::{error, info, trace, warn};
 use asn_wgpu::State;
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
@@ -15,6 +15,7 @@ pub struct App {
     state: Option<State>,
     config: AppConfig,
     is_running: bool,
+    frame_count: u64,
 }
 
 impl ApplicationHandler for App {
@@ -30,18 +31,31 @@ impl ApplicationHandler for App {
             .with_inner_size(winit::dpi::LogicalSize::new(
                 self.config.window_width,
                 self.config.window_height,
-            ));
+            ))
+            .with_resizable(true)
+            .with_decorations(true);
 
-        let window = Arc::new(
-            event_loop
-                .create_window(window_attributes)
-                .expect("Failed to create window"),
-        );
+        let window = match event_loop.create_window(window_attributes) {
+            Ok(window) => Arc::new(window),
+            Err(e) => {
+                error(LOG_MODULE_NAME, &format!("Failed to create window: {e}"));
+                event_loop.exit();
+                return;
+            }
+        };
 
-        let state = pollster::block_on(State::new(Arc::clone(&window)))
-            .expect("Failed to create GPU state");
+        let state = match pollster::block_on(State::new(Arc::clone(&window))) {
+            Ok(state) => state,
+            Err(e) => {
+                error(LOG_MODULE_NAME, &format!("Failed to create GPU state: {e}"));
+                event_loop.exit();
+                return;
+            }
+        };
+        
         self.state = Some(state);
         self.is_running = true;
+        self.frame_count = 0;
         info(LOG_MODULE_NAME, "Application initialized successfully");
     }
 
@@ -64,6 +78,12 @@ impl ApplicationHandler for App {
             WindowEvent::KeyboardInput { event, .. } => {
                 self.handle_keyboard_input(event_loop, event);
             }
+            WindowEvent::Focused(focused) => {
+                trace(LOG_MODULE_NAME, &format!("Window focus changed: {focused}"));
+            }
+            WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
+                trace(LOG_MODULE_NAME, &format!("Scale factor changed: {scale_factor}"));
+            }
             _ => {
                 trace(LOG_MODULE_NAME, &format!("Window {id:?} event: {event:?}"));
             }
@@ -79,6 +99,7 @@ impl App {
             state: None,
             config,
             is_running: false,
+            frame_count: 0,
         }
     }
 
@@ -89,6 +110,11 @@ impl App {
     /// Returns a reference to the current configuration
     pub fn config(&self) -> &AppConfig {
         &self.config
+    }
+
+    /// Returns the current frame count
+    pub fn frame_count(&self) -> u64 {
+        self.frame_count
     }
 
     /// Handles application close
@@ -105,37 +131,47 @@ impl App {
             return;
         };
 
+        self.frame_count += 1;
+
+        // Start render pass
         match state.draw_start() {
             Ok(mut ctx) => {
+                // Perform rendering
                 if let Err(draw_error) = state.draw(&mut ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
-                    if let Err(restore_error) = state.restore() {
-                        error(
-                            LOG_MODULE_NAME,
-                            &format!("Surface restore failed: {restore_error}"),
-                        );
-                    }
+                    Self::try_restore(state);
                     return;
                 }
+                
+                // End render pass
                 if let Err(end_error) = state.draw_end(ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw end failed: {end_error}"));
-                    if let Err(restore_error) = state.restore() {
-                        error(
-                            LOG_MODULE_NAME,
-                            &format!("Surface restore failed: {restore_error}"),
-                        );
+                    Self::try_restore(state);
+                } else {
+                    // Log frame rate every 60 frames
+                    if self.frame_count % 60 == 0 {
+                        trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
                     }
                 }
             }
             Err(start_error) => {
                 error(LOG_MODULE_NAME, &format!("Draw start failed: {start_error}"));
-                if let Err(restore_error) = state.restore() {
-                    error(
-                        LOG_MODULE_NAME,
-                        &format!("Surface restore failed: {restore_error}"),
-                    );
-                }
+                Self::try_restore(state);
             }
+        }
+    }
+
+    /// Handles render errors by attempting to restore the surface
+    fn try_restore(state: &mut State) {
+        warn(LOG_MODULE_NAME, "Attempting to restore surface after render error");
+        
+        if let Err(restore_error) = state.restore() {
+            error(
+                LOG_MODULE_NAME,
+                &format!("Surface restore failed: {restore_error}"),
+            );
+        } else {
+            info(LOG_MODULE_NAME, "Surface restored successfully after error");
         }
     }
 
@@ -153,6 +189,8 @@ impl App {
 
         if let Err(resize_error) = state.resize(width, height) {
             error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
+        } else {
+            info(LOG_MODULE_NAME, &format!("Window resized successfully to {width}x{height}"));
         }
     }
 
@@ -173,6 +211,11 @@ impl App {
                 winit::keyboard::Key::Named(winit::keyboard::NamedKey::F11) => {
                     info(LOG_MODULE_NAME, "F11 key pressed - toggling fullscreen");
                     // TODO: Implement fullscreen toggle
+                    warn(LOG_MODULE_NAME, "Fullscreen toggle not yet implemented");
+                }
+                winit::keyboard::Key::Named(winit::keyboard::NamedKey::F1) => {
+                    info(LOG_MODULE_NAME, "F1 key pressed - showing help");
+                    // TODO: Implement help system
                 }
                 _ => {
                     trace(

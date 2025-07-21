@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Instant;
 
 use asn_logger::trace;
 use winit::window::Window;
@@ -6,10 +7,10 @@ use winit::window::Window;
 use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
-    wgpu_components::wgpu_quad,
+    wgpu_components::{wgpu_mesh_color, wgpu_mesh_textured},
 };
 
-/// Состояние GPU и рендеринга
+/// GPU state and rendering management
 pub struct State {
     surface: wgpu::Surface<'static>,
     device: wgpu::Device,
@@ -17,31 +18,42 @@ pub struct State {
     config: wgpu::SurfaceConfiguration,
     is_surface_configured: bool,
     window: Arc<Window>,
-    quad: wgpu_quad::WgpuQuad,
+    quad: wgpu_mesh_color::WgpuQuad,
+    quad_textured: wgpu_mesh_textured::WgpuQuadTextured,
+    render_stats: RenderStats,
 }
 
-/// Контекст рендера для split pass
+/// Performance monitoring statistics
+#[derive(Default)]
+struct RenderStats {
+    frame_count: u32,
+    total_render_time: std::time::Duration,
+    last_frame_time: Option<Instant>,
+}
+
+/// Render context for split pass rendering
 pub struct RenderContext {
     pub output: wgpu::SurfaceTexture,
     pub encoder: wgpu::CommandEncoder,
     pub view: wgpu::TextureView,
+    pub frame_start: Instant,
 }
 
 impl State {
-    /// Создает новое состояние GPU с указанным окном
+    /// Creates new GPU state with specified window
     ///
     /// # Arguments
-    /// * `window` - Окно для рендеринга
+    /// * `window` - Window for rendering
     ///
     /// # Returns
-    /// * `Result<Self, StateError>` - Новое состояние или ошибка
+    /// * `Result<Self, StateError>` - New state or error
     pub async fn new(window: Arc<Window>) -> Result<Self, StateError> {
         trace(LOG_MODULE_NAME, "Creating new State");
 
         let size = window.inner_size();
         trace(LOG_MODULE_NAME, &format!("window size: {size:?}"));
 
-        // Валидация размера окна
+        // Window size validation
         if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
             return Err(StateError::InvalidWindowSize {
                 width: size.width,
@@ -55,7 +67,7 @@ impl State {
             &format!("backend_features: {backend_features:?}"),
         );
 
-        // Создание экземпляра GPU
+        // Create GPU instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
             #[cfg(not(target_arch = "wasm32"))]
             backends: wgpu::Backends::PRIMARY,
@@ -64,12 +76,12 @@ impl State {
             ..Default::default()
         });
 
-        // Создание поверхности
+        // Create surface
         let surface = instance
             .create_surface(window.clone())
             .map_err(|e| StateError::SurfaceCreation(e.to_string()))?;
 
-        // Поиск подходящего адаптера
+        // Find suitable adapter
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::default(),
@@ -79,7 +91,7 @@ impl State {
             .await
             .map_err(|_| StateError::NoAdapter)?;
 
-        // Создание устройства и очереди
+        // Create device and queue
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
                 label: Some("ASN WGPU Device"),
@@ -95,7 +107,7 @@ impl State {
             .await
             .map_err(|e| StateError::DeviceCreation(e.to_string()))?;
 
-        // Настройка поверхности
+        // Configure surface
         let surface_caps = surface.get_capabilities(&adapter);
         let surface_format = surface_caps
             .formats
@@ -117,7 +129,19 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_quad::WgpuQuad::new(&device, surface_format, include_str!("shader.wgsl"));
+        let shader_source = include_str!("color_triangle.wgsl");
+        let quad = wgpu_mesh_color::WgpuQuad::new(&device, surface_format, shader_source);
+
+        let diffuse_bytes = include_bytes!("happy-tree.png");
+        let shader_source = include_str!("textured_triangle.wgsl");
+
+        let quad_textured = wgpu_mesh_textured::WgpuQuadTextured::new(
+            &device,
+            &queue,
+            surface_format,
+            shader_source,
+            diffuse_bytes,
+        );
 
         Ok(Self {
             surface,
@@ -127,18 +151,20 @@ impl State {
             is_surface_configured: false,
             window,
             quad,
+            quad_textured,
+            render_stats: RenderStats::default(),
         })
     }
 
-    /// Изменяет размер поверхности рендеринга
+    /// Resizes the rendering surface
     ///
     /// # Arguments
-    /// * `width` - Новая ширина
-    /// * `height` - Новая высота
+    /// * `width` - New width
+    /// * `height` - New height
     pub fn resize(&mut self, width: u32, height: u32) -> Result<(), StateError> {
         trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
 
-        // Валидация размеров
+        // Size validation
         if width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE {
             return Err(StateError::InvalidWindowSize { width, height });
         }
@@ -151,13 +177,13 @@ impl State {
         Ok(())
     }
 
-    /// Восстанавливает состояние после потери контекста
+    /// Restores state after context loss
     pub fn restore(&mut self) -> Result<(), StateError> {
         let size = self.window.inner_size();
         self.resize(size.width, size.height)
     }
 
-    /// Начинает рендер-проход, возвращает RenderContext
+    /// Starts render pass, returns RenderContext
     pub fn draw_start(&mut self) -> Result<RenderContext, StateError> {
         self.window.request_redraw();
         if !self.is_surface_configured {
@@ -178,20 +204,41 @@ impl State {
                 label: Some("Render Encoder"),
             });
 
+        let frame_start = Instant::now();
+
         Ok(RenderContext {
             output,
             encoder,
             view,
+            frame_start,
         })
     }
 
-    /// Завершает рендер-проход, сабмитит команды и презентует output
+    /// Ends render pass, submits commands and presents output
     pub fn draw_end(&mut self, ctx: RenderContext) -> Result<(), StateError> {
+        let frame_duration = ctx.frame_start.elapsed();
+
+        // Update render statistics
+        self.render_stats.frame_count += 1;
+        self.render_stats.total_render_time += frame_duration;
+
+        // Log performance every 60 frames
+        if self.render_stats.frame_count % 60 == 0 {
+            let avg_frame_time =
+                self.render_stats.total_render_time / self.render_stats.frame_count;
+            let fps = 1.0 / avg_frame_time.as_secs_f64();
+            trace(
+                LOG_MODULE_NAME,
+                &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
+            );
+        }
+
         self.queue.submit(std::iter::once(ctx.encoder.finish()));
         ctx.output.present();
         Ok(())
     }
 
+    /// Performs rendering with the provided context
     pub fn draw(&mut self, ctx: &mut RenderContext) -> Result<(), StateError> {
         let mut render_pass = ctx.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -202,23 +249,46 @@ impl State {
                     load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
                     store: wgpu::StoreOp::Store,
                 },
+                depth_slice: None,
             })],
             depth_stencil_attachment: None,
             occlusion_query_set: None,
             timestamp_writes: None,
         });
 
-        self.quad.draw(&mut render_pass);
+        // self.quad.draw(&mut render_pass);
+        self.quad_textured.draw(&mut render_pass);
+
         Ok(())
     }
 
-    /// Возвращает размер окна
+    /// Returns window size
     pub fn window_size(&self) -> winit::dpi::PhysicalSize<u32> {
         self.window.inner_size()
     }
 
-    /// Проверяет, настроена ли поверхность
+    /// Checks if surface is configured
     pub fn is_configured(&self) -> bool {
         self.is_surface_configured
+    }
+
+    /// Returns current frame count
+    pub fn frame_count(&self) -> u64 {
+        self.render_stats.frame_count as u64
+    }
+
+    /// Returns average frame time
+    pub fn average_frame_time(&self) -> Option<std::time::Duration> {
+        if self.render_stats.frame_count > 0 {
+            Some(self.render_stats.total_render_time / self.render_stats.frame_count)
+        } else {
+            None
+        }
+    }
+
+    /// Returns current FPS
+    pub fn fps(&self) -> Option<f64> {
+        self.average_frame_time()
+            .map(|duration| 1.0 / duration.as_secs_f64())
     }
 }
