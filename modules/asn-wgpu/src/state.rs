@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use asn_logger::{trace, warn};
+use asn_logger::trace;
 use winit::window::Window;
 
 use crate::{
@@ -219,16 +219,20 @@ impl State {
     /// Ends render pass, submits commands and presents output
     pub fn draw_end(&mut self, ctx: RenderContext) -> Result<(), StateError> {
         let frame_duration = ctx.frame_start.elapsed();
-        
+
         // Update render statistics
         self.render_stats.frame_count += 1;
         self.render_stats.total_render_time += frame_duration;
-        
+
         // Log performance every 60 frames
         if self.render_stats.frame_count % 60 == 0 {
-            let avg_frame_time = self.render_stats.total_render_time / self.render_stats.frame_count;
+            let avg_frame_time =
+                self.render_stats.total_render_time / self.render_stats.frame_count;
             let fps = 1.0 / avg_frame_time.as_secs_f64();
-            trace(LOG_MODULE_NAME, &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time));
+            trace(
+                LOG_MODULE_NAME,
+                &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
+            );
         }
 
         self.queue.submit(std::iter::once(ctx.encoder.finish()));
@@ -247,6 +251,7 @@ impl State {
                     load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
                     store: wgpu::StoreOp::Store,
                 },
+                depth_slice: None,
             })],
             depth_stencil_attachment: None,
             occlusion_query_set: None,
@@ -285,6 +290,7 @@ impl State {
 
     /// Returns current FPS
     pub fn fps(&self) -> Option<f64> {
-        self.average_frame_time().map(|duration| 1.0 / duration.as_secs_f64())
+        self.average_frame_time()
+            .map(|duration| 1.0 / duration.as_secs_f64())
     }
 }
