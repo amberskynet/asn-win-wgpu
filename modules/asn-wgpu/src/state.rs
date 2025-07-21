@@ -129,11 +129,8 @@ impl State {
 
         trace(LOG_MODULE_NAME, "State created successfully");
 
-        let quad = wgpu_mesh_color::WgpuQuad::new(
-            &device,
-            surface_format,
-            include_str!("color_triangle.wgsl"),
-        );
+        let shader_source = include_str!("color_triangle.wgsl");
+        let quad = wgpu_mesh_color::WgpuQuad::new(&device, surface_format, shader_source);
 
         let diffuse_bytes = include_bytes!("happy-tree.png");
         let shader_source = include_str!("textured_triangle.wgsl");

@@ -15,7 +15,6 @@ pub struct WgpuQuadTextured {
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
-    diffuse_texture: texture::Texture,
     num_indices: u32,
 }
 
@@ -70,7 +69,6 @@ impl WgpuQuadTextured {
             index_buffer,
             num_indices,
             diffuse_bind_group,
-            diffuse_texture,
         }
     }
 
