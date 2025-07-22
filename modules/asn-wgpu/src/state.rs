@@ -144,6 +144,7 @@ impl State {
             diffuse_bytes,
         );
 
+        let shader_source = include_str!("map_shader.wgsl");
         let map_bytes = include_bytes!("tiles.png");
         let quad_map =
             wgpu_map::WgpuMap::new(&device, &queue, surface_format, shader_source, map_bytes);
