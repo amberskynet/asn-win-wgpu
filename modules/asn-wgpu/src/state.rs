@@ -7,7 +7,7 @@ use winit::window::Window;
 use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
-    wgpu_components::{wgpu_mesh_color, wgpu_mesh_textured},
+    wgpu_components::{wgpu_map, wgpu_mesh_color, wgpu_mesh_textured},
 };
 
 /// GPU state and rendering management
@@ -20,6 +20,7 @@ pub struct State {
     window: Arc<Window>,
     quad: wgpu_mesh_color::WgpuQuad,
     quad_textured: wgpu_mesh_textured::WgpuQuadTextured,
+    quad_map: wgpu_map::WgpuMap,
     render_stats: RenderStats,
 }
 
@@ -143,6 +144,10 @@ impl State {
             diffuse_bytes,
         );
 
+        let map_bytes = include_bytes!("tiles.png");
+        let quad_map =
+            wgpu_map::WgpuMap::new(&device, &queue, surface_format, shader_source, map_bytes);
+
         Ok(Self {
             surface,
             device,
@@ -152,6 +157,7 @@ impl State {
             window,
             quad,
             quad_textured,
+            quad_map,
             render_stats: RenderStats::default(),
         })
     }
@@ -256,8 +262,9 @@ impl State {
             timestamp_writes: None,
         });
 
+        self.quad_map.draw(&mut render_pass);
         // self.quad.draw(&mut render_pass);
-        self.quad_textured.draw(&mut render_pass);
+        // self.quad_textured.draw(&mut render_pass);
 
         Ok(())
     }
