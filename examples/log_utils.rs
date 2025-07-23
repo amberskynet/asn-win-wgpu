@@ -8,16 +8,15 @@ pub fn setup_log() {
 
 
     c.module_levels
-        .insert(String::from("wgpu_core"), AsnLogLevel::Off);
+        .insert(String::from("wgpu_core"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("wgpu_hal"), AsnLogLevel::Off);
+        .insert(String::from("wgpu_hal"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("naga"), AsnLogLevel::Off);
+        .insert(String::from("naga"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Off);
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Error);
 
     init_log(&c);
-
 }
 
 #[allow(dead_code)]

@@ -67,12 +67,15 @@ impl ApplicationHandler for App {
 
         match event {
             WindowEvent::CloseRequested => {
+                trace(LOG_MODULE_NAME, &format!("CloseRequested event"));
                 self.handle_close(event_loop);
             }
             WindowEvent::RedrawRequested => {
+                // trace(LOG_MODULE_NAME, &format!("RedrawRequested event"));
                 self.handle_redraw();
             }
             WindowEvent::Resized(size) => {
+                trace(LOG_MODULE_NAME, &format!("Resized event: {size:?}"));
                 self.handle_resize(size.width, size.height);
             }
             WindowEvent::KeyboardInput { event, .. } => {
@@ -80,6 +83,7 @@ impl ApplicationHandler for App {
                 self.handle_keyboard_input(event_loop, event);
             }
             WindowEvent::Focused(focused) => {
+                trace(LOG_MODULE_NAME, &format!("Window focus changed: {id:?}"));
                 trace(LOG_MODULE_NAME, &format!("Window focus changed: {focused}"));
             }
             WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
@@ -127,6 +131,7 @@ impl App {
 
     /// Handles the redraw event by rendering the current state
     fn handle_redraw(&mut self) {
+        
         let Some(state) = self.state.as_mut() else {
             error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
             return;
@@ -151,7 +156,7 @@ impl App {
                 } else {
                     // Log frame rate every 60 frames
                     if self.frame_count % 60 == 0 {
-                        trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
+                        // trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
                     }
                 }
             }

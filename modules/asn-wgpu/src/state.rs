@@ -308,7 +308,7 @@ impl State {
     /// Перезагружает шейдер карты с диска
     pub fn reload_map_shader(&mut self) -> Result<(), StateError> {
         use std::fs;
-        let shader_source = fs::read_to_string("asn-win-wgpu/modules/asn-wgpu/src/map_shader.wgsl")
+        let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
             .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
         let map_bytes = include_bytes!("tiles.png");
         self.quad_map = wgpu_map::WgpuMap::new(
