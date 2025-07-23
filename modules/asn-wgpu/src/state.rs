@@ -299,4 +299,25 @@ impl State {
         self.average_frame_time()
             .map(|duration| 1.0 / duration.as_secs_f64())
     }
+
+    /// Returns a reference to the window
+    pub fn window(&self) -> &Arc<Window> {
+        &self.window
+    }
+
+    /// Перезагружает шейдер карты с диска
+    pub fn reload_map_shader(&mut self) -> Result<(), StateError> {
+        use std::fs;
+        let shader_source = fs::read_to_string("asn-win-wgpu/modules/asn-wgpu/src/map_shader.wgsl")
+            .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
+        let map_bytes = include_bytes!("tiles.png");
+        self.quad_map = wgpu_map::WgpuMap::new(
+            &self.device,
+            &self.queue,
+            self.config.format,
+            &shader_source,
+            map_bytes,
+        );
+        Ok(())
+    }
 }

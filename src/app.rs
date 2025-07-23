@@ -76,6 +76,7 @@ impl ApplicationHandler for App {
                 self.handle_resize(size.width, size.height);
             }
             WindowEvent::KeyboardInput { event, .. } => {
+                trace(LOG_MODULE_NAME, &format!("KeyboardInput event: {event:?}"));
                 self.handle_keyboard_input(event_loop, event);
             }
             WindowEvent::Focused(focused) => {
@@ -216,6 +217,16 @@ impl App {
                 winit::keyboard::Key::Named(winit::keyboard::NamedKey::F1) => {
                     info(LOG_MODULE_NAME, "F1 key pressed - showing help");
                     // TODO: Implement help system
+                }
+                winit::keyboard::Key::Character("r") | winit::keyboard::Key::Character("R") => {
+                    info(LOG_MODULE_NAME, "R key pressed - reloading map shader");
+                    if let Some(state) = self.state.as_mut() {
+                        match state.reload_map_shader() {
+                            Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
+                            Err(e) => error(LOG_MODULE_NAME, &format!("Failed to reload map shader: {e}")),
+                        }
+                        state.window().request_redraw();
+                    }
                 }
                 _ => {
                     trace(
