@@ -4,7 +4,7 @@ mod vertex;
 
 use crate::texture;
 use asn_logger::trace;
-use data::{INDICES, LOG_MODULE_NAME, VERTICES};
+use data::{BLUE_PIXEL, INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
 
@@ -27,7 +27,11 @@ impl WgpuMap {
         texture_bytes: &[u8],
     ) -> Self {
         let diffuse_texture =
-            texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png").unwrap();
+            texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
+                .unwrap();
+
+        let map_texture =
+            texture::Texture::from_rgba(&device, &queue, BLUE_PIXEL, 1, 1, "BLUE_PIXEL").unwrap();
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Map Vertex Buffer"),
@@ -56,6 +60,14 @@ impl WgpuMap {
                     binding: 1,
                     resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
                 },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::TextureView(&map_texture.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: wgpu::BindingResource::Sampler(&map_texture.sampler),
+                },
             ],
             label: Some("map_diffuse_bind_group"),
         });
@@ -80,4 +92,4 @@ impl WgpuMap {
         render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
         render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
     }
-} 
+}

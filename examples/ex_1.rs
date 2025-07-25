@@ -1,17 +1,13 @@
 extern crate asn_logger;
-extern crate asn_node_quad;
 extern crate asn_win_wgpu;
 
 mod log_utils;
 use log_utils::setup_log;
 
-use asn_node_quad::AsnNodeQuad;
 use asn_win_wgpu::{asn_win_config::custom_config, run_with_config};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
-
-    let _node = AsnNodeQuad::new();
 
     // Example 2: Run with custom configuration
     let config = custom_config(

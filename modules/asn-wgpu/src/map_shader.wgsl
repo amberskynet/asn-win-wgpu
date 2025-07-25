@@ -26,8 +26,15 @@ fn vs_main(
 var t_diffuse: texture_2d<f32>;
 @group(0) @binding(1)
 var s_diffuse: sampler;
+@group(0) @binding(2)
+var t_map: texture_2d<f32>;
+@group(0) @binding(3)
+var s_map: sampler;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return textureSample(t_diffuse, s_diffuse, in.tex_coords);
+    // Пример смешивания двух текстур (можно заменить на свою логику)
+    let color1 = textureSample(t_diffuse, s_diffuse, in.tex_coords);
+    let color2 = textureSample(t_map, s_map, in.tex_coords);
+    return mix(color1, color2, 0.5);
 }
