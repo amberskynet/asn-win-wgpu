@@ -14,6 +14,7 @@ pub struct WgpuMap {
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
     num_indices: u32,
+    map_texture: texture::Texture,
 }
 
 impl WgpuMap {
@@ -79,7 +80,13 @@ impl WgpuMap {
             index_buffer,
             num_indices,
             diffuse_bind_group,
+            map_texture,
         }
+    }
+
+    pub fn update_map(&self, queue: &wgpu::Queue, rgba: &[u8], width: u32, height: u32) {
+        self.map_texture
+            .update_from_rgba(queue, rgba, width, height);
     }
 
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
