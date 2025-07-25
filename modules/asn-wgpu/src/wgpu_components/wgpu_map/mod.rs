@@ -83,7 +83,7 @@ impl WgpuMap {
     }
 
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
-        // trace(LOG_MODULE_NAME, format!("draw").as_str());
+        trace(LOG_MODULE_NAME, format!("draw").as_str());
         render_pass.set_pipeline(&self.render_pipeline);
         render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
         render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
