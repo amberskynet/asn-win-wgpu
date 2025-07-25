@@ -2,13 +2,11 @@ mod data;
 mod utils;
 mod vertex;
 
-use crate::texture;
+use crate::{texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout};
 use asn_logger::trace;
 use data::{BLUE_PIXEL, INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
-
-use crate::wgpu_utils::get_texture_bind_group_layout;
 
 pub struct WgpuMap {
     render_pipeline: wgpu::RenderPipeline,
