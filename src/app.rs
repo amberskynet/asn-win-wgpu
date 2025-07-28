@@ -67,18 +67,23 @@ impl ApplicationHandler for App {
 
         match event {
             WindowEvent::CloseRequested => {
+                trace(LOG_MODULE_NAME, &format!("CloseRequested event"));
                 self.handle_close(event_loop);
             }
             WindowEvent::RedrawRequested => {
+                // trace(LOG_MODULE_NAME, &format!("RedrawRequested event"));
                 self.handle_redraw();
             }
             WindowEvent::Resized(size) => {
+                trace(LOG_MODULE_NAME, &format!("Resized event: {size:?}"));
                 self.handle_resize(size.width, size.height);
             }
             WindowEvent::KeyboardInput { event, .. } => {
+                trace(LOG_MODULE_NAME, &format!("KeyboardInput event: {event:?}"));
                 self.handle_keyboard_input(event_loop, event);
             }
             WindowEvent::Focused(focused) => {
+                trace(LOG_MODULE_NAME, &format!("Window focus changed: {id:?}"));
                 trace(LOG_MODULE_NAME, &format!("Window focus changed: {focused}"));
             }
             WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
@@ -126,6 +131,7 @@ impl App {
 
     /// Handles the redraw event by rendering the current state
     fn handle_redraw(&mut self) {
+        
         let Some(state) = self.state.as_mut() else {
             error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
             return;
@@ -150,7 +156,7 @@ impl App {
                 } else {
                     // Log frame rate every 60 frames
                     if self.frame_count % 60 == 0 {
-                        trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
+                        // trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
                     }
                 }
             }
@@ -216,6 +222,16 @@ impl App {
                 winit::keyboard::Key::Named(winit::keyboard::NamedKey::F1) => {
                     info(LOG_MODULE_NAME, "F1 key pressed - showing help");
                     // TODO: Implement help system
+                }
+                winit::keyboard::Key::Character("r") | winit::keyboard::Key::Character("R") => {
+                    info(LOG_MODULE_NAME, "R key pressed - reloading map shader");
+                    if let Some(state) = self.state.as_mut() {
+                        match state.reload_map_shader() {
+                            Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
+                            Err(e) => error(LOG_MODULE_NAME, &format!("Failed to reload map shader: {e}")),
+                        }
+                        state.window().request_redraw();
+                    }
                 }
                 _ => {
                     trace(
