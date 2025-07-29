@@ -1,5 +1,4 @@
-use crate::texture;
-use wgpu::{Device, Queue};
+use rand::Rng;
 
 /// Класс для инициализации и обработки RGBA-массивов
 ///
@@ -102,40 +101,6 @@ impl RgbaHandler {
             height,
             data: rgba.to_vec(),
         })
-    }
-
-    /// Создает текстуру из RGBA-данных
-    ///
-    /// # Аргументы
-    ///
-    /// * `device` - WGPU устройство
-    /// * `queue` - WGPU очередь команд
-    /// * `label` - метка для текстуры
-    ///
-    /// # Возвращает
-    ///
-    /// `Result<texture::Texture, String>` - созданная текстура или ошибка
-    ///
-    /// # Пример
-    ///
-    /// ```rust
-    /// use asn_wgpu::RgbaHandler;
-    /// use wgpu::Device;
-    ///
-    /// let mut handler = RgbaHandler::new(256, 256);
-    /// handler.fill(255, 0, 0, 255); // Красный цвет
-    ///
-    /// // Создание текстуры (требует WGPU контекст)
-    /// // let texture = handler.create_texture(&device, &queue, "my_texture").unwrap();
-    /// ```
-    pub fn create_texture(
-        &self,
-        device: &Device,
-        queue: &Queue,
-        label: &str,
-    ) -> Result<texture::Texture, String> {
-        texture::Texture::from_rgba(device, queue, &self.data, self.width, self.height, label)
-            .map_err(|e| format!("Ошибка создания текстуры: {}", e))
     }
 
     /// Обновляет данные RGBA-массива
@@ -320,6 +285,81 @@ impl RgbaHandler {
         }
     }
 
+    /// Заполняет массив случайными RGBA-значениями
+    ///
+    /// Генерирует случайные значения для каждого пикселя в диапазоне 0-255.
+    /// Альфа-канал устанавливается в 255 (полная непрозрачность).
+    ///
+    /// # Пример
+    ///
+    /// ```rust
+    /// use asn_wgpu::RgbaHandler;
+    ///
+    /// let mut handler = RgbaHandler::new(100, 100);
+    /// handler.fill_random(); // Заполнение случайными цветами
+    /// ```
+    pub fn fill_random(&mut self) {
+        let mut rng = rand::rng();
+
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = rng.random_range(0..=255); // R
+            self.data[i + 1] = rng.random_range(0..=255); // G
+            self.data[i + 2] = rng.random_range(0..=255); // B
+            self.data[i + 3] = 255; // A (полная непрозрачность)
+        }
+    }
+
+    /// Заполняет массив случайными RGBA-значениями с настраиваемой прозрачностью
+    ///
+    /// Генерирует случайные значения для каждого пикселя в диапазоне 0-255.
+    /// Альфа-канал также генерируется случайно.
+    ///
+    /// # Пример
+    ///
+    /// ```rust
+    /// use asn_wgpu::RgbaHandler;
+    ///
+    /// let mut handler = RgbaHandler::new(100, 100);
+    /// handler.fill_random_with_alpha(); // Заполнение случайными цветами с случайной прозрачностью
+    /// ```
+    pub fn fill_random_with_alpha(&mut self) {
+        let mut rng = rand::rng();
+
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = rng.random_range(0..=255); // R
+            self.data[i + 1] = rng.random_range(0..=255); // G
+            self.data[i + 2] = rng.random_range(0..=255); // B
+            self.data[i + 3] = rng.random_range(0..=255); // A
+        }
+    }
+
+    /// Заполняет массив случайными значениями в указанном диапазоне
+    ///
+    /// # Аргументы
+    ///
+    /// * `min_value` - минимальное значение для RGB компонентов (0-255)
+    /// * `max_value` - максимальное значение для RGB компонентов (0-255)
+    /// * `alpha` - фиксированное значение альфа-канала (0-255)
+    ///
+    /// # Пример
+    ///
+    /// ```rust
+    /// use asn_wgpu::RgbaHandler;
+    ///
+    /// let mut handler = RgbaHandler::new(100, 100);
+    /// handler.fill_random_range(128, 255, 255); // Только светлые цвета
+    /// ```
+    pub fn fill_random_range(&mut self, min_value: u8, max_value: u8, alpha: u8) {
+        let mut rng = rand::rng();
+
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = rng.random_range(min_value..=max_value); // R
+            self.data[i + 1] = rng.random_range(min_value..=max_value); // G
+            self.data[i + 2] = rng.random_range(min_value..=max_value); // B
+            self.data[i + 3] = alpha; // A
+        }
+    }
+
     /// Получает размеры изображения
     ///
     /// # Возвращает
@@ -469,6 +509,48 @@ mod tests {
             for x in 0..10 {
                 let pixel = handler.get_pixel(x, y).unwrap();
                 assert_eq!(pixel, (255, 0, 0, 255));
+            }
+        }
+    }
+
+    #[test]
+    fn test_fill_random() {
+        let mut handler = RgbaHandler::new(10, 10);
+        handler.fill_random();
+
+        // Проверяем, что все пиксели имеют альфа = 255
+        for y in 0..10 {
+            for x in 0..10 {
+                let pixel = handler.get_pixel(x, y).unwrap();
+                assert_eq!(pixel.3, 255); // Альфа-канал должен быть 255
+            }
+        }
+    }
+
+    #[test]
+    fn test_fill_random_with_alpha() {
+        let mut handler = RgbaHandler::new(10, 10);
+        handler.fill_random_with_alpha();
+
+        // Проверяем, что данные заполнены (не все нули)
+        let data = handler.data();
+        let has_non_zero = data.iter().any(|&x| x != 0);
+        assert!(has_non_zero);
+    }
+
+    #[test]
+    fn test_fill_random_range() {
+        let mut handler = RgbaHandler::new(10, 10);
+        handler.fill_random_range(128, 255, 200);
+
+        // Проверяем, что все значения в указанном диапазоне
+        for y in 0..10 {
+            for x in 0..10 {
+                let pixel = handler.get_pixel(x, y).unwrap();
+                assert!(pixel.0 >= 128 && pixel.0 <= 255); // R
+                assert!(pixel.1 >= 128 && pixel.1 <= 255); // G
+                assert!(pixel.2 >= 128 && pixel.2 <= 255); // B
+                assert_eq!(pixel.3, 200); // A
             }
         }
     }
