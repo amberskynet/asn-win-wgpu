@@ -52,7 +52,6 @@
 //! ```
 
 mod data;
-mod rgba_handler;
 mod utils;
 mod vertex;
 
@@ -152,6 +151,3 @@ impl WgpuMap {
         render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
     }
 }
-
-// Публичный экспорт RgbaHandler
-pub use rgba_handler::RgbaHandler;

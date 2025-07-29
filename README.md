@@ -40,8 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = AppConfig {
         window_title: "My App".to_string(),
         window_width: 1024,
-        window_height: 768,
-        vsync_enabled: true,
+        window_height: 768
     };
 
     asn_win_wgpu::run_with_config(config)
