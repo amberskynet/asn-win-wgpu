@@ -55,9 +55,11 @@ mod data;
 mod utils;
 mod vertex;
 
-use crate::{texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout};
+use crate::{
+    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
+};
 use asn_logger::trace;
-use data::{BLUE_PIXEL, INDICES, LOG_MODULE_NAME, VERTICES};
+use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
 
@@ -82,8 +84,18 @@ impl WgpuMap {
             texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
                 .unwrap();
 
-        let map_texture =
-            texture::Texture::from_rgba(&device, &queue, BLUE_PIXEL, 1, 1, "BLUE_PIXEL").unwrap();
+        let mut rgba_map_handler = RgbaHandler::new(256, 256);
+        rgba_map_handler.fill_random();
+
+        let map_texture = texture::Texture::from_rgba(
+            &device,
+            &queue,
+            rgba_map_handler.data(),
+            256,
+            256,
+            "BLUE_PIXEL",
+        )
+        .unwrap();
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Map Vertex Buffer"),

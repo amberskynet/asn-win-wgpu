@@ -25,4 +25,5 @@ pub const VERTICES: &[Vertex] = &[
 
 pub const INDICES: &[u16] = &[0, 1, 2, 2, 3, 0];
 
-pub const BLUE_PIXEL: &[u8] = &[15, 0, 0xFF, 1];
+#[allow(unused)]
+pub const BLUE_PIXEL: &[u8] = &[0, 0, 0xFF, 1];
