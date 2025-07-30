@@ -378,6 +378,16 @@ impl RgbaHandler {
         (self.width, self.height)
     }
 
+    /// Возвращает ширину изображения
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    /// Возвращает высоту изображения
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     /// Получает ссылку на данные
     ///
     /// # Возвращает

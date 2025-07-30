@@ -69,7 +69,9 @@ pub struct WgpuMap {
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
     num_indices: u32,
+    rgba_map_handler: RgbaHandler,
     map_texture: texture::Texture,
+    is_map_updated: bool,
 }
 
 impl WgpuMap {
@@ -145,13 +147,26 @@ impl WgpuMap {
             index_buffer,
             num_indices,
             diffuse_bind_group,
+            rgba_map_handler,
             map_texture,
+            is_map_updated: false,
         }
     }
 
-    pub fn update_map(&self, queue: &wgpu::Queue, rgba: &[u8], width: u32, height: u32) {
-        self.map_texture
-            .update_from_rgba(queue, rgba, width, height);
+    pub fn update_map(&mut self, rgba: &[u8]) {
+        self.rgba_map_handler.update_data(rgba).unwrap();
+        self.is_map_updated = true;
+    }
+
+    pub fn update_queue(&mut self, queue: &wgpu::Queue) {
+        if self.is_map_updated {
+            self.map_texture.update_from_rgba(
+                queue,
+                self.rgba_map_handler.data(),
+                self.rgba_map_handler.width(),
+                self.rgba_map_handler.height(),
+            );
+        }
     }
 
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
