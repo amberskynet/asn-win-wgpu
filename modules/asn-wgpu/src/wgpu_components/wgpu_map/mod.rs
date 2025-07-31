@@ -56,7 +56,7 @@ mod utils;
 mod vertex;
 
 use crate::{
-    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
+    texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout, RgbaHandler,
 };
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
