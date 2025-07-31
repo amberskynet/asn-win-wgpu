@@ -6,13 +6,13 @@ edition = "2024"
 [dependencies]
 winit = { version = "0.30" }
 asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "2.1.1", features = [] }
-thiserror = "1.0"
+thiserror = "2.0"
 anyhow = "1.0.98"
-bytemuck = { version = "1.16", features = [ "derive" ] }
+bytemuck = { version = "1.23", features = [ "derive" ] }
 rand = "0.9.2"
 
 [dependencies.image]
-version = "0.24"
+version = "0.25"
 default-features = false
 features = ["png", "jpeg"]
 
