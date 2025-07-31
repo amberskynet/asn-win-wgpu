@@ -43,7 +43,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         window_height: 768,
         vsync_enabled: true,
     };
-    
+
     asn_win_wgpu::run_with_config(config)
 }
 ```
@@ -98,3 +98,8 @@ wasm-pack build --target web
 ## License
 
 This project is part of the Amberskynet ecosystem.
+
+
+### zsh autosuggestion:
+
+ source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
