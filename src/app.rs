@@ -3,7 +3,7 @@ use crate::data::LOG_MODULE_NAME;
 use std::sync::Arc;
 
 use asn_logger::{error, info, trace, warn};
-use asn_wgpu::State;
+use asn_wgpu::{RgbaHandler, State};
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
@@ -16,6 +16,7 @@ pub struct App {
     config: AppConfig,
     is_running: bool,
     frame_count: u64,
+    map: RgbaHandler,
 }
 
 impl ApplicationHandler for App {
@@ -52,7 +53,7 @@ impl ApplicationHandler for App {
                 return;
             }
         };
-        
+
         self.state = Some(state);
         self.is_running = true;
         self.frame_count = 0;
@@ -87,12 +88,20 @@ impl ApplicationHandler for App {
                 trace(LOG_MODULE_NAME, &format!("Window focus changed: {focused}"));
             }
             WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
-                trace(LOG_MODULE_NAME, &format!("Scale factor changed: {scale_factor}"));
+                trace(
+                    LOG_MODULE_NAME,
+                    &format!("Scale factor changed: {scale_factor}"),
+                );
             }
             _ => {
                 trace(LOG_MODULE_NAME, &format!("Window {id:?} event: {event:?}"));
             }
         }
+    }
+
+    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        info(LOG_MODULE_NAME, "about_to_wait");
+        self.update();
     }
 }
 
@@ -100,11 +109,14 @@ impl ApplicationHandler for App {
 impl App {
     /// Creates a new App with custom configuration
     pub fn with_config(config: AppConfig) -> Self {
+        let map = RgbaHandler::new(256, 256);
+
         Self {
             state: None,
             config,
             is_running: false,
             frame_count: 0,
+            map,
         }
     }
 
@@ -122,6 +134,15 @@ impl App {
         self.frame_count
     }
 
+    fn update(&mut self) {
+        self.map.fill_random();
+        let Some(state) = self.state.as_mut() else {
+            error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
+            return;
+        };
+        state.update_map_data(self.map.data());
+    }
+
     /// Handles application close
     fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info(LOG_MODULE_NAME, "Application close requested");
@@ -131,7 +152,6 @@ impl App {
 
     /// Handles the redraw event by rendering the current state
     fn handle_redraw(&mut self) {
-        
         let Some(state) = self.state.as_mut() else {
             error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
             return;
@@ -148,7 +168,7 @@ impl App {
                     Self::try_restore(state);
                     return;
                 }
-                
+
                 // End render pass
                 if let Err(end_error) = state.draw_end(ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw end failed: {end_error}"));
@@ -161,7 +181,10 @@ impl App {
                 }
             }
             Err(start_error) => {
-                error(LOG_MODULE_NAME, &format!("Draw start failed: {start_error}"));
+                error(
+                    LOG_MODULE_NAME,
+                    &format!("Draw start failed: {start_error}"),
+                );
                 Self::try_restore(state);
             }
         }
@@ -169,8 +192,11 @@ impl App {
 
     /// Handles render errors by attempting to restore the surface
     fn try_restore(state: &mut State) {
-        warn(LOG_MODULE_NAME, "Attempting to restore surface after render error");
-        
+        warn(
+            LOG_MODULE_NAME,
+            "Attempting to restore surface after render error",
+        );
+
         if let Err(restore_error) = state.restore() {
             error(
                 LOG_MODULE_NAME,
@@ -196,7 +222,10 @@ impl App {
         if let Err(resize_error) = state.resize(width, height) {
             error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
         } else {
-            info(LOG_MODULE_NAME, &format!("Window resized successfully to {width}x{height}"));
+            info(
+                LOG_MODULE_NAME,
+                &format!("Window resized successfully to {width}x{height}"),
+            );
         }
     }
 
@@ -228,7 +257,10 @@ impl App {
                     if let Some(state) = self.state.as_mut() {
                         match state.reload_map_shader() {
                             Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
-                            Err(e) => error(LOG_MODULE_NAME, &format!("Failed to reload map shader: {e}")),
+                            Err(e) => error(
+                                LOG_MODULE_NAME,
+                                &format!("Failed to reload map shader: {e}"),
+                            ),
                         }
                         state.window().request_redraw();
                     }
