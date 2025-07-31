@@ -247,6 +247,9 @@ impl State {
 
     /// Performs rendering with the provided context
     pub fn draw(&mut self, ctx: &mut RenderContext) -> Result<(), StateError> {
+        // Обновляем очередь перед отрисовкой
+        self.quad_map.update_queue(&self.queue);
+
         let mut render_pass = ctx.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -319,5 +322,10 @@ impl State {
             map_bytes,
         );
         Ok(())
+    }
+
+    /// Обновляет данные карты
+    pub fn update_map_data(&mut self, rgba: &[u8]) {
+        self.quad_map.update_map(rgba);
     }
 }

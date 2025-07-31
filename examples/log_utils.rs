@@ -13,12 +13,12 @@ pub fn setup_log() {
     c.module_levels
         .insert(String::from("naga"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Error);
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Info);
 
     c.module_levels
         .insert(String::from("wgpu_map"), AsnLogLevel::Error);
 
-  init_log(&c);
+    init_log(&c);
 }
 
 #[allow(dead_code)]
