@@ -52,13 +52,14 @@
 //! ```
 
 mod data;
-mod rgba_handler;
 mod utils;
 mod vertex;
 
-use crate::{texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout};
+use crate::{
+    texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout, RgbaHandler,
+};
 use asn_logger::trace;
-use data::{BLUE_PIXEL, INDICES, LOG_MODULE_NAME, VERTICES};
+use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
 
@@ -68,7 +69,9 @@ pub struct WgpuMap {
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
     num_indices: u32,
+    rgba_map_handler: RgbaHandler,
     map_texture: texture::Texture,
+    is_map_updated: bool,
 }
 
 impl WgpuMap {
@@ -83,8 +86,18 @@ impl WgpuMap {
             texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
                 .unwrap();
 
-        let map_texture =
-            texture::Texture::from_rgba(&device, &queue, BLUE_PIXEL, 1, 1, "BLUE_PIXEL").unwrap();
+        let mut rgba_map_handler = RgbaHandler::new(256, 256);
+        rgba_map_handler.fill_random();
+
+        let map_texture = texture::Texture::from_rgba(
+            &device,
+            &queue,
+            rgba_map_handler.data(),
+            256,
+            256,
+            "BLUE_PIXEL",
+        )
+        .unwrap();
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Map Vertex Buffer"),
@@ -134,13 +147,26 @@ impl WgpuMap {
             index_buffer,
             num_indices,
             diffuse_bind_group,
+            rgba_map_handler,
             map_texture,
+            is_map_updated: false,
         }
     }
 
-    pub fn update_map(&self, queue: &wgpu::Queue, rgba: &[u8], width: u32, height: u32) {
-        self.map_texture
-            .update_from_rgba(queue, rgba, width, height);
+    pub fn update_map(&mut self, rgba: &[u8]) {
+        self.rgba_map_handler.update_data(rgba).unwrap();
+        self.is_map_updated = true;
+    }
+
+    pub fn update_queue(&mut self, queue: &wgpu::Queue) {
+        if self.is_map_updated {
+            self.map_texture.update_from_rgba(
+                queue,
+                self.rgba_map_handler.data(),
+                self.rgba_map_handler.width(),
+                self.rgba_map_handler.height(),
+            );
+        }
     }
 
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
@@ -152,6 +178,3 @@ impl WgpuMap {
         render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
     }
 }
-
-// Публичный экспорт RgbaHandler
-pub use rgba_handler::RgbaHandler;

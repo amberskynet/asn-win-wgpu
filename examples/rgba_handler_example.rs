@@ -1,4 +1,4 @@
-use asn_wgpu::wgpu_components::wgpu_map::RgbaHandler;
+use asn_wgpu::RgbaHandler;
 
 fn main() {
     println!("Пример использования RgbaHandler");
