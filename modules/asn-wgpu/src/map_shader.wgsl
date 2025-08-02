@@ -36,5 +36,5 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // Пример смешивания двух текстур (можно заменить на свою логику)
     let color1 = textureSample(t_diffuse, s_diffuse, in.tex_coords);
     let color2 = textureSample(t_map, s_map, in.tex_coords);
-    return mix(color1, color2, 0.5);
+    return mix(color1, color2, 1.0);
 }
