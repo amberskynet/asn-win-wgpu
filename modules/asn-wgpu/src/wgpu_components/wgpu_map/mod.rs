@@ -70,7 +70,7 @@ pub struct WgpuMap {
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
     num_indices: u32,
-    rgba_map_handler: RgbaHandler,
+    map_handler: RgbaHandler,
     map_texture: texture::Texture,
     is_map_updated: bool,
 }
@@ -89,15 +89,15 @@ impl WgpuMap {
             texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
                 .unwrap();
 
-        let mut rgba_map_handler = RgbaHandler::new(map_width, map_height);
-        rgba_map_handler.fill_random();
+        let mut map_handler = RgbaHandler::new(map_width, map_height);
+        map_handler.fill_random();
 
         let map_texture = texture::Texture::from_rgba(
             &device,
             &queue,
-            rgba_map_handler.data(),
-            rgba_map_handler.width(),
-            rgba_map_handler.height(),
+            map_handler.data(),
+            map_handler.width(),
+            map_handler.height(),
             "BLUE_PIXEL",
         )
         .unwrap();
@@ -150,14 +150,14 @@ impl WgpuMap {
             index_buffer,
             num_indices,
             diffuse_bind_group,
-            rgba_map_handler,
+            map_handler,
             map_texture,
             is_map_updated: false,
         }
     }
 
     pub fn update_map(&mut self, rgba: &[u8]) {
-        self.rgba_map_handler.update_data(rgba).unwrap();
+        self.map_handler.update_data(rgba).unwrap();
         self.is_map_updated = true;
     }
 
@@ -165,9 +165,9 @@ impl WgpuMap {
         if self.is_map_updated {
             self.map_texture.update_from_rgba(
                 queue,
-                self.rgba_map_handler.data(),
-                self.rgba_map_handler.width(),
-                self.rgba_map_handler.height(),
+                self.map_handler.data(),
+                self.map_handler.width(),
+                self.map_handler.height(),
             );
         }
     }
@@ -188,8 +188,6 @@ impl WgpuMap {
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         texture_bytes: &[u8],
-        width: u32,
-        height: u32,
     ) -> Result<(), StateError> {
         use std::fs;
         let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
@@ -202,8 +200,8 @@ impl WgpuMap {
             format,
             &shader_source,
             texture_bytes,
-            width,
-            height,
+            self.map_handler.width(),
+            self.map_handler.height(),
         );
 
         // Обновляем текущий экземпляр

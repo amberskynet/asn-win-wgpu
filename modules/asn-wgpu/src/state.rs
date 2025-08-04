@@ -321,14 +321,8 @@ impl State {
     /// Перезагружает шейдер карты с диска
     pub fn reload_map_shader(&mut self) -> Result<(), StateError> {
         let map_bytes = include_bytes!("tiles.png");
-        self.quad_map.reload_shader(
-            &self.device,
-            &self.queue,
-            self.config.format,
-            map_bytes,
-            256,
-            256,
-        )
+        self.quad_map
+            .reload_shader(&self.device, &self.queue, self.config.format, map_bytes)
     }
 
     /// Обновляет данные карты
