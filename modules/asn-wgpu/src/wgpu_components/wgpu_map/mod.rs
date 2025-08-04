@@ -82,14 +82,14 @@ impl WgpuMap {
         format: wgpu::TextureFormat,
         shader_source: &str,
         texture_bytes: &[u8],
-        width: u32,
-        height: u32,
+        map_width: u32,
+        map_height: u32,
     ) -> Self {
         let diffuse_texture =
             texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
                 .unwrap();
 
-        let mut rgba_map_handler = RgbaHandler::new(width, height);
+        let mut rgba_map_handler = RgbaHandler::new(map_width, map_height);
         rgba_map_handler.fill_random();
 
         let map_texture = texture::Texture::from_rgba(
