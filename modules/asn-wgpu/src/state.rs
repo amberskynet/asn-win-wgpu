@@ -144,8 +144,8 @@ impl State {
             diffuse_bytes,
         );
 
-        let map_width = 128;
-        let map_height = 128;
+        let map_width = 256;
+        let map_height = 256;
 
         let shader_source = include_str!("map_shader.wgsl");
         let map_tiles = include_bytes!("tiles.png");
