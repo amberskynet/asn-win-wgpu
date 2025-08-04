@@ -48,7 +48,11 @@ impl State {
     ///
     /// # Returns
     /// * `Result<Self, StateError>` - New state or error
-    pub async fn new(window: Arc<Window>) -> Result<Self, StateError> {
+    pub async fn new(
+        window: Arc<Window>,
+        map_width: u32,
+        map_height: u32,
+    ) -> Result<Self, StateError> {
         trace(LOG_MODULE_NAME, "Creating new State");
 
         let size = window.inner_size();
@@ -144,17 +148,15 @@ impl State {
             diffuse_bytes,
         );
 
-        let map_width = 256;
-        let map_height = 256;
-
         let shader_source = include_str!("map_shader.wgsl");
-        let map_tiles = include_bytes!("tiles.png");
+        let map_tiles_bytes = include_bytes!("tiles.png");
+
         let quad_map = wgpu_map::WgpuMap::new(
             &device,
             &queue,
             surface_format,
             shader_source,
-            map_tiles,
+            map_tiles_bytes,
             map_width,
             map_height,
         );

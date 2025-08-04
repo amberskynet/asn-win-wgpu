@@ -81,12 +81,12 @@ impl WgpuMap {
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         shader_source: &str,
-        texture_bytes: &[u8],
+        map_tiles_bytes: &[u8],
         map_width: u32,
         map_height: u32,
     ) -> Self {
         let diffuse_texture =
-            texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
+            texture::Texture::from_bytes(&device, &queue, map_tiles_bytes, "map-texture.png")
                 .unwrap();
 
         let mut map_handler = RgbaHandler::new(map_width, map_height);

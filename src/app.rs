@@ -45,7 +45,11 @@ impl ApplicationHandler for App {
             }
         };
 
-        let state = match pollster::block_on(State::new(Arc::clone(&window))) {
+        let state = match pollster::block_on(State::new(
+            Arc::clone(&window),
+            self.map.width(),
+            self.map.height(),
+        )) {
             Ok(state) => state,
             Err(e) => {
                 error(LOG_MODULE_NAME, &format!("Failed to create GPU state: {e}"));
@@ -109,7 +113,7 @@ impl ApplicationHandler for App {
 impl App {
     /// Creates a new App with custom configuration
     pub fn with_config(config: AppConfig) -> Self {
-        let map = RgbaHandler::new(256, 256);
+        let map = RgbaHandler::new(32, 32);
 
         Self {
             state: None,
@@ -135,11 +139,11 @@ impl App {
     }
 
     fn update(&mut self) {
-        self.map.fill_random();
         let Some(state) = self.state.as_mut() else {
             error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
             return;
         };
+        self.map.fill_random();
         state.update_map_data(self.map.data());
     }
 
