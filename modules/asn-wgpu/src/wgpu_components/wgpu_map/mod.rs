@@ -56,7 +56,8 @@ mod utils;
 mod vertex;
 
 use crate::{
-    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
+    RgbaHandler, state_error::StateError, texture,
+    wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
@@ -178,5 +179,36 @@ impl WgpuMap {
         render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
         render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
         render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
+    }
+
+    /// Перезагружает шейдер карты с диска
+    pub fn reload_shader(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        texture_bytes: &[u8],
+        width: u32,
+        height: u32,
+    ) -> Result<(), StateError> {
+        use std::fs;
+        let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
+            .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
+
+        // Создаем новый экземпляр WgpuMap с обновленным шейдером
+        let new_map = Self::new(
+            device,
+            queue,
+            format,
+            &shader_source,
+            texture_bytes,
+            width,
+            height,
+        );
+
+        // Обновляем текущий экземпляр
+        *self = new_map;
+
+        Ok(())
     }
 }

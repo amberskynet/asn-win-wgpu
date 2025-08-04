@@ -320,20 +320,15 @@ impl State {
 
     /// Перезагружает шейдер карты с диска
     pub fn reload_map_shader(&mut self) -> Result<(), StateError> {
-        use std::fs;
-        let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
-            .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
         let map_bytes = include_bytes!("tiles.png");
-        self.quad_map = wgpu_map::WgpuMap::new(
+        self.quad_map.reload_shader(
             &self.device,
             &self.queue,
             self.config.format,
-            &shader_source,
             map_bytes,
-            self.config.width,
-            self.config.height,
-        );
-        Ok(())
+            256,
+            256,
+        )
     }
 
     /// Обновляет данные карты
