@@ -56,7 +56,7 @@ mod utils;
 mod vertex;
 
 use crate::{
-    texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout, RgbaHandler,
+    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
@@ -81,20 +81,22 @@ impl WgpuMap {
         format: wgpu::TextureFormat,
         shader_source: &str,
         texture_bytes: &[u8],
+        width: u32,
+        height: u32,
     ) -> Self {
         let diffuse_texture =
             texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
                 .unwrap();
 
-        let mut rgba_map_handler = RgbaHandler::new(256, 256);
+        let mut rgba_map_handler = RgbaHandler::new(width, height);
         rgba_map_handler.fill_random();
 
         let map_texture = texture::Texture::from_rgba(
             &device,
             &queue,
             rgba_map_handler.data(),
-            256,
-            256,
+            rgba_map_handler.width(),
+            rgba_map_handler.height(),
             "BLUE_PIXEL",
         )
         .unwrap();

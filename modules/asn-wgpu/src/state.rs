@@ -144,10 +144,20 @@ impl State {
             diffuse_bytes,
         );
 
+        let map_width = 128;
+        let map_height = 128;
+
         let shader_source = include_str!("map_shader.wgsl");
-        let map_bytes = include_bytes!("tiles.png");
-        let quad_map =
-            wgpu_map::WgpuMap::new(&device, &queue, surface_format, shader_source, map_bytes);
+        let map_tiles = include_bytes!("tiles.png");
+        let quad_map = wgpu_map::WgpuMap::new(
+            &device,
+            &queue,
+            surface_format,
+            shader_source,
+            map_tiles,
+            map_width,
+            map_height,
+        );
 
         Ok(Self {
             surface,
@@ -320,6 +330,8 @@ impl State {
             self.config.format,
             &shader_source,
             map_bytes,
+            self.config.width,
+            self.config.height,
         );
         Ok(())
     }
