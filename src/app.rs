@@ -113,7 +113,7 @@ impl ApplicationHandler for App {
 impl App {
     /// Creates a new App with custom configuration
     pub fn with_config(config: AppConfig) -> Self {
-        let map = RgbaHandler::new(512, 512);
+        let map = RgbaHandler::new(32, 32);
 
         Self {
             state: None,
