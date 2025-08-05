@@ -13,7 +13,7 @@ pub fn setup_log() {
     c.module_levels
         .insert(String::from("naga"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Info);
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Trace);
 
     c.module_levels
         .insert(String::from("wgpu_map"), AsnLogLevel::Error);

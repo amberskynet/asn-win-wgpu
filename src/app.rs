@@ -104,7 +104,7 @@ impl ApplicationHandler for App {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
-        info(LOG_MODULE_NAME, "about_to_wait");
+        trace(LOG_MODULE_NAME, "about_to_wait");
         self.update();
     }
 }
@@ -113,7 +113,7 @@ impl ApplicationHandler for App {
 impl App {
     /// Creates a new App with custom configuration
     pub fn with_config(config: AppConfig) -> Self {
-        let map = RgbaHandler::new(256, 256);
+        let map = RgbaHandler::new(512, 512);
 
         Self {
             state: None,
@@ -139,11 +139,13 @@ impl App {
     }
 
     fn update(&mut self) {
+        self.map.fill_random();
+
         let Some(state) = self.state.as_mut() else {
-            error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
+            error(LOG_MODULE_NAME, "Cannot update: state is not initialized");
             return;
         };
-        self.map.fill_random();
+
         state.update_map_data(self.map.data());
     }
 
@@ -161,6 +163,11 @@ impl App {
             return;
         };
 
+        // if !state.is_configured() {
+        //     error(LOG_MODULE_NAME, "Cannot render: surface not configured");
+        //     return;
+        // }
+
         self.frame_count += 1;
 
         // Start render pass
@@ -169,18 +176,21 @@ impl App {
                 // Perform rendering
                 if let Err(draw_error) = state.draw(&mut ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
-                    Self::try_restore(state);
+                    self.try_restore();
                     return;
                 }
 
                 // End render pass
                 if let Err(end_error) = state.draw_end(ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw end failed: {end_error}"));
-                    Self::try_restore(state);
+                    self.try_restore();
                 } else {
                     // Log frame rate every 60 frames
                     if self.frame_count % 60 == 0 {
-                        // trace(LOG_MODULE_NAME, &format!("Rendered frame {}", self.frame_count));
+                        // info(
+                        //     LOG_MODULE_NAME,
+                        //     &format!("Rendered frame {}", self.frame_count),
+                        // );
                     }
                 }
             }
@@ -189,17 +199,22 @@ impl App {
                     LOG_MODULE_NAME,
                     &format!("Draw start failed: {start_error}"),
                 );
-                Self::try_restore(state);
+                self.try_restore();
             }
         }
     }
 
     /// Handles render errors by attempting to restore the surface
-    fn try_restore(state: &mut State) {
+    fn try_restore(&mut self) {
         warn(
             LOG_MODULE_NAME,
             "Attempting to restore surface after render error",
         );
+
+        let Some(state) = self.state.as_mut() else {
+            error(LOG_MODULE_NAME, "Cannot render: state is not initialized");
+            return;
+        };
 
         if let Err(restore_error) = state.restore() {
             error(
@@ -259,13 +274,13 @@ impl App {
                 winit::keyboard::Key::Character("r") | winit::keyboard::Key::Character("R") => {
                     info(LOG_MODULE_NAME, "R key pressed - reloading map shader");
                     if let Some(state) = self.state.as_mut() {
-                        match state.reload_map_shader() {
-                            Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
-                            Err(e) => error(
-                                LOG_MODULE_NAME,
-                                &format!("Failed to reload map shader: {e}"),
-                            ),
-                        }
+                        // match state.reload_map_shader() {
+                        //     Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
+                        //     Err(e) => error(
+                        //         LOG_MODULE_NAME,
+                        //         &format!("Failed to reload map shader: {e}"),
+                        //     ),
+                        // }
                         state.window().request_redraw();
                     }
                 }
