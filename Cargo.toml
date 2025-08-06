@@ -18,9 +18,6 @@ asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = 
 asn-wgpu = { path = "./modules/asn-wgpu" }
 pollster = "0.4"
 
-[dev-dependencies]
-criterion = "0.5"
-
 [profile.dev]
 opt-level = 0
 debug = true
