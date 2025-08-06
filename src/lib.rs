@@ -89,12 +89,11 @@ fn run_with_app(app: &mut impl ApplicationHandler) -> Result<(), Box<dyn std::er
 
 pub fn run(
     config: &AsnGuiWindowConfig,
-    handler: impl AsnGuiHandler,
+    handler: Arc<impl AsnGuiHandler>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     info(LOG_MODULE_NAME, "Starting ASN WGPU application");
 
-    let h = Arc::new(handler);
-    let mut app = App::new(config, h);
+    let mut app = App::new(config, handler.clone());
 
     run_with_app(&mut app)
 }
