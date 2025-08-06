@@ -103,7 +103,7 @@ impl ApplicationHandler for App {
         }
     }
 
-    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         trace(LOG_MODULE_NAME, "about_to_wait");
         self.update();
     }
@@ -118,6 +118,7 @@ impl App {
         Self {
             state: None,
             config,
+            map,
             is_running: false,
             frame_count: 0,
         }
