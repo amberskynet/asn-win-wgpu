@@ -138,6 +138,34 @@ impl Texture {
         })
     }
 
+    pub fn update_pixel(&self, queue: &wgpu::Queue, rgba: &[u8; 4], x: u32, y: u32) {
+        let size = wgpu::Extent3d {
+            width: 1,  // Обновляем только 1 пиксель по ширине
+            height: 1, // Обновляем только 1 пиксель по высоте
+            depth_or_array_layers: 1,
+        };
+
+        queue.write_texture(
+            wgpu::TexelCopyTextureInfo {
+                texture: &self.texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d {
+                    x, // X-координата пикселя
+                    y, // Y-координата пикселя
+                    z: 0,
+                },
+                aspect: wgpu::TextureAspect::All,
+            },
+            rgba,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(4),  // 4 байта на строку (1 пиксель)
+                rows_per_image: Some(1), // Только 1 строка
+            },
+            size,
+        );
+    }
+
     pub fn update_from_rgba(&self, queue: &wgpu::Queue, rgba: &[u8], width: u32, height: u32) {
         let size = wgpu::Extent3d {
             width,
