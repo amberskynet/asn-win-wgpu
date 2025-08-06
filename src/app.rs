@@ -10,14 +10,16 @@ use winit::event_loop::ActiveEventLoop;
 use winit::window::WindowId;
 
 /// Main application struct that handles window events and rendering
-#[derive(Default)]
-pub struct App<H: AsnGuiHandler> {
+pub struct App<H>
+where
+    H: AsnGuiHandler,
+{
     state: Option<State>,
     config: AsnGuiWindowConfig,
     is_running: bool,
     frame_count: u64,
     map: RgbaHandler,
-    gui_handler: H,
+    gui_handler: Arc<H>,
 }
 
 impl<H> ApplicationHandler for App<H>
@@ -118,13 +120,14 @@ where
     H: AsnGuiHandler,
 {
     /// Creates a new App with custom configuration
-    pub fn new(config: &AsnGuiWindowConfig) -> Self {
+    pub fn new(config: &AsnGuiWindowConfig, h: Arc<H>) -> Self {
         let map = RgbaHandler::new(32, 32);
 
         Self {
             state: None,
             config: config.clone(),
             map,
+            gui_handler: h,
             is_running: false,
             frame_count: 0,
         }

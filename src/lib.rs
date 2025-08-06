@@ -44,8 +44,10 @@ extern crate asn_logger;
 extern crate asn_wgpu;
 extern crate winit;
 
+use std::sync::Arc;
+
 use app::App;
-use asn_gui_core::AsnGuiWindowConfig;
+use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
 use asn_logger::{error, info};
 use data::LOG_MODULE_NAME;
 use winit::{
@@ -85,10 +87,14 @@ fn run_with_app(app: &mut impl ApplicationHandler) -> Result<(), Box<dyn std::er
     }
 }
 
-pub fn run(config: &AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run(
+    config: &AsnGuiWindowConfig,
+    handler: impl AsnGuiHandler,
+) -> Result<(), Box<dyn std::error::Error>> {
     info(LOG_MODULE_NAME, "Starting ASN WGPU application");
 
-    let mut app = App::new(config);
+    let h = Arc::new(handler);
+    let mut app = App::new(config, h);
 
     run_with_app(&mut app)
 }
