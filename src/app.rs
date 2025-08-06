@@ -1,5 +1,5 @@
 use crate::data::LOG_MODULE_NAME;
-use asn_gui_core::AsnGuiWindowConfig;
+use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
 use std::sync::Arc;
 
 use asn_logger::{error, info, trace, warn};
@@ -11,15 +11,19 @@ use winit::window::WindowId;
 
 /// Main application struct that handles window events and rendering
 #[derive(Default)]
-pub struct App {
+pub struct App<H: AsnGuiHandler> {
     state: Option<State>,
     config: AsnGuiWindowConfig,
     is_running: bool,
     frame_count: u64,
     map: RgbaHandler,
+    gui_handler: H,
 }
 
-impl ApplicationHandler for App {
+impl<H> ApplicationHandler for App<H>
+where
+    H: AsnGuiHandler,
+{
     /// Called when the application is resumed (e.g., when a window is created)
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         info(
@@ -109,15 +113,17 @@ impl ApplicationHandler for App {
     }
 }
 
-#[allow(dead_code)]
-impl App {
+impl<H> App<H>
+where
+    H: AsnGuiHandler,
+{
     /// Creates a new App with custom configuration
-    pub fn with_config(config: AsnGuiWindowConfig) -> Self {
+    pub fn new(config: &AsnGuiWindowConfig) -> Self {
         let map = RgbaHandler::new(32, 32);
 
         Self {
             state: None,
-            config,
+            config: config.clone(),
             map,
             is_running: false,
             frame_count: 0,

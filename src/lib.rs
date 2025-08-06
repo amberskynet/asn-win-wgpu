@@ -48,69 +48,28 @@ use app::App;
 use asn_gui_core::AsnGuiWindowConfig;
 use asn_logger::{error, info};
 use data::LOG_MODULE_NAME;
-use winit::event_loop::{ControlFlow, EventLoop};
+use winit::{
+    application::ApplicationHandler,
+    event_loop::{ControlFlow, EventLoop},
+};
 
-/// Runs the application with default configuration
+/// Runs the application with a custom application instance
 ///
-/// This is the simplest way to start the application. It uses default
-/// window settings and configuration.
-///
-/// # Returns
-///
-/// Returns `Ok(())` on successful completion, or an error if the
-/// application fails to start or encounters an unrecoverable error.
-///
-/// # Example
-///
-/// ```rust
-/// use asn_win_wgpu::run;
-///
-/// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     run()
-/// }
-/// ```
-pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    run_with_config(AsnGuiWindowConfig::default())
-}
-
-/// Runs the application with custom configuration
-///
-/// Allows you to customize window properties, rendering settings,
-/// and other application parameters.
+/// Allows you to use a custom application instance instead of the default one.
 ///
 /// # Arguments
 ///
-/// * `config` - Application configuration containing window settings
+/// * `app` - Application instance to run
 ///
 /// # Returns
 ///
 /// Returns `Ok(())` on successful completion, or an error if the
 /// application fails to start or encounters an unrecoverable error.
-///
-/// # Example
-///
-/// ```rust
-/// use asn_win_wgpu::{run_with_config, asn_win_config::AppConfig};
-///
-/// fn main() -> Result<(), Box<dyn std::error::Error>> {
-///     let config = AppConfig {
-///         window_title: "My App".to_string(),
-///         window_width: 1024,
-///         window_height: 768,
-///     };
-///
-///     run_with_config(config)
-/// }
-/// ```
-pub fn run_with_config(config: AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
-    info(LOG_MODULE_NAME, "Starting ASN WGPU application");
-
+fn run_with_app(app: &mut impl ApplicationHandler) -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = EventLoop::new().map_err(|e| format!("Failed to create event loop: {e}"))?;
 
     event_loop.set_control_flow(ControlFlow::Poll);
-
-    let mut app = App::with_config(config);
-    let result = event_loop.run_app(&mut app);
+    let result = event_loop.run_app(app);
 
     match result {
         Ok(_) => {
@@ -124,4 +83,12 @@ pub fn run_with_config(config: AsnGuiWindowConfig) -> Result<(), Box<dyn std::er
             ))))
         }
     }
+}
+
+pub fn run(config: &AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
+    info(LOG_MODULE_NAME, "Starting ASN WGPU application");
+
+    let mut app = App::new(config);
+
+    run_with_app(&mut app)
 }
