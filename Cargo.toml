@@ -14,8 +14,10 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 winit = { version = "0.30" }
-asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "2.1.1", features = [] }
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "2.1.1", features = [
+] }
 asn-wgpu = { path = "./modules/asn-wgpu" }
+asn-gui-core = { path = "./modules/asn-gui-core" }
 pollster = "0.4"
 
 [profile.dev]

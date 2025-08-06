@@ -1,5 +1,5 @@
-use crate::asn_win_config::AppConfig;
 use crate::data::LOG_MODULE_NAME;
+use asn_gui_core::AsnGuiWindowConfig;
 use std::sync::Arc;
 
 use asn_logger::{error, info, trace, warn};
@@ -13,7 +13,7 @@ use winit::window::WindowId;
 #[derive(Default)]
 pub struct App {
     state: Option<State>,
-    config: AppConfig,
+    config: AsnGuiWindowConfig,
     is_running: bool,
     frame_count: u64,
     map: RgbaHandler,
@@ -112,7 +112,7 @@ impl ApplicationHandler for App {
 #[allow(dead_code)]
 impl App {
     /// Creates a new App with custom configuration
-    pub fn with_config(config: AppConfig) -> Self {
+    pub fn with_config(config: AsnGuiWindowConfig) -> Self {
         let map = RgbaHandler::new(32, 32);
 
         Self {
@@ -129,7 +129,7 @@ impl App {
     }
 
     /// Returns a reference to the current configuration
-    pub fn config(&self) -> &AppConfig {
+    pub fn config(&self) -> &AsnGuiWindowConfig {
         &self.config
     }
 
@@ -272,17 +272,7 @@ impl App {
                     // TODO: Implement help system
                 }
                 winit::keyboard::Key::Character("r") | winit::keyboard::Key::Character("R") => {
-                    info(LOG_MODULE_NAME, "R key pressed - reloading map shader");
-                    if let Some(state) = self.state.as_mut() {
-                        // match state.reload_map_shader() {
-                        //     Ok(_) => info(LOG_MODULE_NAME, "Map shader reloaded successfully"),
-                        //     Err(e) => error(
-                        //         LOG_MODULE_NAME,
-                        //         &format!("Failed to reload map shader: {e}"),
-                        //     ),
-                        // }
-                        state.window().request_redraw();
-                    }
+                    info(LOG_MODULE_NAME, "R key pressed...");
                 }
                 _ => {
                     trace(

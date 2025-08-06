@@ -38,7 +38,6 @@
 //! ```
 
 mod app;
-pub mod asn_win_config;
 mod data;
 
 extern crate asn_logger;
@@ -46,8 +45,8 @@ extern crate asn_wgpu;
 extern crate winit;
 
 use app::App;
+use asn_gui_core::AsnGuiWindowConfig;
 use asn_logger::{error, info};
-use asn_win_config::AppConfig;
 use data::LOG_MODULE_NAME;
 use winit::event_loop::{ControlFlow, EventLoop};
 
@@ -71,7 +70,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 /// }
 /// ```
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    run_with_config(AppConfig::default())
+    run_with_config(AsnGuiWindowConfig::default())
 }
 
 /// Runs the application with custom configuration
@@ -103,7 +102,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 ///     run_with_config(config)
 /// }
 /// ```
-pub fn run_with_config(config: AppConfig) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run_with_config(config: AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
     info(LOG_MODULE_NAME, "Starting ASN WGPU application");
 
     let event_loop = EventLoop::new().map_err(|e| format!("Failed to create event loop: {e}"))?;

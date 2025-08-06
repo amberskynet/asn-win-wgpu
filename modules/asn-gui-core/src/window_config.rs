@@ -1,12 +1,11 @@
-/// Configuration for the application
 #[derive(Debug, Clone)]
-pub struct AppConfig {
+pub struct AsnGuiWindowConfig {
     pub window_title: String,
     pub window_width: u32,
     pub window_height: u32,
 }
 
-impl Default for AppConfig {
+impl Default for AsnGuiWindowConfig {
     fn default() -> Self {
         Self {
             window_title: "ASN WGPU Application".to_string(),
@@ -16,17 +15,13 @@ impl Default for AppConfig {
     }
 }
 
-/// Creates a default application configuration
-pub fn default_config() -> AppConfig {
-    AppConfig::default()
-}
-
-/// Creates a custom application configuration
-pub fn custom_config(title: impl Into<String>, width: u32, height: u32) -> AppConfig {
-    AppConfig {
-        window_title: title.into(),
-        window_width: width,
-        window_height: height,
+impl AsnGuiWindowConfig {
+    pub fn new(title: impl Into<String>, width: u32, height: u32) -> Self {
+        Self {
+            window_title: title.into(),
+            window_width: width,
+            window_height: height,
+        }
     }
 }
 
@@ -36,7 +31,7 @@ mod tests {
 
     #[test]
     fn test_default_config() {
-        let config = AppConfig::default();
+        let config = AsnGuiWindowConfig::default();
         assert_eq!(config.window_title, "ASN WGPU Application");
         assert_eq!(config.window_width, 800);
         assert_eq!(config.window_height, 600);
@@ -44,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_custom_config() {
-        let config = AppConfig {
+        let config = AsnGuiWindowConfig {
             window_title: "Test App".to_string(),
             window_width: 1024,
             window_height: 768,
