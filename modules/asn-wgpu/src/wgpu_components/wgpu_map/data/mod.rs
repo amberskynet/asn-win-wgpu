@@ -1,5 +1,7 @@
 use super::vertex::Vertex;
 
+pub const SHADER_SOURCE: &str = include_str!("map_shader.wgsl");
+
 pub const LOG_MODULE_NAME: &str = "wgpu_map";
 
 const DELTA_POINT: f32 = 1.0;

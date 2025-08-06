@@ -4,13 +4,8 @@ pub fn get_render_pipeline(
     device: &wgpu::Device,
     format: wgpu::TextureFormat,
     texture_bind_group_layout: &wgpu::BindGroupLayout,
-    shader_source: &str,
+    shader: wgpu::ShaderModule,
 ) -> wgpu::RenderPipeline {
-    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-        label: Some("Map Shader"),
-        source: wgpu::ShaderSource::Wgsl(shader_source.into()),
-    });
-
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("Map Render Pipeline Layout"),
         bind_group_layouts: &[&texture_bind_group_layout],

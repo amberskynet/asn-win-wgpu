@@ -148,14 +148,13 @@ impl State {
             diffuse_bytes,
         );
 
-        let shader_source = include_str!("map_shader.wgsl");
+        // let shader_source = include_str!("wgpu_components/wgpu_map/data/map_shader.wgsl");
         let map_tiles_bytes = include_bytes!("tiles.png");
 
         let quad_map = wgpu_map::WgpuMap::new(
             &device,
             &queue,
             surface_format,
-            shader_source,
             map_tiles_bytes,
             map_width,
             map_height,
