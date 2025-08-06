@@ -4,7 +4,6 @@ pub struct AppConfig {
     pub window_title: String,
     pub window_width: u32,
     pub window_height: u32,
-    pub vsync: bool,
 }
 
 impl Default for AppConfig {
@@ -13,7 +12,6 @@ impl Default for AppConfig {
             window_title: "ASN WGPU Application".to_string(),
             window_width: 800,
             window_height: 600,
-            vsync: true,
         }
     }
 }
@@ -24,12 +22,11 @@ pub fn default_config() -> AppConfig {
 }
 
 /// Creates a custom application configuration
-pub fn custom_config(title: impl Into<String>, width: u32, height: u32, vsync: bool) -> AppConfig {
+pub fn custom_config(title: impl Into<String>, width: u32, height: u32) -> AppConfig {
     AppConfig {
         window_title: title.into(),
         window_width: width,
         window_height: height,
-        vsync,
     }
 }
 
@@ -43,7 +40,6 @@ mod tests {
         assert_eq!(config.window_title, "ASN WGPU Application");
         assert_eq!(config.window_width, 800);
         assert_eq!(config.window_height, 600);
-        assert!(config.vsync);
     }
 
     #[test]
@@ -52,22 +48,19 @@ mod tests {
             window_title: "Test App".to_string(),
             window_width: 1024,
             window_height: 768,
-            vsync: false,
         };
-        
+
         assert_eq!(config.window_title, "Test App");
         assert_eq!(config.window_width, 1024);
         assert_eq!(config.window_height, 768);
-        assert!(!config.vsync);
     }
 
     #[test]
     fn test_custom_config_builder() {
-        let config = custom_config("Builder Test", 1920, 1080, false);
-        
+        let config = custom_config("Builder Test", 1920, 1080);
+
         assert_eq!(config.window_title, "Builder Test");
         assert_eq!(config.window_width, 1920);
         assert_eq!(config.window_height, 1080);
-        assert!(!config.vsync);
     }
 }

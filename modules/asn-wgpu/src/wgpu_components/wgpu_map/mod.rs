@@ -56,8 +56,7 @@ mod utils;
 mod vertex;
 
 use crate::{
-    state_error::StateError, texture,
-    wgpu_components::wgpu_map::utils::get_texture_bind_group_layout, RgbaHandler,
+    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
 
 // Реэкспортируем оптимизированную карту

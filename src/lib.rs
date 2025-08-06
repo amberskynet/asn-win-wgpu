@@ -31,9 +31,8 @@
 //!         window_title: "My Custom App".to_string(),
 //!         window_width: 1024,
 //!         window_height: 768,
-//!         vsync: true,
 //!     };
-//!     
+//!
 //!     run_with_config(config)
 //! }
 //! ```
@@ -99,9 +98,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 ///         window_title: "My App".to_string(),
 ///         window_width: 1024,
 ///         window_height: 768,
-///         vsync: true,
 ///     };
-///     
+///
 ///     run_with_config(config)
 /// }
 /// ```

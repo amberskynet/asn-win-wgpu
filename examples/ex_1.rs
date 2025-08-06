@@ -10,12 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
     // Example 2: Run with custom configuration
-    let config = custom_config(
-        "My Custom WGPU App",
-        1024,
-        768,
-        true, // vsync enabled
-    );
+    let config = custom_config("My Custom WGPU App", 1024, 768);
 
     run_with_config(config)
 }

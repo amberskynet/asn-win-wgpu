@@ -12,7 +12,6 @@ pub const MIN_WINDOW_SIZE: u32 = 1;
 
 /// Максимальный размер окна (для валидации)
 pub const MAX_WINDOW_SIZE: u32 = 16384;
-
 /// Настройки для создания GPU устройства
 pub const DEVICE_LABEL: &str = "ASN WGPU Device";
 pub const SHADER_LABEL: &str = "ASN Shader";
