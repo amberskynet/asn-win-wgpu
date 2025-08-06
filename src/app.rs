@@ -1,6 +1,6 @@
 use crate::data::LOG_MODULE_NAME;
 use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use asn_logger::{error, info, trace, warn};
 use asn_wgpu::{RgbaHandler, State};
@@ -19,7 +19,7 @@ where
     is_running: bool,
     frame_count: u64,
     map: RgbaHandler,
-    gui_handler: Arc<H>,
+    gui_handler: Arc<Mutex<H>>,
 }
 
 impl<H> ApplicationHandler for App<H>
@@ -120,7 +120,7 @@ where
     H: AsnGuiHandler,
 {
     /// Creates a new App with custom configuration
-    pub fn new(config: &AsnGuiWindowConfig, h: Arc<H>) -> Self {
+    pub fn new(config: &AsnGuiWindowConfig, h: Arc<Mutex<H>>) -> Self {
         let map = RgbaHandler::new(32, 32);
 
         Self {
@@ -182,6 +182,11 @@ where
         // Start render pass
         match state.draw_start() {
             Ok(mut ctx) => {
+                {
+                    let mut h = self.gui_handler.lock().unwrap();
+                    h.update();
+                }
+
                 // Perform rendering
                 if let Err(draw_error) = state.draw(&mut ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
