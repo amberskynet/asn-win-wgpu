@@ -17,6 +17,7 @@ pub struct State {
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     is_surface_configured: bool,
+    is_need_update: bool,
     window: Arc<Window>,
     quad: wgpu_mesh_color::WgpuQuad,
     quad_textured: wgpu_mesh_textured::WgpuQuadTextured,
@@ -29,7 +30,6 @@ pub struct State {
 struct RenderStats {
     frame_count: u32,
     total_render_time: std::time::Duration,
-    last_frame_time: Option<Instant>,
 }
 
 /// Render context for split pass rendering
@@ -48,7 +48,11 @@ impl State {
     ///
     /// # Returns
     /// * `Result<Self, StateError>` - New state or error
-    pub async fn new(window: Arc<Window>) -> Result<Self, StateError> {
+    pub async fn new(
+        window: Arc<Window>,
+        map_width: u32,
+        map_height: u32,
+    ) -> Result<Self, StateError> {
         trace(LOG_MODULE_NAME, "Creating new State");
 
         let size = window.inner_size();
@@ -145,9 +149,17 @@ impl State {
         );
 
         let shader_source = include_str!("map_shader.wgsl");
-        let map_bytes = include_bytes!("tiles.png");
-        let quad_map =
-            wgpu_map::WgpuMap::new(&device, &queue, surface_format, shader_source, map_bytes);
+        let map_tiles_bytes = include_bytes!("tiles.png");
+
+        let quad_map = wgpu_map::WgpuMap::new(
+            &device,
+            &queue,
+            surface_format,
+            shader_source,
+            map_tiles_bytes,
+            map_width,
+            map_height,
+        );
 
         Ok(Self {
             surface,
@@ -155,6 +167,7 @@ impl State {
             queue,
             config,
             is_surface_configured: false,
+            is_need_update: false,
             window,
             quad,
             quad_textured,
@@ -186,6 +199,7 @@ impl State {
 
     /// Restores state after context loss
     pub fn restore(&mut self) -> Result<(), StateError> {
+        trace(LOG_MODULE_NAME, &format!("restore..."));
         let size = self.window.inner_size();
         self.resize(size.width, size.height)
     }
@@ -240,6 +254,8 @@ impl State {
             );
         }
 
+        self.is_need_update = true;
+
         self.queue.submit(std::iter::once(ctx.encoder.finish()));
         ctx.output.present();
         Ok(())
@@ -247,8 +263,11 @@ impl State {
 
     /// Performs rendering with the provided context
     pub fn draw(&mut self, ctx: &mut RenderContext) -> Result<(), StateError> {
-        // Обновляем очередь перед отрисовкой
-        self.quad_map.update_queue(&self.queue);
+        if self.is_need_update {
+            // Обновляем очередь перед отрисовкой
+            self.quad_map.update_queue(&self.queue);
+            self.is_need_update = false;
+        }
 
         let mut render_pass = ctx.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Render Pass"),
@@ -306,22 +325,6 @@ impl State {
     /// Returns a reference to the window
     pub fn window(&self) -> &Arc<Window> {
         &self.window
-    }
-
-    /// Перезагружает шейдер карты с диска
-    pub fn reload_map_shader(&mut self) -> Result<(), StateError> {
-        use std::fs;
-        let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
-            .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
-        let map_bytes = include_bytes!("tiles.png");
-        self.quad_map = wgpu_map::WgpuMap::new(
-            &self.device,
-            &self.queue,
-            self.config.format,
-            &shader_source,
-            map_bytes,
-        );
-        Ok(())
     }
 
     /// Обновляет данные карты

@@ -11,5 +11,6 @@ pub use state::State;
 pub use state_error::StateError;
 
 pub use rgba_handler::RgbaHandler;
+pub use wgpu_components::wgpu_map::WgpuMap;
 pub use wgpu_components::wgpu_mesh_color::WgpuQuad;
 pub use wgpu_components::wgpu_mesh_textured::WgpuQuadTextured;

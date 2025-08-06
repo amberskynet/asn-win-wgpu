@@ -56,8 +56,11 @@ mod utils;
 mod vertex;
 
 use crate::{
-    texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout, RgbaHandler,
+    RgbaHandler, state_error::StateError, texture,
+    wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
+
+// Реэкспортируем оптимизированную карту
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
@@ -69,7 +72,7 @@ pub struct WgpuMap {
     index_buffer: wgpu::Buffer,
     diffuse_bind_group: wgpu::BindGroup,
     num_indices: u32,
-    rgba_map_handler: RgbaHandler,
+    map_handler: RgbaHandler,
     map_texture: texture::Texture,
     is_map_updated: bool,
 }
@@ -80,22 +83,24 @@ impl WgpuMap {
         queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
         shader_source: &str,
-        texture_bytes: &[u8],
+        map_tiles_bytes: &[u8],
+        map_width: u32,
+        map_height: u32,
     ) -> Self {
         let diffuse_texture =
-            texture::Texture::from_bytes(&device, &queue, texture_bytes, "map-texture.png")
+            texture::Texture::from_bytes(&device, &queue, map_tiles_bytes, "map-texture.png")
                 .unwrap();
 
-        let mut rgba_map_handler = RgbaHandler::new(256, 256);
-        rgba_map_handler.fill_random();
+        let mut map_handler = RgbaHandler::new(map_width, map_height);
+        map_handler.fill_random();
 
         let map_texture = texture::Texture::from_rgba(
             &device,
             &queue,
-            rgba_map_handler.data(),
-            256,
-            256,
-            "BLUE_PIXEL",
+            map_handler.data(),
+            map_handler.width(),
+            map_handler.height(),
+            "MAP_TEXTURE_0",
         )
         .unwrap();
 
@@ -147,25 +152,28 @@ impl WgpuMap {
             index_buffer,
             num_indices,
             diffuse_bind_group,
-            rgba_map_handler,
+            map_handler,
             map_texture,
             is_map_updated: false,
         }
     }
 
     pub fn update_map(&mut self, rgba: &[u8]) {
-        self.rgba_map_handler.update_data(rgba).unwrap();
+        self.map_handler.update_data(rgba).unwrap();
         self.is_map_updated = true;
     }
 
     pub fn update_queue(&mut self, queue: &wgpu::Queue) {
         if self.is_map_updated {
+            // Обновляем текстуру напрямую
             self.map_texture.update_from_rgba(
                 queue,
-                self.rgba_map_handler.data(),
-                self.rgba_map_handler.width(),
-                self.rgba_map_handler.height(),
+                self.map_handler.data(),
+                self.map_handler.width(),
+                self.map_handler.height(),
             );
+
+            self.is_map_updated = false;
         }
     }
 
@@ -176,5 +184,34 @@ impl WgpuMap {
         render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
         render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
         render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
+    }
+
+    /// Перезагружает шейдер карты с диска
+    pub fn reload_shader(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        format: wgpu::TextureFormat,
+        texture_bytes: &[u8],
+    ) -> Result<(), StateError> {
+        use std::fs;
+        let shader_source = fs::read_to_string("modules/asn-wgpu/src/map_shader.wgsl")
+            .map_err(|e| StateError::TextureError(format!("Failed to reload shader: {e}")))?;
+
+        // Создаем новый экземпляр WgpuMap с обновленным шейдером
+        let new_map = Self::new(
+            device,
+            queue,
+            format,
+            &shader_source,
+            texture_bytes,
+            self.map_handler.width(),
+            self.map_handler.height(),
+        );
+
+        // Обновляем текущий экземпляр
+        *self = new_map;
+
+        Ok(())
     }
 }
