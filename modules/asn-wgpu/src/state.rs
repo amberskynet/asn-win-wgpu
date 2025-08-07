@@ -14,7 +14,6 @@ use crate::{
 /// GPU state and rendering management
 pub struct State {
     wgpu_context: WgpuContext,
-    // is_surface_configured: bool,
     is_need_update: bool,
     window: Arc<Window>,
     quad: wgpu_mesh_color::WgpuQuad,

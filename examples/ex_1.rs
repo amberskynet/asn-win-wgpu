@@ -20,6 +20,10 @@ impl AsnGuiHandler for MyAsnGuiHandler {
     fn draw(&mut self) {
         println!("Draw");
     }
+
+    fn init(&mut self) {
+        println!("Init");
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

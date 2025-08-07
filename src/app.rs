@@ -64,6 +64,11 @@ where
             }
         };
 
+        {
+            let mut h = self.gui_handler.lock().unwrap();
+            h.init();
+        }
+
         self.state = Some(state);
         self.is_running = true;
         self.frame_count = 0;
