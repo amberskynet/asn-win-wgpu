@@ -56,9 +56,11 @@ mod utils;
 mod vertex;
 
 use crate::{
-    RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
+    RgbaHandler, state::RenderContext, texture,
+    wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
 
+use asn_gui_core::{AsnGuiElement, AsnGuiMap};
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, SHADER_SOURCE, VERTICES};
 use utils::get_render_pipeline;
@@ -73,6 +75,24 @@ pub struct WgpuMap {
     map_handler: RgbaHandler,
     map_texture: texture::Texture,
     is_map_updated: bool,
+}
+
+impl AsnGuiElement for WgpuMap {
+    type AsnRenderContext = RenderContext;
+
+    fn update(&mut self, _ctx: &Self::AsnRenderContext) {
+        todo!()
+    }
+
+    fn draw(&mut self, _ctx: &Self::AsnRenderContext) {
+        todo!()
+    }
+}
+
+impl AsnGuiMap for WgpuMap {
+    fn update_map(&mut self, _rgba: &[u8]) {
+        todo!()
+    }
 }
 
 impl WgpuMap {

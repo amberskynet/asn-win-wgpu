@@ -136,6 +136,7 @@ name = "asn-wgpu"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "asn-gui-core",
  "asn-logger",
  "bytemuck",
  "image",
