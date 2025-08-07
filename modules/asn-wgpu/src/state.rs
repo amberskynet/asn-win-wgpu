@@ -13,12 +13,8 @@ use crate::{
 
 /// GPU state and rendering management
 pub struct State {
-    // surface: wgpu::Surface<'static>,
-    // device: wgpu::Device,
-    // queue: wgpu::Queue,
-    // config: wgpu::SurfaceConfiguration,
     wgpu_context: WgpuContext,
-    is_surface_configured: bool,
+    // is_surface_configured: bool,
     is_need_update: bool,
     window: Arc<Window>,
     quad: wgpu_mesh_color::WgpuQuad,
@@ -168,11 +164,11 @@ impl State {
             surface,
             config,
             surface_format,
+            is_surface_configured: false,
         };
 
         Ok(Self {
             wgpu_context,
-            is_surface_configured: false,
             is_need_update: false,
             window,
             quad,
@@ -195,12 +191,13 @@ impl State {
             return Err(StateError::InvalidWindowSize { width, height });
         }
 
-        self.wgpu_context.config.width = width;
-        self.wgpu_context.config.height = height;
-        self.wgpu_context
-            .surface
-            .configure(&self.wgpu_context.device, &self.wgpu_context.config);
-        self.is_surface_configured = true;
+        self.wgpu_context.resize(width, height);
+        // self.wgpu_context.config.width = width;
+        // self.wgpu_context.config.height = height;
+        // self.wgpu_context
+        //     .surface
+        //     .configure(&self.wgpu_context.device, &self.wgpu_context.config);
+        // self.is_surface_configured = true;
 
         Ok(())
     }
@@ -215,7 +212,7 @@ impl State {
     /// Starts render pass, returns RenderContext
     pub fn draw_start(&mut self) -> Result<RenderContext, StateError> {
         self.window.request_redraw();
-        if !self.is_surface_configured {
+        if !self.wgpu_context.is_surface_configured {
             return Err(StateError::TextureError(
                 "Surface not configured".to_string(),
             ));
@@ -311,7 +308,7 @@ impl State {
 
     /// Checks if surface is configured
     pub fn is_configured(&self) -> bool {
-        self.is_surface_configured
+        self.wgpu_context.is_surface_configured
     }
 
     /// Returns current frame count
