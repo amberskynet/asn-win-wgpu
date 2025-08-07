@@ -1,1 +1,0 @@
-pub trait AsnGuiComponent {}
