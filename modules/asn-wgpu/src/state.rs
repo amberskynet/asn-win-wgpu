@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Instant;
 
+use asn_gui_core::{AsnGuiElement, AsnGuiFabrica, AsnGuiMap};
 use asn_logger::trace;
 use winit::window::Window;
 
@@ -338,5 +339,20 @@ impl State {
     /// Обновляет данные карты
     pub fn update_map_data(&mut self, rgba: &[u8]) {
         self.quad_map.update_map(rgba);
+    }
+}
+
+impl AsnGuiFabrica for State {
+    fn get_map(&self, map_tiles_bytes: &[u8], map_width: u32, map_height: u32) -> impl AsnGuiMap {
+        let quad_map = wgpu_map::WgpuMap::new(
+            &self.wgpu_context.device,
+            &self.wgpu_context.queue,
+            self.wgpu_context.surface_format,
+            map_tiles_bytes,
+            map_width,
+            map_height,
+        );
+
+        quad_map
     }
 }

@@ -66,7 +66,7 @@ where
 
         {
             let mut h = self.gui_handler.lock().unwrap();
-            h.init();
+            h.init(&state);
         }
 
         self.state = Some(state);

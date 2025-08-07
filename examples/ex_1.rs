@@ -7,10 +7,12 @@ use std::sync::{Arc, Mutex};
 
 use log_utils::setup_log;
 
-use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
+use asn_gui_core::{AsnGuiElement, AsnGuiHandler, AsnGuiMap, AsnGuiWindowConfig};
 use asn_win_wgpu::run;
 
-struct MyAsnGuiHandler {}
+struct MyAsnGuiHandler {
+    m: Box<dyn AsnGuiMap>,
+}
 
 impl AsnGuiHandler for MyAsnGuiHandler {
     fn update(&mut self) {
@@ -21,8 +23,11 @@ impl AsnGuiHandler for MyAsnGuiHandler {
         println!("Draw");
     }
 
-    fn init(&mut self) {
-        println!("Init");
+    fn init(&mut self, f: &impl asn_gui_core::AsnGuiFabrica) {
+        let map_width = 256;
+        let map_height = 256;
+        let map_tiles_bytes = include_bytes!("tiles.png");
+        let m = f.get_map(map_tiles_bytes, map_width, map_height);
     }
 }
 
