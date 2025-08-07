@@ -148,6 +148,11 @@ where
     }
 
     fn update(&mut self) {
+        {
+            let mut h = self.gui_handler.lock().unwrap();
+            h.update();
+        }
+
         self.map.fill_random();
 
         let Some(state) = self.state.as_mut() else {
@@ -182,16 +187,16 @@ where
         // Start render pass
         match state.draw_start() {
             Ok(mut ctx) => {
-                {
-                    let mut h = self.gui_handler.lock().unwrap();
-                    h.update();
-                }
-
                 // Perform rendering
                 if let Err(draw_error) = state.draw(&mut ctx) {
                     error(LOG_MODULE_NAME, &format!("Draw failed: {draw_error}"));
                     self.try_restore();
                     return;
+                }
+
+                {
+                    let mut h = self.gui_handler.lock().unwrap();
+                    h.draw();
                 }
 
                 // End render pass
