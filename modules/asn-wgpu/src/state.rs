@@ -8,14 +8,16 @@ use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
     state_error::StateError,
     wgpu_components::{wgpu_map, wgpu_mesh_color, wgpu_mesh_textured},
+    wgpu_context::WgpuContext,
 };
 
 /// GPU state and rendering management
 pub struct State {
-    surface: wgpu::Surface<'static>,
-    device: wgpu::Device,
-    queue: wgpu::Queue,
-    config: wgpu::SurfaceConfiguration,
+    // surface: wgpu::Surface<'static>,
+    // device: wgpu::Device,
+    // queue: wgpu::Queue,
+    // config: wgpu::SurfaceConfiguration,
+    wgpu_context: WgpuContext,
     is_surface_configured: bool,
     is_need_update: bool,
     window: Arc<Window>,
@@ -160,11 +162,16 @@ impl State {
             map_height,
         );
 
-        Ok(Self {
-            surface,
+        let wgpu_context = WgpuContext {
             device,
             queue,
+            surface,
             config,
+            surface_format,
+        };
+
+        Ok(Self {
+            wgpu_context,
             is_surface_configured: false,
             is_need_update: false,
             window,
@@ -188,9 +195,11 @@ impl State {
             return Err(StateError::InvalidWindowSize { width, height });
         }
 
-        self.config.width = width;
-        self.config.height = height;
-        self.surface.configure(&self.device, &self.config);
+        self.wgpu_context.config.width = width;
+        self.wgpu_context.config.height = height;
+        self.wgpu_context
+            .surface
+            .configure(&self.wgpu_context.device, &self.wgpu_context.config);
         self.is_surface_configured = true;
 
         Ok(())
@@ -212,17 +221,19 @@ impl State {
             ));
         }
         let output = self
+            .wgpu_context
             .surface
             .get_current_texture()
             .map_err(|e| StateError::TextureError(e.to_string()))?;
         let view = output
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
-        let encoder = self
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                label: Some("Render Encoder"),
-            });
+        let encoder =
+            self.wgpu_context
+                .device
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                    label: Some("Render Encoder"),
+                });
 
         let frame_start = Instant::now();
 
@@ -255,7 +266,9 @@ impl State {
 
         self.is_need_update = true;
 
-        self.queue.submit(std::iter::once(ctx.encoder.finish()));
+        self.wgpu_context
+            .queue
+            .submit(std::iter::once(ctx.encoder.finish()));
         ctx.output.present();
         Ok(())
     }
@@ -264,7 +277,7 @@ impl State {
     pub fn draw(&mut self, ctx: &mut RenderContext) -> Result<(), StateError> {
         if self.is_need_update {
             // Обновляем очередь перед отрисовкой
-            self.quad_map.update_queue(&self.queue);
+            self.quad_map.update_queue(&self.wgpu_context.queue);
             self.is_need_update = false;
         }
 

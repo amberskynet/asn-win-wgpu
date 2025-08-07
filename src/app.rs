@@ -206,10 +206,10 @@ where
                 } else {
                     // Log frame rate every 60 frames
                     if self.frame_count % 60 == 0 {
-                        // info(
-                        //     LOG_MODULE_NAME,
-                        //     &format!("Rendered frame {}", self.frame_count),
-                        // );
+                        info(
+                            LOG_MODULE_NAME,
+                            &format!("Rendered frame {}", self.frame_count),
+                        );
                     }
                 }
             }

@@ -1,5 +1,6 @@
 pub mod state;
 pub mod state_error;
+mod wgpu_context;
 
 mod data;
 pub mod rgba_handler;

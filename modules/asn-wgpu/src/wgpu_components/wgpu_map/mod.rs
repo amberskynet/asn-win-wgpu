@@ -59,7 +59,6 @@ use crate::{
     RgbaHandler, texture, wgpu_components::wgpu_map::utils::get_texture_bind_group_layout,
 };
 
-// Реэкспортируем оптимизированную карту
 use asn_logger::trace;
 use data::{INDICES, LOG_MODULE_NAME, SHADER_SOURCE, VERTICES};
 use utils::get_render_pipeline;
