@@ -1,4 +1,4 @@
-use asn_logger::{init_log, AsnLogConfig, AsnLogLevel};
+use asn_logger::{AsnLogConfig, AsnLogLevel, init_log};
 
 pub fn setup_log() {
     let mut c = AsnLogConfig {
@@ -13,7 +13,7 @@ pub fn setup_log() {
     c.module_levels
         .insert(String::from("naga"), AsnLogLevel::Error);
     c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Trace);
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Error);
 
     c.module_levels
         .insert(String::from("wgpu_map"), AsnLogLevel::Error);
