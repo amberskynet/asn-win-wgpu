@@ -1,14 +1,6 @@
 use winit::application::ApplicationHandler;
 
-pub struct WinitApp {}
-
-impl WinitApp {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
-
-impl ApplicationHandler for WinitApp {
+impl ApplicationHandler for super::runner_dataset::RunnerDataset {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         let _ = event_loop;
         // todo!()

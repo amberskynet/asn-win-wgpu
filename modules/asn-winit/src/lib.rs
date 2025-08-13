@@ -2,26 +2,25 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 
 mod data;
-mod winit_app;
+mod runner_dataset;
 
 use asn_gui_core::*;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use winit::event_loop::ControlFlow;
 
-use crate::winit_app::WinitApp;
+use crate::runner_dataset::new_runner_dataset;
 
 pub fn run(config: &AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
-    let _ = config;
     info(LOG_MODULE_NAME, "run()");
 
-    let mut app = WinitApp::new();
+    let mut runner = new_runner_dataset(config);
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;
 
     event_loop.set_control_flow(ControlFlow::Poll);
-    let result = event_loop.run_app(&mut app);
+    let result = event_loop.run_app(&mut runner);
 
     match result {
         Ok(_) => {
