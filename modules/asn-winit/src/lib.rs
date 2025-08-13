@@ -7,11 +7,12 @@ mod runner_dataset;
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
-use runner_dataset::new_runner_dataset;
 use winit::event_loop::ControlFlow;
 
 // do some re-export
 pub use winit;
+
+use crate::runner_dataset::RunnerDataset;
 
 pub type WinitWindow = winit::window::Window;
 
@@ -21,7 +22,7 @@ where
 {
     info(LOG_MODULE_NAME, "run()");
 
-    let mut runner = new_runner_dataset(r);
+    let mut runner = RunnerDataset::new(r);
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;
