@@ -141,6 +141,7 @@ dependencies = [
  "asn-winit",
  "bytemuck",
  "image",
+ "pollster",
  "rand",
  "thiserror 2.0.14",
  "wgpu",
