@@ -342,17 +342,17 @@ impl State {
     }
 }
 
-impl AsnGuiFabrica for State {
-    fn get_map(&self, map_tiles_bytes: &[u8], map_width: u32, map_height: u32) -> impl AsnGuiMap {
-        let quad_map = wgpu_map::WgpuMap::new(
-            &self.wgpu_context.device,
-            &self.wgpu_context.queue,
-            self.wgpu_context.surface_format,
-            map_tiles_bytes,
-            map_width,
-            map_height,
-        );
+// impl AsnGuiFabrica for State {
+//     fn get_map(&self, map_tiles_bytes: &[u8], map_width: u32, map_height: u32) -> impl AsnGuiMap {
+//         let quad_map = wgpu_map::WgpuMap::new(
+//             &self.wgpu_context.device,
+//             &self.wgpu_context.queue,
+//             self.wgpu_context.surface_format,
+//             map_tiles_bytes,
+//             map_width,
+//             map_height,
+//         );
 
-        quad_map
-    }
-}
+//         quad_map
+//     }
+// }

@@ -10,9 +10,7 @@ use log_utils::setup_log;
 use asn_gui_core::{AsnGuiElement, AsnGuiHandler, AsnGuiMap, AsnGuiWindowConfig};
 use asn_win_wgpu::run;
 
-struct MyAsnGuiHandler {
-    m: Box<dyn AsnGuiMap>,
-}
+struct MyAsnGuiHandler {}
 
 impl AsnGuiHandler for MyAsnGuiHandler {
     fn update(&mut self) {

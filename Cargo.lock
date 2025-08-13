@@ -153,7 +153,16 @@ dependencies = [
  "asn-gui-core",
  "asn-logger",
  "asn-wgpu",
+ "asn-winit",
  "pollster",
+ "winit",
+]
+
+[[package]]
+name = "asn-winit"
+version = "0.1.0"
+dependencies = [
+ "asn-logger",
  "winit",
 ]
 
