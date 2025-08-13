@@ -12,7 +12,7 @@ use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
 impl<R> ApplicationHandler for RunnerDataset<R>
 where
-    R: TAsnRenderManager + TAsnSurface,
+    R: TAsnRenderManager,
 {
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         // This method is called when the event loop is about to wait for new events.

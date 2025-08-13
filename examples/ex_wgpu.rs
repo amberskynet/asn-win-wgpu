@@ -5,8 +5,6 @@ extern crate asn_winit;
 
 mod log_utils;
 
-use asn_wgpu::get_manager;
-
 use asn_logger::*;
 use log_utils::setup_log;
 
@@ -17,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info(LOG_MODULE_NAME, "hello from main()");
 
-    let r = get_manager();
+    let r = asn_wgpu::get_manager();
 
     asn_winit::run(r)
 }

@@ -3,6 +3,7 @@ pub mod state;
 pub mod state_error;
 mod wgpu_context;
 
+use asn_gui_core::{TAsnRenderManager, TAsnSurface};
 use render_manager::RenderManager;
 
 mod data;
@@ -19,8 +20,8 @@ pub use wgpu_components::wgpu_map::WgpuMap;
 pub use wgpu_components::wgpu_mesh_color::WgpuQuad;
 pub use wgpu_components::wgpu_mesh_textured::WgpuQuadTextured;
 
-pub type ManagerWindow = asn_winit::winit::window::Window;
+// pub type ManagerWindow = asn_winit::winit::window::Window;
 
-pub fn get_manager() -> RenderManager {
+pub fn get_manager() -> impl TAsnRenderManager {
     RenderManager::new()
 }
