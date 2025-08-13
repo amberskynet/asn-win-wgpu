@@ -13,9 +13,11 @@ use winit::event_loop::ControlFlow;
 // do some re-export
 pub use winit;
 
+pub type WinitWindow = winit::window::Window;
+
 pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     info(LOG_MODULE_NAME, "run()");
 

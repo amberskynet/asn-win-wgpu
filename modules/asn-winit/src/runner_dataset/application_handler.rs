@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnSurface, TAsnWindowManager};
+use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
 use asn_logger::{error, info, trace, warn};
 
 use winit::{

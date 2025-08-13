@@ -1,5 +1,5 @@
 mod application_handler;
-mod asn_win_manager_impl;
+mod window_manager;
 
 use std::sync::Arc;
 
