@@ -1,4 +1,4 @@
-use asn_gui_core::AsnGuiWindowConfig;
+use crate::AsnGuiWindowConfig;
 
 pub trait TAsnWindowManager {
     type AsnWindow;

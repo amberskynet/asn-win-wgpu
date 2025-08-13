@@ -1,10 +1,7 @@
-use asn_gui_core::AsnGuiWindowConfig;
+use asn_gui_core::{AsnGuiWindowConfig, TAsnWindowManager};
 use asn_logger::error;
 
-use crate::{
-    data::LOG_MODULE_NAME,
-    runner_dataset::{RunnerDataset, t_window_manager::TAsnWindowManager},
-};
+use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
 impl TAsnWindowManager for RunnerDataset {
     type AsnWindow = winit::window::Window;

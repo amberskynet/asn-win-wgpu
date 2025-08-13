@@ -1,4 +1,4 @@
-use super::t_window_manager::TAsnWindowManager;
+use asn_gui_core::TAsnWindowManager;
 use asn_logger::{info, trace, warn};
 
 use winit::{

@@ -1,6 +1,5 @@
 mod application_handler;
 mod asn_win_manager_impl;
-mod t_window_manager;
 
 use asn_gui_core::AsnGuiWindowConfig;
 
