@@ -8,11 +8,11 @@ use winit::{
     window::WindowId,
 };
 
-use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
+use crate::{WinitWindow, data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
 impl<R> ApplicationHandler for RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         // This method is called when the event loop is about to wait for new events.
@@ -30,7 +30,7 @@ where
             let w = self.new_window(event_loop, &conf).unwrap();
             let arc_w = Arc::new(w);
 
-            // self.r.init(arc_w.clone());
+            self.r.init(arc_w.clone()).unwrap();
 
             self.window = Some(arc_w);
         }
@@ -73,7 +73,7 @@ where
 
 impl<R> RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     /// Handles application close
     fn handle_close(&mut self, event_loop: &ActiveEventLoop) {

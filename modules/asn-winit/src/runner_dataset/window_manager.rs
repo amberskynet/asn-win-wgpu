@@ -1,11 +1,11 @@
 use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
 use asn_logger::error;
 
-use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
+use crate::{WinitWindow, data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
 impl<R> TAsnWindowManager for RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     type AsnWindow = winit::window::Window;
 

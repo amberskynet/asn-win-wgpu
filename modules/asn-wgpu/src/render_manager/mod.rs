@@ -1,12 +1,9 @@
 mod asn_render_manager_impl;
 mod frame_context;
-mod surface_state;
 mod wgpu_context;
 
-use surface_state::WgpuSurfaceState;
-
 pub struct RenderManager {
-    s: Option<WgpuSurfaceState>,
+    s: Option<wgpu_context::WgpuContext>,
 }
 
 impl RenderManager {

@@ -1,6 +1,7 @@
-use super::frame_context::WgpuFrameContext;
-
 use super::RenderManager;
+use super::frame_context::WgpuFrameContext;
+use super::wgpu_context::WgpuContext;
+
 use asn_gui_core::TAsnRenderManager;
 use asn_winit::WinitWindow;
 
@@ -19,7 +20,9 @@ impl TAsnRenderManager for RenderManager {
     }
 
     fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = w;
+        let context = WgpuContext::new(w);
+        self.s = Some(context);
+
         Ok(())
     }
 }

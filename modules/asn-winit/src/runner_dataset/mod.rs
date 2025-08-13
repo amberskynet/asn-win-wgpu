@@ -4,19 +4,20 @@ mod window_manager;
 use std::sync::Arc;
 
 use asn_gui_core::TAsnRenderManager;
-use winit::window::Window;
+
+use crate::WinitWindow;
 
 pub struct RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
-    window: Option<Arc<Window>>,
+    window: Option<Arc<WinitWindow>>,
     r: R,
 }
 
 impl<R> RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     fn new(r: R) -> Self {
         Self { window: None, r }
@@ -25,7 +26,7 @@ where
 
 pub fn new_runner_dataset<R>(r: R) -> RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager<Window = WinitWindow>,
 {
     RunnerDataset::new(r)
 }
