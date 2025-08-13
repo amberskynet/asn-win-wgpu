@@ -4,7 +4,7 @@ extern crate asn_logger;
 mod data;
 mod runner_dataset;
 
-use asn_gui_core::*;
+use asn_gui_core::AsnGuiWindowConfig;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use runner_dataset::new_runner_dataset;

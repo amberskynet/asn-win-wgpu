@@ -45,7 +45,7 @@ extern crate asn_winit;
 
 use std::sync::{Arc, Mutex};
 
-use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
+use asn_gui_core::{AsnGuiWindowConfig, TAsnGuiHandler};
 use asn_logger::{error, info};
 // use asn_winit::winit::{
 //     application::ApplicationHandler,
@@ -87,7 +87,7 @@ use data::LOG_MODULE_NAME;
 
 pub fn run(
     config: &AsnGuiWindowConfig,
-    handler: Arc<Mutex<impl AsnGuiHandler>>,
+    handler: Arc<Mutex<impl TAsnGuiHandler>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let _ = handler;
     let _ = config;
