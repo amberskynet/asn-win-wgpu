@@ -1,5 +1,5 @@
 use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
-use asn_logger::{info, trace, warn};
+use asn_logger::{error, info, trace, warn};
 
 use winit::{
     application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop,
@@ -98,7 +98,29 @@ where
         // }
     }
 
-    fn handle_redraw(&mut self) {}
+    fn handle_redraw(&mut self) {
+        let fcx = match self.r.begin_frame() {
+            Ok(fcx) => fcx,
+            Err(e) => {
+                error(
+                    LOG_MODULE_NAME,
+                    &format!("handle_redraw begin_frame failed: {e}"),
+                );
+                return;
+            }
+        };
+
+        match self.r.end_frame(fcx) {
+            Ok(_) => {}
+            Err(e) => {
+                error(
+                    LOG_MODULE_NAME,
+                    &format!("handle_redraw end_frame failed: {e}"),
+                );
+                return;
+            }
+        }
+    }
 
     /// Handles keyboard input events
     fn handle_keyboard_input(
