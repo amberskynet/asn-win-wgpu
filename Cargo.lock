@@ -162,6 +162,7 @@ dependencies = [
 name = "asn-winit"
 version = "0.1.0"
 dependencies = [
+ "asn-gui-core",
  "asn-logger",
  "winit",
 ]
