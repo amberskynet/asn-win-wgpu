@@ -1,4 +1,6 @@
-use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
+use std::sync::Arc;
+
+use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnSurface, TAsnWindowManager};
 use asn_logger::{error, info, trace, warn};
 
 use winit::{
@@ -10,7 +12,7 @@ use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
 impl<R> ApplicationHandler for RunnerDataset<R>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager + TAsnSurface,
 {
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         // This method is called when the event loop is about to wait for new events.
@@ -26,7 +28,11 @@ where
             let conf = AsnGuiWindowConfig::default();
 
             let w = self.new_window(event_loop, &conf).unwrap();
-            self.window = Some(w);
+            let arc_w = Arc::new(w);
+
+            // self.r.init(arc_w.clone());
+
+            self.window = Some(arc_w);
         }
     }
 

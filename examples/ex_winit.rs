@@ -3,13 +3,25 @@ extern crate asn_logger;
 extern crate asn_winit;
 
 mod log_utils;
-use asn_gui_core::TAsnRenderManager;
+use std::sync::Arc;
+
+use asn_gui_core::{TAsnRenderManager, TAsnSurface};
 use asn_logger::*;
 use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_winit";
 
 pub struct DummyRenderManager {}
+impl TAsnSurface for DummyRenderManager {
+    type AsnWindow = ();
+
+    fn init(&mut self, w: Arc<Self::AsnWindow>) -> Result<(), Box<dyn std::error::Error>> {
+        let _ = w;
+        info(LOG_MODULE_NAME, "init()");
+        Ok(())
+    }
+}
+
 impl TAsnRenderManager for DummyRenderManager {
     type FrameContext = ();
 

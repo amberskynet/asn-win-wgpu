@@ -8,6 +8,7 @@ where
     R: TAsnRenderManager,
 {
     type AsnWindow = winit::window::Window;
+
     type AsnWindowContext = winit::event_loop::ActiveEventLoop;
 
     fn new_window(

@@ -1,6 +1,8 @@
 mod application_handler;
 mod asn_win_manager_impl;
 
+use std::sync::Arc;
+
 use asn_gui_core::TAsnRenderManager;
 use winit::window::Window;
 
@@ -8,7 +10,7 @@ pub struct RunnerDataset<R>
 where
     R: TAsnRenderManager,
 {
-    window: Option<Window>,
+    window: Option<Arc<Window>>,
     r: R,
 }
 

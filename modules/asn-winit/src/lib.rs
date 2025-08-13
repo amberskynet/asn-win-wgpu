@@ -4,7 +4,7 @@ extern crate asn_logger;
 mod data;
 mod runner_dataset;
 
-use asn_gui_core::TAsnRenderManager;
+use asn_gui_core::{TAsnRenderManager, TAsnSurface};
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use runner_dataset::new_runner_dataset;
@@ -15,7 +15,7 @@ pub use winit;
 
 pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
-    R: TAsnRenderManager,
+    R: TAsnRenderManager + TAsnSurface,
 {
     info(LOG_MODULE_NAME, "run()");
 
