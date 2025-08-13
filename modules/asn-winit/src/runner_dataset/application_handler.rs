@@ -1,4 +1,4 @@
-use asn_gui_core::TAsnWindowManager;
+use asn_gui_core::{AsnGuiWindowConfig, TAsnWindowManager};
 use asn_logger::{info, trace, warn};
 
 use winit::{
@@ -20,9 +20,9 @@ impl ApplicationHandler for RunnerDataset {
 
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if self.window.is_none() {
-            let w = self
-                .new_window(event_loop, &self.default_window_config.clone())
-                .unwrap();
+            let conf = AsnGuiWindowConfig::default();
+
+            let w = self.new_window(event_loop, &conf).unwrap();
             self.window = Some(w);
         }
     }

@@ -4,7 +4,6 @@ extern crate asn_logger;
 mod data;
 mod runner_dataset;
 
-use asn_gui_core::AsnGuiWindowConfig;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use runner_dataset::new_runner_dataset;
@@ -13,10 +12,10 @@ use winit::event_loop::ControlFlow;
 // do some re-export
 pub use winit;
 
-pub fn run(config: &AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     info(LOG_MODULE_NAME, "run()");
 
-    let mut runner = new_runner_dataset(config);
+    let mut runner = new_runner_dataset();
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;

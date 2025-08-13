@@ -3,7 +3,6 @@ extern crate asn_logger;
 extern crate asn_winit;
 
 mod log_utils;
-use asn_gui_core::*;
 use asn_logger::*;
 use log_utils::setup_log;
 
@@ -14,7 +13,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info(LOG_MODULE_NAME, "hello from main()");
 
-    let config = AsnGuiWindowConfig::new("My Custom WGPU App Ex Winit", 1024, 768);
-
-    asn_winit::run(&config)
+    asn_winit::run()
 }
