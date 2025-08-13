@@ -1,4 +1,4 @@
-use asn_gui_core::{AsnGuiWindowConfig, TAsnWindowManager};
+use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
 use asn_logger::{info, trace, warn};
 
 use winit::{
@@ -8,7 +8,10 @@ use winit::{
 
 use crate::{data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
-impl ApplicationHandler for RunnerDataset {
+impl<R> ApplicationHandler for RunnerDataset<R>
+where
+    R: TAsnRenderManager,
+{
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         // This method is called when the event loop is about to wait for new events.
         // You can use this to request a redraw if your application needs continuous rendering.
@@ -62,7 +65,10 @@ impl ApplicationHandler for RunnerDataset {
     }
 }
 
-impl RunnerDataset {
+impl<R> RunnerDataset<R>
+where
+    R: TAsnRenderManager,
+{
     /// Handles application close
     fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info(LOG_MODULE_NAME, "Application close requested");

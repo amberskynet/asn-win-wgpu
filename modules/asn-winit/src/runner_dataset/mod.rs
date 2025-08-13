@@ -1,18 +1,29 @@
 mod application_handler;
 mod asn_win_manager_impl;
 
+use asn_gui_core::TAsnRenderManager;
 use winit::window::Window;
 
-pub struct RunnerDataset {
+pub struct RunnerDataset<R>
+where
+    R: TAsnRenderManager,
+{
     window: Option<Window>,
+    r: R,
 }
 
-impl RunnerDataset {
-    fn new() -> Self {
-        Self { window: None }
+impl<R> RunnerDataset<R>
+where
+    R: TAsnRenderManager,
+{
+    fn new(r: R) -> Self {
+        Self { window: None, r }
     }
 }
 
-pub fn new_runner_dataset() -> RunnerDataset {
-    RunnerDataset::new()
+pub fn new_runner_dataset<R>(r: R) -> RunnerDataset<R>
+where
+    R: TAsnRenderManager,
+{
+    RunnerDataset::new(r)
 }
