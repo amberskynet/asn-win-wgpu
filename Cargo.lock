@@ -155,7 +155,6 @@ dependencies = [
  "asn-wgpu",
  "asn-winit",
  "pollster",
- "winit",
 ]
 
 [[package]]

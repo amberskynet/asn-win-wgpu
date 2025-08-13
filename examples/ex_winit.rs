@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info(LOG_MODULE_NAME, "hello from main()");
 
-    let config = AsnGuiWindowConfig::new("My Custom WGPU App", 1024, 768);
+    let config = AsnGuiWindowConfig::new("My Custom WGPU App Ex Winit", 1024, 768);
 
     asn_winit::run(&config)
 }

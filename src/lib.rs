@@ -37,23 +37,21 @@
 //! }
 //! ```
 
-mod app;
 mod data;
 
 extern crate asn_logger;
 extern crate asn_wgpu;
-extern crate winit;
+extern crate asn_winit;
 
 use std::sync::{Arc, Mutex};
 
-use app::App;
 use asn_gui_core::{AsnGuiHandler, AsnGuiWindowConfig};
 use asn_logger::{error, info};
+// use asn_winit::winit::{
+//     application::ApplicationHandler,
+//     event_loop::{ControlFlow, EventLoop},
+// };
 use data::LOG_MODULE_NAME;
-use winit::{
-    application::ApplicationHandler,
-    event_loop::{ControlFlow, EventLoop},
-};
 
 /// Runs the application with a custom application instance
 ///
@@ -67,33 +65,36 @@ use winit::{
 ///
 /// Returns `Ok(())` on successful completion, or an error if the
 /// application fails to start or encounters an unrecoverable error.
-fn run_with_app(app: &mut impl ApplicationHandler) -> Result<(), Box<dyn std::error::Error>> {
-    let event_loop = EventLoop::new().map_err(|e| format!("Failed to create event loop: {e}"))?;
+// fn run_with_app(app: &mut impl ApplicationHandler) -> Result<(), Box<dyn std::error::Error>> {
+//     let event_loop = EventLoop::new().map_err(|e| format!("Failed to create event loop: {e}"))?;
 
-    event_loop.set_control_flow(ControlFlow::Poll);
-    let result = event_loop.run_app(app);
+//     event_loop.set_control_flow(ControlFlow::Poll);
+//     let result = event_loop.run_app(app);
 
-    match result {
-        Ok(_) => {
-            info(LOG_MODULE_NAME, "Application exited successfully");
-            Ok(())
-        }
-        Err(e) => {
-            error(LOG_MODULE_NAME, &e.to_string());
-            Err(Box::new(std::io::Error::other(format!(
-                "Application error: {e}"
-            ))))
-        }
-    }
-}
+//     match result {
+//         Ok(_) => {
+//             info(LOG_MODULE_NAME, "Application exited successfully");
+//             Ok(())
+//         }
+//         Err(e) => {
+//             error(LOG_MODULE_NAME, &e.to_string());
+//             Err(Box::new(std::io::Error::other(format!(
+//                 "Application error: {e}"
+//             ))))
+//         }
+//     }
+// }
 
 pub fn run(
     config: &AsnGuiWindowConfig,
     handler: Arc<Mutex<impl AsnGuiHandler>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    info(LOG_MODULE_NAME, "Starting ASN WGPU application");
+    let _ = handler;
+    let _ = config;
+    //     info(LOG_MODULE_NAME, "Starting ASN WGPU application");
 
-    let mut app = App::new(config, handler.clone());
+    //     let mut app = App::new(config, handler.clone());
 
-    run_with_app(&mut app)
+    //     run_with_app(&mut app)
+    Ok(())
 }

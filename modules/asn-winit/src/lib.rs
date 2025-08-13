@@ -7,9 +7,11 @@ mod runner_dataset;
 use asn_gui_core::*;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
+use runner_dataset::new_runner_dataset;
 use winit::event_loop::ControlFlow;
 
-use crate::runner_dataset::new_runner_dataset;
+// do some re-export
+pub use winit;
 
 pub fn run(config: &AsnGuiWindowConfig) -> Result<(), Box<dyn std::error::Error>> {
     info(LOG_MODULE_NAME, "run()");
