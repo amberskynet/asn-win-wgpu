@@ -138,12 +138,12 @@ dependencies = [
  "anyhow",
  "asn-gui-core",
  "asn-logger",
+ "asn-winit",
  "bytemuck",
  "image",
  "rand",
  "thiserror 2.0.14",
  "wgpu",
- "winit",
 ]
 
 [[package]]

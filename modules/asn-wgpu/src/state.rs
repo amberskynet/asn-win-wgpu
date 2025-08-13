@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use asn_gui_core::{AsnGuiElement, AsnGuiFabrica, AsnGuiMap};
 use asn_logger::trace;
-use winit::window::Window;
+use asn_winit::winit::window::Window;
 
 use crate::{
     data::{DEFAULT_CLEAR_COLOR, LOG_MODULE_NAME, MIN_WINDOW_SIZE},
@@ -302,7 +302,7 @@ impl State {
     }
 
     /// Returns window size
-    pub fn window_size(&self) -> winit::dpi::PhysicalSize<u32> {
+    pub fn window_size(&self) -> asn_winit::winit::dpi::PhysicalSize<u32> {
         self.window.inner_size()
     }
 
