@@ -20,7 +20,7 @@ pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
     R: TAsnRenderManager<Window = WinitWindow>,
 {
-    info(LOG_MODULE_NAME, "run()");
+    m_info!("run()");
 
     let mut runner = RunnerDataset::new(r);
 
@@ -32,11 +32,11 @@ where
 
     match result {
         Ok(_) => {
-            info(LOG_MODULE_NAME, "Application exited successfully");
+            m_info!("Application exited successfully");
             Ok(())
         }
         Err(e) => {
-            error(LOG_MODULE_NAME, &e.to_string());
+            asn_logger::m_error!("Application error: {}", e);
             Err(Box::new(std::io::Error::other(format!(
                 "Application error: {e}"
             ))))

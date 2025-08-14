@@ -3,7 +3,7 @@ mod utils;
 mod vertex;
 
 use crate::texture;
-use asn_logger::trace;
+use asn_logger::m_trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use utils::get_texture_bind_group_layout;
@@ -72,7 +72,7 @@ impl WgpuQuadTextured {
     }
 
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
-        trace(LOG_MODULE_NAME, format!("draw").as_str());
+        m_trace!("draw");
         render_pass.set_pipeline(&self.render_pipeline);
         render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
         render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));

@@ -19,13 +19,13 @@ impl TAsnRenderManager for DummyRenderManager {
     type Window = WinitWindow;
 
     fn begin_frame(&mut self) -> Result<Self::FrameContext, Box<dyn std::error::Error>> {
-        info(LOG_MODULE_NAME, "begin_frame()");
+        m_info!("begin_frame()");
         Ok(())
     }
 
     fn end_frame(&mut self, fcx: Self::FrameContext) -> Result<(), Box<dyn std::error::Error>> {
         let _ = fcx;
-        info(LOG_MODULE_NAME, "end_frame()");
+        m_info!("end_frame()");
         Ok(())
     }
 
@@ -35,10 +35,7 @@ impl TAsnRenderManager for DummyRenderManager {
     }
 
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
-        info(
-            LOG_MODULE_NAME,
-            format!("resize from main() {:?} {:?}", width, height).as_str(),
-        );
+        m_info!("resize from main() {:?} {:?}", width, height);
         Ok(())
     }
 }
@@ -46,7 +43,7 @@ impl TAsnRenderManager for DummyRenderManager {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
-    info(LOG_MODULE_NAME, "hello from main()");
+    m_info!("hello from main()");
 
     let r = DummyRenderManager {};
 

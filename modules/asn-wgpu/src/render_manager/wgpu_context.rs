@@ -19,7 +19,7 @@ pub struct WgpuContext {
 impl WgpuContext {
     pub async fn new(window: Arc<WinitWindow>) -> Result<Self, StateError> {
         let size = window.inner_size();
-        trace(LOG_MODULE_NAME, &format!("window size: {size:?}"));
+        m_trace!("window size: {size:?}");
 
         if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
             return Err(StateError::InvalidWindowSize {
@@ -29,10 +29,7 @@ impl WgpuContext {
         }
 
         let backend_features = wgpu::Instance::enabled_backend_features();
-        trace(
-            LOG_MODULE_NAME,
-            &format!("backend_features: {backend_features:?}"),
-        );
+        m_trace!("backend_features: {backend_features:?}");
 
         // Create GPU instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
@@ -43,14 +40,14 @@ impl WgpuContext {
             ..Default::default()
         });
 
-        trace(LOG_MODULE_NAME, &format!("instance ok"));
+        m_trace!("instance ok");
 
         // Create surface
         let surface = instance
             .create_surface(window.clone())
             .map_err(|e| StateError::SurfaceCreation(e.to_string()))?;
 
-        trace(LOG_MODULE_NAME, &format!("surface ok"));
+        m_trace!("surface ok");
 
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
@@ -61,7 +58,7 @@ impl WgpuContext {
             .await
             .map_err(|_| StateError::NoAdapter)?;
 
-        trace(LOG_MODULE_NAME, &format!("adapter ok"));
+        m_trace!("adapter ok");
 
         // Create device and queue
         let (device, queue) = adapter
@@ -79,12 +76,12 @@ impl WgpuContext {
             .await
             .map_err(|e| StateError::DeviceCreation(e.to_string()))?;
 
-        trace(LOG_MODULE_NAME, &format!("device, queue ok"));
+        m_trace!("device, queue ok");
 
         // Configure surface
         let surface_caps = surface.get_capabilities(&adapter);
 
-        trace(LOG_MODULE_NAME, &format!("surface_caps {:?}", surface_caps));
+        m_trace!("surface_caps {:?}", surface_caps);
 
         let surface_format = surface_caps
             .formats
@@ -93,10 +90,7 @@ impl WgpuContext {
             .copied()
             .unwrap_or(surface_caps.formats[0]);
 
-        trace(
-            LOG_MODULE_NAME,
-            &format!("surface_format {:?}", surface_format),
-        );
+        m_trace!("surface_format {:?}", surface_format);
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -109,7 +103,7 @@ impl WgpuContext {
             desired_maximum_frame_latency: 2,
         };
 
-        trace(LOG_MODULE_NAME, &format!("config ready"));
+        m_trace!("config ready");
 
         let mut w = WgpuContext {
             device,
@@ -125,7 +119,7 @@ impl WgpuContext {
     }
 
     pub fn resize(&mut self, width: u32, height: u32) -> Result<(), StateError> {
-        trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
+        m_trace!("resize {width} {height}");
 
         // Size validation
         if width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE {

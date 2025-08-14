@@ -2,7 +2,7 @@ mod data;
 mod utils;
 mod vertex;
 
-use asn_logger::trace;
+use asn_logger::m_trace;
 use data::{INDICES, LOG_MODULE_NAME, VERTICES};
 use utils::get_render_pipeline;
 use wgpu::util::DeviceExt;
@@ -40,7 +40,7 @@ impl WgpuQuad {
         }
     }
     pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
-        trace(LOG_MODULE_NAME, format!("draw").as_str());
+        m_trace!("draw");
         render_pass.set_pipeline(&self.render_pipeline);
         render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
         render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.

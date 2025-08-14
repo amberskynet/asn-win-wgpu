@@ -5,7 +5,7 @@ use super::frame_context::WgpuFrameContext;
 use super::wgpu_context::WgpuContext;
 
 use asn_gui_core::TAsnRenderManager;
-use asn_logger::error;
+use asn_logger::*;
 use asn_winit::WinitWindow;
 
 impl TAsnRenderManager for RenderManager {
@@ -43,7 +43,7 @@ impl TAsnRenderManager for RenderManager {
         let context = match pollster::block_on(WgpuContext::new(w)) {
             Ok(context) => context,
             Err(e) => {
-                error(LOG_MODULE_NAME, &format!("Failed to create GPU state: {e}"));
+                m_error!("Failed to create GPU state: {e}");
                 return Err(Box::new(std::io::Error::other(format!(
                     "RenderManager:init error: {e}"
                 ))));

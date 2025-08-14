@@ -118,38 +118,8 @@ version = "0.1.0"
 
 [[package]]
 name = "asn-logger"
-version = "0.1.0"
-source = "git+https://github.com/amberskynet/asn-logger.git?tag=2.1.0#2f3d902a62d78f275cb17a5211c7c53fe9bec7e6"
-dependencies = [
- "cfg-if",
- "chrono",
- "console_error_panic_hook",
- "console_log",
- "fern",
- "log",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "asn-logger"
-version = "2.1.1"
-source = "git+https://github.com/amberskynet/asn-logger.git?tag=2.1.1#8d62eb1951c728e59aea023a179133e821e90e8c"
-dependencies = [
- "cfg-if",
- "chrono",
- "console_error_panic_hook",
- "console_log",
- "fern",
- "log",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "asn-logger"
-version = "3.0.1"
-source = "git+https://github.com/amberskynet/asn-logger.git?tag=3.0.0#75eb9b49ac34a9e6ddda24b375abf561e44304d2"
+version = "3.0.0"
+source = "git+https://github.com/amberskynet/asn-logger.git?tag=3.0.0#8cdc5e68c500da6a525f4e8eb2768e350e2e3ee5"
 dependencies = [
  "cfg-if",
  "chrono",
@@ -167,7 +137,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "asn-gui-core",
- "asn-logger 0.1.0",
+ "asn-logger",
  "asn-winit",
  "bytemuck",
  "image",
@@ -182,7 +152,7 @@ name = "asn-win-wgpu"
 version = "0.1.0"
 dependencies = [
  "asn-gui-core",
- "asn-logger 3.0.1",
+ "asn-logger",
  "asn-wgpu",
  "asn-winit",
  "pollster",
@@ -193,7 +163,7 @@ name = "asn-winit"
 version = "0.1.0"
 dependencies = [
  "asn-gui-core",
- "asn-logger 2.1.1",
+ "asn-logger",
  "winit",
 ]
 

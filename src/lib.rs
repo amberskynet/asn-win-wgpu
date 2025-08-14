@@ -46,12 +46,11 @@ extern crate asn_winit;
 use std::sync::{Arc, Mutex};
 
 use asn_gui_core::{AsnGuiWindowConfig, TAsnGuiHandler};
-use asn_logger::{error, info};
 // use asn_winit::winit::{
 //     application::ApplicationHandler,
 //     event_loop::{ControlFlow, EventLoop},
 // };
-use data::LOG_MODULE_NAME;
+// use data::LOG_MODULE_NAME;
 
 /// Runs the application with a custom application instance
 ///

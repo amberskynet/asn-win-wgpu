@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 // use asn_gui_core::{AsnGuiElement, AsnGuiFabrica, AsnGuiMap};
-use asn_logger::trace;
+// use asn_logger::trace;
 use asn_winit::winit::window::Window;
 
 use crate::{
@@ -51,10 +51,10 @@ impl State {
         map_width: u32,
         map_height: u32,
     ) -> Result<Self, StateError> {
-        trace(LOG_MODULE_NAME, "Creating new State");
+        // trace(LOG_MODULE_NAME, "Creating new State");
 
         let size = window.inner_size();
-        trace(LOG_MODULE_NAME, &format!("window size: {size:?}"));
+        // trace(LOG_MODULE_NAME, &format!("window size: {size:?}"));
 
         // Window size validation
         if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
@@ -65,10 +65,10 @@ impl State {
         }
 
         let backend_features = wgpu::Instance::enabled_backend_features();
-        trace(
-            LOG_MODULE_NAME,
-            &format!("backend_features: {backend_features:?}"),
-        );
+        // trace(
+        //     LOG_MODULE_NAME,
+        //     &format!("backend_features: {backend_features:?}"),
+        // );
 
         // Create GPU instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
@@ -130,7 +130,7 @@ impl State {
             desired_maximum_frame_latency: 2,
         };
 
-        trace(LOG_MODULE_NAME, "State created successfully");
+        // trace(LOG_MODULE_NAME, "State created successfully");
 
         let shader_source = include_str!("color_triangle.wgsl");
         let quad = wgpu_mesh_color::WgpuQuad::new(&device, surface_format, shader_source);
@@ -184,7 +184,7 @@ impl State {
     /// * `width` - New width
     /// * `height` - New height
     pub fn resize(&mut self, width: u32, height: u32) -> Result<(), StateError> {
-        trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
+        // trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
 
         // Size validation
         if width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE {
@@ -204,7 +204,7 @@ impl State {
 
     /// Restores state after context loss
     pub fn restore(&mut self) -> Result<(), StateError> {
-        trace(LOG_MODULE_NAME, &format!("restore..."));
+        // trace(LOG_MODULE_NAME, &format!("restore..."));
         let size = self.window.inner_size();
         self.resize(size.width, size.height)
     }
@@ -255,10 +255,10 @@ impl State {
             let avg_frame_time =
                 self.render_stats.total_render_time / self.render_stats.frame_count;
             let fps = 1.0 / avg_frame_time.as_secs_f64();
-            trace(
-                LOG_MODULE_NAME,
-                &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
-            );
+            // trace(
+            //     LOG_MODULE_NAME,
+            //     &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
+            // );
         }
 
         self.is_need_update = true;

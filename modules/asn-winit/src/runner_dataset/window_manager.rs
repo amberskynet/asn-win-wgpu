@@ -1,5 +1,5 @@
 use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager, TAsnWindowManager};
-use asn_logger::error;
+use asn_logger::m_error;
 
 use crate::{WinitWindow, data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
@@ -28,7 +28,7 @@ where
         let window = match ctx.create_window(window_attributes) {
             Ok(window) => window,
             Err(e) => {
-                error(LOG_MODULE_NAME, &format!("Failed to create window: {e}"));
+                m_error!("Failed to create window: {e}");
                 return Err(Box::new(std::io::Error::other(format!(
                     "RunnerDataset:init_window error: {e}"
                 ))));

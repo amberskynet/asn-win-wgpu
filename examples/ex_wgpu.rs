@@ -13,7 +13,7 @@ pub const LOG_MODULE_NAME: &str = "ex_wgpu";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
-    info(LOG_MODULE_NAME, "hello from main()");
+    m_info!("hello from main()");
 
     let r = asn_wgpu::get_manager();
 
