@@ -78,7 +78,6 @@ where
     /// Handles application close
     fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info(LOG_MODULE_NAME, "Application close requested");
-        // self.is_running = false;
         event_loop.exit();
     }
 
