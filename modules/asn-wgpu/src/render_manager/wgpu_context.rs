@@ -119,19 +119,23 @@ impl WgpuContext {
             config,
         };
 
-        w.resize(size.width, size.height);
+        w.resize(size.width, size.height)?;
 
         Ok(w)
     }
 
-    pub fn resize(&mut self, width: u32, height: u32) {
-        trace(
-            LOG_MODULE_NAME,
-            &format!("surface resize {} {}", width, height),
-        );
+    pub fn resize(&mut self, width: u32, height: u32) -> Result<(), StateError> {
+        trace(LOG_MODULE_NAME, &format!("resize {width} {height}"));
+
+        // Size validation
+        if width < MIN_WINDOW_SIZE || height < MIN_WINDOW_SIZE {
+            return Err(StateError::InvalidWindowSize { width, height });
+        }
 
         self.config.width = width;
         self.config.height = height;
         self.surface.configure(&self.device, &self.config);
+
+        Ok(())
     }
 }

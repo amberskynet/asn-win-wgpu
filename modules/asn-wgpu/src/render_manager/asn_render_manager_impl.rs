@@ -7,6 +7,7 @@ use super::wgpu_context::WgpuContext;
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::error;
 use asn_winit::WinitWindow;
+use image::imageops::FilterType::Lanczos3;
 
 impl TAsnRenderManager for RenderManager {
     type FrameContext = WgpuFrameContext;
@@ -51,6 +52,25 @@ impl TAsnRenderManager for RenderManager {
         };
 
         self.s = Some(context);
+
+        Ok(())
+    }
+
+    fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        let s = match self.s.as_mut() {
+            Some(s) => s,
+            None => {
+                return Err(Box::new(std::io::Error::other(format!(
+                    "RenderManager:resize error - manager not initialized"
+                ))));
+            }
+        };
+
+        if let Err(e) = s.resize(width, height) {
+            return Err(Box::new(std::io::Error::other(format!(
+                "RenderManager:resize error - {e}"
+            ))));
+        }
 
         Ok(())
     }

@@ -84,27 +84,32 @@ where
 
     /// Handles window resize events
     fn handle_resize(&mut self, width: u32, height: u32) {
-        // let Some(state) = self.state.as_mut() else {
-        //     error(LOG_MODULE_NAME, "Cannot resize: state is not initialized");
-        //     return;
-        // };
-
         trace(
             LOG_MODULE_NAME,
             &format!("Resizing window to {width}x{height}"),
         );
 
-        // if let Err(resize_error) = state.resize(width, height) {
-        //     error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
-        // } else {
-        //     info(
-        //         LOG_MODULE_NAME,
-        //         &format!("Window resized successfully to {width}x{height}"),
-        //     );
-        // }
+        if let Err(resize_error) = self.r.resize(width, height) {
+            error(LOG_MODULE_NAME, &format!("Resize failed: {resize_error}"));
+        } else {
+            info(
+                LOG_MODULE_NAME,
+                &format!("Window resized successfully to {width}x{height}"),
+            );
+        }
     }
 
     fn handle_redraw(&mut self) {
+        match &self.window {
+            Some(w) => {
+                w.request_redraw();
+            }
+            None => {
+                error(LOG_MODULE_NAME, &format!("window is None"));
+                return;
+            }
+        };
+
         let fcx = match self.r.begin_frame() {
             Ok(fcx) => fcx,
             Err(e) => {
