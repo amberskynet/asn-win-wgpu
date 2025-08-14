@@ -22,7 +22,14 @@ impl TAsnRenderManager for RenderManager {
             }
         };
 
-        let fcx = WgpuFrameContext::new(r.surface, r.device)?;
+        let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
+            Ok(fcx) => fcx,
+            Err(e) => {
+                return Err(Box::new(std::io::Error::other(format!(
+                    "RenderManager:begin_frame error - {e}"
+                ))));
+            }
+        };
 
         Ok(fcx)
     }

@@ -11,8 +11,8 @@ pub struct WgpuFrameContext {
 
 impl WgpuFrameContext {
     pub fn new(
-        surface: wgpu::Surface<'static>,
-        device: wgpu::Device,
+        surface: &wgpu::Surface<'static>,
+        device: &wgpu::Device,
     ) -> Result<WgpuFrameContext, StateError> {
         let output = surface
             .get_current_texture()

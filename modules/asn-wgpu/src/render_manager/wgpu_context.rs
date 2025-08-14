@@ -43,10 +43,14 @@ impl WgpuContext {
             ..Default::default()
         });
 
+        trace(LOG_MODULE_NAME, &format!("instance ok"));
+
         // Create surface
         let surface = instance
             .create_surface(window.clone())
             .map_err(|e| StateError::SurfaceCreation(e.to_string()))?;
+
+        trace(LOG_MODULE_NAME, &format!("surface ok"));
 
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
@@ -56,6 +60,8 @@ impl WgpuContext {
             })
             .await
             .map_err(|_| StateError::NoAdapter)?;
+
+        trace(LOG_MODULE_NAME, &format!("adapter ok"));
 
         // Create device and queue
         let (device, queue) = adapter
@@ -73,14 +79,24 @@ impl WgpuContext {
             .await
             .map_err(|e| StateError::DeviceCreation(e.to_string()))?;
 
+        trace(LOG_MODULE_NAME, &format!("device, queue ok"));
+
         // Configure surface
         let surface_caps = surface.get_capabilities(&adapter);
+
+        trace(LOG_MODULE_NAME, &format!("surface_caps {:?}", surface_caps));
+
         let surface_format = surface_caps
             .formats
             .iter()
             .find(|f| f.is_srgb())
             .copied()
             .unwrap_or(surface_caps.formats[0]);
+
+        trace(
+            LOG_MODULE_NAME,
+            &format!("surface_format {:?}", surface_format),
+        );
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -93,7 +109,9 @@ impl WgpuContext {
             desired_maximum_frame_latency: 2,
         };
 
-        let w = WgpuContext {
+        trace(LOG_MODULE_NAME, &format!("config ready"));
+
+        let mut w = WgpuContext {
             device,
             queue,
             surface_format,
@@ -101,6 +119,19 @@ impl WgpuContext {
             config,
         };
 
+        w.resize(size.width, size.height);
+
         Ok(w)
+    }
+
+    pub fn resize(&mut self, width: u32, height: u32) {
+        trace(
+            LOG_MODULE_NAME,
+            &format!("surface resize {} {}", width, height),
+        );
+
+        self.config.width = width;
+        self.config.height = height;
+        self.surface.configure(&self.device, &self.config);
     }
 }
