@@ -93,7 +93,7 @@ checksum = "175571dd1d178ced59193a6fc02dde1b972eb0bc56c892cde9beeceac5bf0f6b"
 
 [[package]]
 name = "asn-logger"
-version = "2.1.1"
+version = "2.1.0"
 source = "git+https://github.com/amberskynet/asn-logger.git#8d62eb1951c728e59aea023a179133e821e90e8c"
 dependencies = [
  "cfg-if",

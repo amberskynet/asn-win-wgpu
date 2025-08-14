@@ -118,7 +118,7 @@ version = "0.1.0"
 
 [[package]]
 name = "asn-logger"
-version = "2.1.1"
+version = "2.1.0"
 source = "git+https://github.com/amberskynet/asn-logger.git#8d62eb1951c728e59aea023a179133e821e90e8c"
 dependencies = [
  "cfg-if",
