@@ -7,7 +7,6 @@ use super::wgpu_context::WgpuContext;
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::error;
 use asn_winit::WinitWindow;
-use image::imageops::FilterType::Lanczos3;
 
 impl TAsnRenderManager for RenderManager {
     type FrameContext = WgpuFrameContext;

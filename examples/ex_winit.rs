@@ -33,6 +33,14 @@ impl TAsnRenderManager for DummyRenderManager {
         let _ = w;
         Ok(())
     }
+
+    fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        info(
+            LOG_MODULE_NAME,
+            format!("resize from main() {:?} {:?}", width, height).as_str(),
+        );
+        Ok(())
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
