@@ -44,7 +44,7 @@ impl TAsnRenderManager for RenderManager {
             }
         };
 
-        let frame_duration = fcx.frame_start.elapsed();
+        let _frame_duration = fcx.frame_start.elapsed();
 
         // Update render statistics
         // self.render_stats.frame_count += 1;

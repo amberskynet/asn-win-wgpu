@@ -21,6 +21,12 @@ pub use wgpu_components::wgpu_map::WgpuMap;
 pub use wgpu_components::wgpu_mesh_color::WgpuQuad;
 pub use wgpu_components::wgpu_mesh_textured::WgpuQuadTextured;
 
-pub fn get_manager() -> impl TAsnRenderManager<Window = WinitWindow> {
+use crate::render_manager::WgpuFrameContext;
+
+pub type GraphContext = render_manager::WgpuContext;
+pub type FrameContext = render_manager::WgpuFrameContext;
+
+pub fn get_manager() -> impl TAsnRenderManager<Window = WinitWindow, FrameContext = WgpuFrameContext>
+{
     RenderManager::new()
 }

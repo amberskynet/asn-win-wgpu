@@ -4,7 +4,7 @@ extern crate asn_logger;
 mod data;
 mod runner_dataset;
 
-use asn_gui_core::TAsnRenderManager;
+use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use winit::event_loop::ControlFlow;
@@ -16,10 +16,12 @@ use crate::runner_dataset::RunnerDataset;
 
 pub type WinitWindow = winit::window::Window;
 
-pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
+pub fn run<R, H, FC>(r: R, h: H) -> Result<(), Box<dyn std::error::Error>>
 where
-    R: TAsnRenderManager<Window = WinitWindow>,
+    R: TAsnRenderManager<Window = WinitWindow, FrameContext = FC>,
+    H: TAsnGuiHandler<FrameContext = FC>,
 {
+    let _ = h;
     m_info!("run()");
 
     let mut runner = RunnerDataset::new(r);
