@@ -14,6 +14,7 @@ struct MyAsnGuiHandler {}
 
 impl TAsnGuiHandler for MyAsnGuiHandler {
     type FrameContext = ();
+    type GraphContext = ();
 
     fn update(&mut self) {
         println!("Update");
@@ -24,8 +25,9 @@ impl TAsnGuiHandler for MyAsnGuiHandler {
         println!("Draw");
     }
 
-    fn init(&mut self) {
-        todo!()
+    fn init(&mut self, gcx: Self::GraphContext) {
+        let _ = gcx;
+        println!("init");
     }
 }
 
