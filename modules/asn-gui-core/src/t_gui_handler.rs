@@ -1,5 +1,8 @@
 pub trait TAsnGuiHandler {
-    // fn init(&mut self, f: &impl AsnGuiFabrica);
+    type FrameContext;
+
+    fn init(&mut self);
     fn update(&mut self);
-    fn draw(&mut self);
+
+    fn draw(&mut self, fcx: Self::FrameContext);
 }

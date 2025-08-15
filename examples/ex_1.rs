@@ -13,21 +13,20 @@ use asn_win_wgpu::run;
 struct MyAsnGuiHandler {}
 
 impl TAsnGuiHandler for MyAsnGuiHandler {
+    type FrameContext = ();
+
     fn update(&mut self) {
         println!("Update");
     }
 
-    fn draw(&mut self) {
+    fn draw(&mut self, fcx: Self::FrameContext) {
+        let _ = fcx;
         println!("Draw");
     }
 
-    // fn init(&mut self, _f: &impl asn_gui_core::AsnGuiFabrica) {
-    //     println!("Init");
-    //     // let map_width = 256;
-    //     // let map_height = 256;
-    //     // let map_tiles_bytes = include_bytes!("tiles.png");
-    //     // let m = f.get_map(map_tiles_bytes, map_width, map_height);
-    // }
+    fn init(&mut self) {
+        todo!()
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
