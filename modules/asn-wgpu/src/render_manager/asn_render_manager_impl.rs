@@ -35,7 +35,37 @@ impl TAsnRenderManager for RenderManager {
     }
 
     fn end_frame(&mut self, fcx: Self::FrameContext) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = fcx;
+        let r = match self.s.as_mut() {
+            Some(r) => r,
+            None => {
+                return Err(Box::new(std::io::Error::other(format!(
+                    "RenderManager:end_frame error - manager not initialized"
+                ))));
+            }
+        };
+
+        let frame_duration = fcx.frame_start.elapsed();
+
+        // Update render statistics
+        // self.render_stats.frame_count += 1;
+        // self.render_stats.total_render_time += frame_duration;
+
+        // Log performance every 60 frames
+        // if self.render_stats.frame_count % 60 == 0 {
+        // let avg_frame_time =
+        // self.render_stats.total_render_time / self.render_stats.frame_count;
+        // let fps = 1.0 / avg_frame_time.as_secs_f64();
+        // trace(
+        //     LOG_MODULE_NAME,
+        //     &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
+        // );
+        // }
+
+        // self.is_need_update = true;
+
+        r.queue.submit(std::iter::once(fcx.encoder.finish()));
+        fcx.output.present();
+
         Ok(())
     }
 

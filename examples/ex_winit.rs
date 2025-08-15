@@ -31,6 +31,7 @@ impl TAsnRenderManager for DummyRenderManager {
 
     fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
         let _ = w;
+        m_info!("init()");
         Ok(())
     }
 
