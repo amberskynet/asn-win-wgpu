@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     asn_winit::run(r)?;
 
-    for i in 0..1 {
+    for i in 0..2 {
         pollster::block_on(update());
         m_info!("update {i}");
         sleep(Duration::from_secs(1));
