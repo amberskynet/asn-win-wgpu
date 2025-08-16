@@ -21,13 +21,13 @@ mod dummy_gui {
         type GraphContext = asn_wgpu::GraphContext;
         type FrameContext = asn_wgpu::FrameContext;
 
-        fn init(&mut self, gcx: Self::GraphContext) {
+        fn init(&mut self, gcx: &Self::GraphContext) {
             let _ = gcx;
         }
 
         fn update(&mut self) {}
 
-        fn draw(&mut self, fcx: Self::FrameContext) {
+        fn draw(&mut self, fcx: &Self::FrameContext) {
             let _ = fcx;
         }
     }

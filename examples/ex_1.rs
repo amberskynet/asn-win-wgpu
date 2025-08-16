@@ -20,12 +20,12 @@ impl TAsnGuiHandler for MyAsnGuiHandler {
         println!("Update");
     }
 
-    fn draw(&mut self, fcx: Self::FrameContext) {
+    fn draw(&mut self, fcx: &Self::FrameContext) {
         let _ = fcx;
         println!("Draw");
     }
 
-    fn init(&mut self, gcx: Self::GraphContext) {
+    fn init(&mut self, gcx: &Self::GraphContext) {
         let _ = gcx;
         println!("init");
     }

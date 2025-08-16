@@ -39,7 +39,7 @@ impl TAsnGuiHandler for DummyGuiHandler {
     type GraphContext = ();
     type FrameContext = ();
 
-    fn init(&mut self, gcx: Self::GraphContext) {
+    fn init(&mut self, gcx: &Self::GraphContext) {
         t_info!("TAsnGuiHandler", "init()");
         let _ = gcx;
     }
@@ -48,7 +48,7 @@ impl TAsnGuiHandler for DummyGuiHandler {
         t_info!("TAsnGuiHandler", "update()");
     }
 
-    fn draw(&mut self, fcx: Self::FrameContext) {
+    fn draw(&mut self, fcx: &Self::FrameContext) {
         t_info!("TAsnGuiHandler", "draw()");
         let _ = fcx;
     }

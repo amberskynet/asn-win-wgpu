@@ -10,7 +10,7 @@ use asn_winit::WinitWindow;
 
 impl<H> TAsnRenderManager for RenderManager<H>
 where
-    H: TAsnGuiHandler,
+    H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,
 {
     type Window = WinitWindow;
 
@@ -55,7 +55,7 @@ where
             Some(r) => r,
             None => {
                 return Err(Box::new(std::io::Error::other(format!(
-                    "RenderManager:begin_frame error - manager not initialized"
+                    "RenderManager:draw error - manager not initialized"
                 ))));
             }
         };
@@ -64,11 +64,22 @@ where
             Ok(fcx) => fcx,
             Err(e) => {
                 return Err(Box::new(std::io::Error::other(format!(
-                    "RenderManager:begin_frame error - {e}"
+                    "RenderManager:draw error - {e}"
                 ))));
             }
         };
 
+        {
+            let mut h = match self.h.lock() {
+                Ok(h) => h,
+                Err(e) => {
+                    return Err(Box::new(std::io::Error::other(format!(
+                        "RenderManager:draw error - handler cant unlock - {e}"
+                    ))));
+                }
+            };
+            h.draw(&fcx)
+        }
         // end frame
 
         let _frame_duration = fcx.frame_start.elapsed();
