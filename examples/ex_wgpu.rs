@@ -5,7 +5,11 @@ extern crate asn_winit;
 
 mod log_utils;
 
-use std::sync::{Arc, Mutex};
+use std::{
+    sync::{Arc, Mutex},
+    thread::sleep,
+    time::Duration,
+};
 
 use asn_logger::*;
 use log_utils::setup_log;
@@ -59,5 +63,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let r = asn_wgpu::get_manager(h_safe);
 
-    asn_winit::run(r)
+    asn_winit::run(r)?;
+
+    for i in 0..1 {
+        pollster::block_on(update());
+        m_info!("update {i}");
+        sleep(Duration::from_secs(1));
+    }
+
+    Ok(())
 }
