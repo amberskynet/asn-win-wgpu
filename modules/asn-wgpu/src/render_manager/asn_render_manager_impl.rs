@@ -4,11 +4,14 @@ use super::RenderManager;
 use super::frame_context::WgpuFrameContext;
 use super::wgpu_context::WgpuContext;
 
-use asn_gui_core::TAsnRenderManager;
+use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
-impl TAsnRenderManager for RenderManager {
+impl<H> TAsnRenderManager for RenderManager<H>
+where
+    H: TAsnGuiHandler,
+{
     type Window = WinitWindow;
 
     fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
