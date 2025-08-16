@@ -25,6 +25,18 @@ where
             }
         };
 
+        {
+            let mut h = match self.h.lock() {
+                Ok(h) => h,
+                Err(e) => {
+                    return Err(Box::new(std::io::Error::other(format!(
+                        "RenderManager:draw error - handler cant unlock - {e}"
+                    ))));
+                }
+            };
+            h.init(&context)
+        }
+
         self.s = Some(context);
 
         Ok(())
