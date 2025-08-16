@@ -7,7 +7,6 @@ use asn_gui_core::TAsnRenderManager;
 use render_manager::RenderManager;
 
 mod data;
-mod wgpu_utils;
 
 pub use state_error::StateError;
 
