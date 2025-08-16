@@ -100,21 +100,13 @@ where
             }
         };
 
-        let fcx = match self.r.begin_frame() {
-            Ok(fcx) => fcx,
-            Err(e) => {
-                m_error!("handle_redraw begin_frame failed: {e}");
+        match self.r.draw() {
+            Ok(_) => {}
+            Err(err) => {
+                m_error!("handle_redraw draw failed: {err}");
                 return;
             }
         };
-
-        match self.r.end_frame(fcx) {
-            Ok(_) => {}
-            Err(e) => {
-                m_error!("handle_redraw end_frame failed: {e}");
-                return;
-            }
-        }
     }
 
     /// Handles keyboard input events

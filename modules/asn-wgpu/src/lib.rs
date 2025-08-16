@@ -10,12 +10,9 @@ mod data;
 
 pub use state_error::StateError;
 
-use crate::render_manager::WgpuFrameContext;
-
 pub type GraphContext = render_manager::WgpuContext;
 pub type FrameContext = render_manager::WgpuFrameContext;
 
-pub fn get_manager()
--> impl TAsnRenderManager<Window = asn_winit::WinitWindow, FrameContext = WgpuFrameContext> {
+pub fn get_manager() -> impl TAsnRenderManager<Window = asn_winit::WinitWindow> {
     RenderManager::new()
 }

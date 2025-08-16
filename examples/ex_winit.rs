@@ -16,19 +16,7 @@ pub struct DummyRenderManager {}
 pub struct DummyGuiHandler {}
 
 impl TAsnRenderManager for DummyRenderManager {
-    type FrameContext = ();
     type Window = WinitWindow;
-
-    fn begin_frame(&mut self) -> Result<Self::FrameContext, Box<dyn std::error::Error>> {
-        m_info!("begin_frame()");
-        Ok(())
-    }
-
-    fn end_frame(&mut self, fcx: Self::FrameContext) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = fcx;
-        m_info!("end_frame()");
-        Ok(())
-    }
 
     fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
         let _ = w;
@@ -38,6 +26,11 @@ impl TAsnRenderManager for DummyRenderManager {
 
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
         m_info!("resize from main() {:?} {:?}", width, height);
+        Ok(())
+    }
+
+    fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        m_info!("draw");
         Ok(())
     }
 }
@@ -67,7 +60,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     m_info!("hello from main()");
 
     let r = DummyRenderManager {};
-    let h = DummyGuiHandler {};
 
-    asn_winit::run(r, h)
+    asn_winit::run(r)
 }

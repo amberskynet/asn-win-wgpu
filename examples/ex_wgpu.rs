@@ -28,17 +28,12 @@ impl TAsnGuiHandler for DummyGuiHandler {
     }
 }
 
-fn get_dummy_gui_handler() -> impl TAsnGuiHandler<FrameContext = asn_wgpu::FrameContext> {
-    return DummyGuiHandler {};
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
     m_info!("hello from main()");
 
     let r = asn_wgpu::get_manager();
-    let h = get_dummy_gui_handler();
 
-    asn_winit::run(r, h)
+    asn_winit::run(r)
 }
