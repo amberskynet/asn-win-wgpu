@@ -3,7 +3,7 @@ extern crate asn_logger;
 extern crate asn_winit;
 
 mod log_utils;
-use std::sync::Arc;
+use std::{sync::Arc, thread::sleep, time::Duration};
 
 use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
@@ -61,5 +61,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let r = DummyRenderManager {};
 
-    asn_winit::run(r)
+    asn_winit::run(r)?;
+
+    sleep(Duration::from_secs(5));
+
+    Ok(())
 }
