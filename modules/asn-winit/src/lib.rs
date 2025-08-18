@@ -3,16 +3,18 @@ extern crate asn_logger;
 
 mod data;
 mod runner_dataset;
+mod winit_app_state;
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use winit::event_loop::ControlFlow;
+use winit_app_state::InitializationState;
 
 // do some re-export
 pub use winit;
 
-use crate::runner_dataset::RunnerDataset;
+use crate::winit_app_state::{EmptyState, ReadyState};
 
 pub type WinitWindow = winit::window::Window;
 
@@ -22,7 +24,8 @@ where
 {
     m_info!("run()");
 
-    let mut runner = RunnerDataset::new(r);
+    let mut runner: InitializationState<EmptyState<R>, ReadyState<R>> =
+        InitializationState::Uninitialized(EmptyState { r: Some(r) });
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;
