@@ -25,7 +25,8 @@ impl TAsnRenderManager for DummyRenderManager {
         Ok(())
     }
 
-    fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+    fn resize(&mut self, width: u32, _height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        let _ = width;
         m_info!("resize");
         Ok(())
     }
