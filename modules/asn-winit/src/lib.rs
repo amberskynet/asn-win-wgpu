@@ -2,31 +2,31 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 
 mod data;
-mod runner;
-mod runner_dataset;
-mod winit_app_state;
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
 use winit::event_loop::ControlFlow;
-use winit_app_state::InitializationState;
+
+mod app_state;
+mod winit_utils;
 
 // do some re-export
 pub use winit;
 
-use crate::winit_app_state::{EmptyState, ReadyState};
+use crate::app_state::new_state;
 
 pub type WinitWindow = winit::window::Window;
 
+pub trait RenderManager: TAsnRenderManager<Window = WinitWindow> {}
+
 pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
-    R: TAsnRenderManager<Window = WinitWindow>,
+    R: RenderManager,
 {
     m_info!("run()");
 
-    // let mut runner: InitializationState<EmptyState<R>, ReadyState<R>> =
-    //     InitializationState::Uninitialized(EmptyState { r: Some(r) });
+    let mut runner = new_state(r);
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;
