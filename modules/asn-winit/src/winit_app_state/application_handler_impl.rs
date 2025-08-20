@@ -1,4 +1,7 @@
-use asn_gui_core::TAsnRenderManager;
+use std::sync::Arc;
+
+use asn_gui_core::{AsnGuiWindowConfig, TAsnRenderManager};
+use asn_logger::log::error;
 use winit::application::ApplicationHandler;
 
 use crate::WinitWindow;
@@ -10,10 +13,24 @@ where
     R: TAsnRenderManager<Window = WinitWindow>,
 {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+        let _ = event_loop;
         if let super::InitializationState::Uninitialized(u) = self {
-            let r = u.r.take().unwrap();
-            let r = ReadyState { r };
-            *self = InitializationState::Initialized(r);
+            let mut r = u.r.take().unwrap();
+
+            let conf = AsnGuiWindowConfig::default();
+
+            let w = super::winit_utils::new_window(event_loop, &conf).unwrap();
+            let arc_w = Arc::new(w);
+
+            match r.init(arc_w) {
+                Ok(_) => {
+                    let r = ReadyState { r };
+                    *self = InitializationState::Initialized(r);
+                }
+                Err(err) => {
+                    error!("ApplicationHandler resumed error: {err}");
+                }
+            }
         }
     }
 
@@ -23,6 +40,8 @@ where
         window_id: winit::window::WindowId,
         event: winit::event::WindowEvent,
     ) {
-        // todo!()
+        let _ = event_loop;
+        let _ = event;
+        let _ = window_id;
     }
 }
