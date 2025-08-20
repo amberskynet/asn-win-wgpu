@@ -44,7 +44,7 @@ where
     RenderManagerState::Empty(r)
 }
 
-// TODO for future change <R> to FnOnce<R> (?)
+// don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
 impl<R> RenderManagerState<R>
 where
