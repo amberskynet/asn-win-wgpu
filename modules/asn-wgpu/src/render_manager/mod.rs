@@ -9,9 +9,17 @@ use asn_gui_core::TAsnGuiHandler;
 pub use frame_context::WgpuFrameContext;
 pub use wgpu_context::WgpuContext;
 
+pub trait GuiHandler:
+    TAsnGuiHandler<
+        GraphContext = wgpu_context::WgpuContext,
+        FrameContext = frame_context::WgpuFrameContext,
+    >
+{
+}
+
 pub struct RenderManager<H>
 where
-    H: TAsnGuiHandler,
+    H: GuiHandler,
 {
     s: Option<wgpu_context::WgpuContext>,
     h: Arc<Mutex<H>>,
@@ -19,10 +27,7 @@ where
 
 impl<H> RenderManager<H>
 where
-    H: TAsnGuiHandler<
-            GraphContext = wgpu_context::WgpuContext,
-            FrameContext = frame_context::WgpuFrameContext,
-        >,
+    H: GuiHandler,
 {
     pub fn new(h: Arc<Mutex<H>>) -> Self {
         RenderManager {

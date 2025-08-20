@@ -1,16 +1,16 @@
-use crate::data::LOG_MODULE_NAME;
+use crate::{data::LOG_MODULE_NAME, render_manager::GuiHandler};
 
 use super::RenderManager;
 use super::frame_context::WgpuFrameContext;
 use super::wgpu_context::WgpuContext;
 
-use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
+use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
 impl<H> TAsnRenderManager for RenderManager<H>
 where
-    H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,
+    H: GuiHandler,
 {
     type Window = WinitWindow;
 

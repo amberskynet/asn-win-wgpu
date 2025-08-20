@@ -50,8 +50,6 @@ mod dummy_gui {
     }
 }
 
-async fn update() {}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
@@ -61,12 +59,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let h_safe = Arc::new(Mutex::new(h));
 
-    let r = asn_wgpu::get_manager(h_safe);
+    // let r = asn_wgpu::render_manager::RenderManager {};
+    // let r = asn_wgpu::get_manager(h_safe);
 
     asn_winit::run(r)?;
 
     for i in 0..2 {
-        pollster::block_on(update());
         m_info!("update {i}");
         sleep(Duration::from_secs(1));
     }
