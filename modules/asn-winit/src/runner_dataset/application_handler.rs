@@ -10,63 +10,63 @@ use winit::{
 
 use crate::{WinitWindow, data::LOG_MODULE_NAME, runner_dataset::RunnerDataset};
 
-// impl<R> ApplicationHandler for RunnerDataset<R>
-// where
-//     R: TAsnRenderManager<Window = WinitWindow>,
-// {
-//     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
-//         // This method is called when the event loop is about to wait for new events.
-//         // You can use this to request a redraw if your application needs continuous rendering.
-//         if let Some(window) = &self.window {
-//             // trace(LOG_MODULE_NAME, &format!("about_to_wait"));
-//             window.request_redraw();
-//         }
-//     }
+impl<R> ApplicationHandler for RunnerDataset<R>
+where
+    R: TAsnRenderManager<Window = WinitWindow>,
+{
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        // This method is called when the event loop is about to wait for new events.
+        // You can use this to request a redraw if your application needs continuous rendering.
+        if let Some(window) = &self.window {
+            // trace(LOG_MODULE_NAME, &format!("about_to_wait"));
+            window.request_redraw();
+        }
+    }
 
-//     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-//         if self.window.is_none() {
-//             let conf = AsnGuiWindowConfig::default();
+    fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+        if self.window.is_none() {
+            let conf = AsnGuiWindowConfig::default();
 
-//             let w = self.new_window(event_loop, &conf).unwrap();
-//             let arc_w = Arc::new(w);
+            let w = self.new_window(event_loop, &conf).unwrap();
+            let arc_w = Arc::new(w);
 
-//             self.r.init(arc_w.clone()).unwrap();
+            self.r.init(arc_w.clone()).unwrap();
 
-//             self.window = Some(arc_w);
-//         }
-//     }
+            self.window = Some(arc_w);
+        }
+    }
 
-//     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
-//         match event {
-//             WindowEvent::CloseRequested => {
-//                 m_trace!("CloseRequested event");
-//                 self.handle_close(event_loop);
-//             }
-//             WindowEvent::RedrawRequested => {
-//                 // trace(LOG_MODULE_NAME, &format!("RedrawRequested event"));
-//                 self.handle_redraw();
-//             }
-//             WindowEvent::Resized(size) => {
-//                 m_trace!("Resized event: {size:?}");
-//                 self.handle_resize(size.width, size.height);
-//             }
-//             WindowEvent::KeyboardInput { event, .. } => {
-//                 m_trace!("KeyboardInput event: {event:?}");
-//                 self.handle_keyboard_input(event_loop, event);
-//             }
-//             WindowEvent::Focused(focused) => {
-//                 m_trace!("Window focus changed: {id:?}");
-//                 m_trace!("Window focus changed: {focused}");
-//             }
-//             WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
-//                 m_trace!("Scale factor changed: {scale_factor}");
-//             }
-//             _ => {
-//                 m_trace!("Window {id:?} event: {event:?}");
-//             }
-//         }
-//     }
-// }
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
+        match event {
+            WindowEvent::CloseRequested => {
+                m_trace!("CloseRequested event");
+                self.handle_close(event_loop);
+            }
+            WindowEvent::RedrawRequested => {
+                // trace(LOG_MODULE_NAME, &format!("RedrawRequested event"));
+                self.handle_redraw();
+            }
+            WindowEvent::Resized(size) => {
+                m_trace!("Resized event: {size:?}");
+                self.handle_resize(size.width, size.height);
+            }
+            WindowEvent::KeyboardInput { event, .. } => {
+                m_trace!("KeyboardInput event: {event:?}");
+                self.handle_keyboard_input(event_loop, event);
+            }
+            WindowEvent::Focused(focused) => {
+                m_trace!("Window focus changed: {id:?}");
+                m_trace!("Window focus changed: {focused}");
+            }
+            WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
+                m_trace!("Scale factor changed: {scale_factor}");
+            }
+            _ => {
+                m_trace!("Window {id:?} event: {event:?}");
+            }
+        }
+    }
+}
 
 impl<R> RunnerDataset<R>
 where

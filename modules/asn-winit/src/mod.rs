@@ -2,6 +2,7 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 
 mod data;
+mod runner;
 mod runner_dataset;
 mod winit_app_state;
 
@@ -24,8 +25,8 @@ where
 {
     m_info!("run()");
 
-    let mut runner: InitializationState<EmptyState<R>, ReadyState<R>> =
-        InitializationState::Uninitialized(EmptyState { r: Some(r) });
+    // let mut runner: InitializationState<EmptyState<R>, ReadyState<R>> =
+    //     InitializationState::Uninitialized(EmptyState { r: Some(r) });
 
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))?;
