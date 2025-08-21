@@ -73,6 +73,8 @@ where
             }
         };
 
+        r.window.request_redraw();
+
         let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
             Ok(fcx) => fcx,
             Err(e) => {

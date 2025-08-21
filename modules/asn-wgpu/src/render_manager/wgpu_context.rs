@@ -9,6 +9,7 @@ use crate::{
 };
 
 pub struct WgpuContext {
+    pub window: Arc<WinitWindow>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface_format: wgpu::TextureFormat,
@@ -106,6 +107,7 @@ impl WgpuContext {
         m_trace!("config ready");
 
         let mut w = WgpuContext {
+            window,
             device,
             queue,
             surface_format,
