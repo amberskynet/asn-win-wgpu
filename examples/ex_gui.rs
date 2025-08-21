@@ -16,39 +16,39 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_wgpu";
 
-mod dummy_gui {
-    use asn_logger::*;
-    pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
+pub struct DummyGuiHandler {}
 
-    pub struct DummyGuiHandler {}
+use asn_gui_core::TAsnGuiHandler;
+use asn_wgpu::{WgpuGuiHandler, render_manager};
 
-    use asn_gui_core::TAsnGuiHandler;
-    use asn_wgpu::{WgpuGuiHandler, render_manager};
+// как заполнять gui-компоненты до вызова init ?
+// State -> Loaded/Unloaded
+// Option -> Option<Element>
+// FnOnce() -> TAsnGuiHandler
 
-    impl TAsnGuiHandler for DummyGuiHandler {
-        type GraphContext = render_manager::WgpuContext;
-        type FrameContext = render_manager::WgpuFrameContext;
+impl TAsnGuiHandler for DummyGuiHandler {
+    type GraphContext = render_manager::WgpuContext;
+    type FrameContext = render_manager::WgpuFrameContext;
 
-        fn init(&mut self, gcx: &Self::GraphContext) {
-            let _ = gcx;
-            m_info!("init");
-        }
-
-        fn update(&mut self) {
-            m_info!("update");
-        }
-
-        fn draw(&mut self, fcx: &Self::FrameContext) {
-            let _ = fcx;
-            m_info!("draw");
-        }
+    fn init(&mut self, gcx: &Self::GraphContext) {
+        let _ = gcx;
+        m_info!("init");
     }
 
-    impl WgpuGuiHandler for DummyGuiHandler {}
-
-    pub fn get_handler() -> impl WgpuGuiHandler {
-        DummyGuiHandler {}
+    fn update(&mut self) {
+        m_info!("update");
     }
+
+    fn draw(&mut self, fcx: &Self::FrameContext) {
+        let _ = fcx;
+        m_info!("draw");
+    }
+}
+
+impl WgpuGuiHandler for DummyGuiHandler {}
+
+pub fn get_handler() -> impl WgpuGuiHandler {
+    DummyGuiHandler {}
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -56,7 +56,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
-    let h = dummy_gui::get_handler();
+    let h = DummyGuiHandler {};
 
     let h_safe = Arc::new(Mutex::new(h));
 
