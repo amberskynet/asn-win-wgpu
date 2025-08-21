@@ -156,6 +156,7 @@ dependencies = [
  "asn-wgpu",
  "asn-winit",
  "pollster",
+ "wgpu-map",
 ]
 
 [[package]]
@@ -2251,6 +2252,10 @@ dependencies = [
  "windows",
  "windows-core 0.58.0",
 ]
+
+[[package]]
+name = "wgpu-map"
+version = "0.1.0"
 
 [[package]]
 name = "wgpu-types"
