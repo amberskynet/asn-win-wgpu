@@ -23,6 +23,7 @@ pub trait WgpuGuiHandler:
 {
 }
 
+// Выдаем на выход TAsnGuiHandler совместимый с WinitRenderManager
 pub fn get_manager<H: WgpuGuiHandler>(h: Arc<Mutex<H>>) -> impl asn_winit::WinitRenderManager {
     RenderManager::new(h)
 }

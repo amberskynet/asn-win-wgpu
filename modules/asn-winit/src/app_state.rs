@@ -50,7 +50,7 @@ impl<R> RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
-    pub fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if let Self::Empty(r) = self {
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
@@ -131,8 +131,13 @@ where
 {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         trace!("ApplicationHandler resumed: {self}");
-        self.resumed(event_loop);
+        self.handle_resumed(event_loop);
         trace!("ApplicationHandler resumed: {self}");
+    }
+
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        // trace!("ApplicationHandler about_to_wait");
+        self.handle_redraw();
     }
 
     fn window_event(
