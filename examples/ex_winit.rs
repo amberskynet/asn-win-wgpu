@@ -7,7 +7,7 @@ use std::{sync::Arc, thread::sleep, time::Duration};
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
-use asn_winit::{RenderManager, WinitWindow};
+use asn_winit::{WinitRenderManager, WinitWindow};
 use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_winit";
@@ -25,7 +25,8 @@ impl TAsnRenderManager for DummyRenderManager {
         Ok(())
     }
 
-    fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+    fn resize(&mut self, width: u32, _height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        let _ = width;
         m_info!("resize");
         Ok(())
     }
@@ -36,7 +37,7 @@ impl TAsnRenderManager for DummyRenderManager {
     }
 }
 
-impl RenderManager for DummyRenderManager {}
+impl WinitRenderManager for DummyRenderManager {}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();

@@ -18,11 +18,11 @@ use crate::app_state::new_state;
 
 pub type WinitWindow = winit::window::Window;
 
-pub trait RenderManager: TAsnRenderManager<Window = WinitWindow> {}
+pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> {}
 
 pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
-    R: RenderManager,
+    R: WinitRenderManager,
 {
     m_info!("run()");
 

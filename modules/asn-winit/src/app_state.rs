@@ -3,7 +3,7 @@ use std::{fmt, sync::Arc};
 use asn_gui_core::AsnGuiWindowConfig;
 use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
 
-use crate::{RenderManager, winit_utils::new_window};
+use crate::{WinitRenderManager, winit_utils::new_window};
 
 use asn_logger::log::*;
 
@@ -39,7 +39,7 @@ impl<R> RenderManagerState<R> {
 
 pub fn new_state<R>(r: R) -> RenderManagerState<R>
 where
-    R: RenderManager,
+    R: WinitRenderManager,
 {
     RenderManagerState::Empty(r)
 }
@@ -48,9 +48,9 @@ where
 
 impl<R> RenderManagerState<R>
 where
-    R: RenderManager,
+    R: WinitRenderManager,
 {
-    pub fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if let Self::Empty(r) = self {
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
@@ -127,12 +127,17 @@ where
 
 impl<R> ApplicationHandler for RenderManagerState<R>
 where
-    R: RenderManager,
+    R: WinitRenderManager,
 {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         trace!("ApplicationHandler resumed: {self}");
-        self.resumed(event_loop);
+        self.handle_resumed(event_loop);
         trace!("ApplicationHandler resumed: {self}");
+    }
+
+    fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
+        // trace!("ApplicationHandler about_to_wait");
+        self.handle_redraw();
     }
 
     fn window_event(

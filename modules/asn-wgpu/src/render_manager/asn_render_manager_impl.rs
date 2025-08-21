@@ -1,16 +1,17 @@
+use crate::WgpuGuiHandler;
 use crate::data::LOG_MODULE_NAME;
 
 use super::RenderManager;
 use super::frame_context::WgpuFrameContext;
 use super::wgpu_context::WgpuContext;
 
-use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
+use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
 impl<H> TAsnRenderManager for RenderManager<H>
 where
-    H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,
+    H: WgpuGuiHandler,
 {
     type Window = WinitWindow;
 
@@ -71,6 +72,8 @@ where
                 ))));
             }
         };
+
+        r.window.request_redraw();
 
         let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
             Ok(fcx) => fcx,

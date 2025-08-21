@@ -4,14 +4,15 @@ mod wgpu_context;
 
 use std::sync::{Arc, Mutex};
 
-use asn_gui_core::TAsnGuiHandler;
-
+use asn_winit::WinitRenderManager;
 pub use frame_context::WgpuFrameContext;
 pub use wgpu_context::WgpuContext;
 
+use crate::WgpuGuiHandler;
+
 pub struct RenderManager<H>
 where
-    H: TAsnGuiHandler,
+    H: WgpuGuiHandler,
 {
     s: Option<wgpu_context::WgpuContext>,
     h: Arc<Mutex<H>>,
@@ -19,10 +20,7 @@ where
 
 impl<H> RenderManager<H>
 where
-    H: TAsnGuiHandler<
-            GraphContext = wgpu_context::WgpuContext,
-            FrameContext = frame_context::WgpuFrameContext,
-        >,
+    H: WgpuGuiHandler,
 {
     pub fn new(h: Arc<Mutex<H>>) -> Self {
         RenderManager {
@@ -31,3 +29,5 @@ where
         }
     }
 }
+
+impl<H> WinitRenderManager for RenderManager<H> where H: WgpuGuiHandler {}

@@ -23,11 +23,9 @@ mod dummy_gui {
     pub struct DummyGuiHandler {}
 
     use asn_gui_core::TAsnGuiHandler;
+    use asn_wgpu::{WgpuGuiHandler, render_manager};
 
     impl TAsnGuiHandler for DummyGuiHandler {
-        type GraphContext = asn_wgpu::GraphContext;
-        type FrameContext = asn_wgpu::FrameContext;
-
         fn init(&mut self, gcx: &Self::GraphContext) {
             let _ = gcx;
             m_info!("init");
@@ -41,16 +39,17 @@ mod dummy_gui {
             let _ = fcx;
             m_info!("draw");
         }
+
+        type GraphContext = render_manager::WgpuContext;
+        type FrameContext = render_manager::WgpuFrameContext;
     }
 
-    pub fn get_handler()
-    -> impl TAsnGuiHandler<GraphContext = asn_wgpu::GraphContext, FrameContext = asn_wgpu::FrameContext>
-    {
+    impl WgpuGuiHandler for DummyGuiHandler {}
+
+    pub fn get_handler() -> impl WgpuGuiHandler {
         DummyGuiHandler {}
     }
 }
-
-async fn update() {}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
@@ -66,7 +65,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     asn_winit::run(r)?;
 
     for i in 0..2 {
-        pollster::block_on(update());
         m_info!("update {i}");
         sleep(Duration::from_secs(1));
     }

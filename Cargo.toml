@@ -18,6 +18,7 @@ asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "3.0
 asn-wgpu = { path = "./modules/asn-wgpu" }
 asn-winit = { path = "./modules/asn-winit" }
 asn-gui-core = { path = "./modules/asn-gui-core" }
+wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
 pollster = "0.4"
 
 [profile.dev]
