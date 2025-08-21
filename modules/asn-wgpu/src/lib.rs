@@ -23,6 +23,15 @@ pub trait WgpuGuiHandler:
 {
 }
 
+// Blanket
+impl<T> WgpuGuiHandler for T where
+    T: TAsnGuiHandler<
+            GraphContext = render_manager::WgpuContext,
+            FrameContext = render_manager::WgpuFrameContext,
+        >
+{
+}
+
 // Выдаем на выход TAsnGuiHandler совместимый с WinitRenderManager
 pub fn get_manager<H: WgpuGuiHandler>(h: Arc<Mutex<H>>) -> impl asn_winit::WinitRenderManager {
     RenderManager::new(h)

@@ -44,8 +44,6 @@ mod dummy_gui {
         type FrameContext = render_manager::WgpuFrameContext;
     }
 
-    impl WgpuGuiHandler for DummyGuiHandler {}
-
     pub fn get_handler() -> impl WgpuGuiHandler {
         DummyGuiHandler {}
     }

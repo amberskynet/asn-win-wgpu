@@ -45,8 +45,6 @@ impl TAsnGuiHandler for DummyGuiHandler {
     }
 }
 
-impl WgpuGuiHandler for DummyGuiHandler {}
-
 pub fn get_handler() -> impl WgpuGuiHandler {
     DummyGuiHandler {}
 }
