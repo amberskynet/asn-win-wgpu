@@ -1,4 +1,5 @@
-use crate::{data::LOG_MODULE_NAME, render_manager::GuiHandler};
+use crate::WgpuGuiHandler;
+use crate::data::LOG_MODULE_NAME;
 
 use super::RenderManager;
 use super::frame_context::WgpuFrameContext;
@@ -10,7 +11,7 @@ use asn_winit::WinitWindow;
 
 impl<H> TAsnRenderManager for RenderManager<H>
 where
-    H: GuiHandler,
+    H: WgpuGuiHandler,
 {
     type Window = WinitWindow;
 

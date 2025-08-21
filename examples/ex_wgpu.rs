@@ -23,11 +23,9 @@ mod dummy_gui {
     pub struct DummyGuiHandler {}
 
     use asn_gui_core::TAsnGuiHandler;
+    use asn_wgpu::{WgpuGuiHandler, render_manager};
 
     impl TAsnGuiHandler for DummyGuiHandler {
-        type GraphContext = asn_wgpu::GraphContext;
-        type FrameContext = asn_wgpu::FrameContext;
-
         fn init(&mut self, gcx: &Self::GraphContext) {
             let _ = gcx;
             m_info!("init");
@@ -41,11 +39,14 @@ mod dummy_gui {
             let _ = fcx;
             m_info!("draw");
         }
+
+        type GraphContext = render_manager::WgpuContext;
+        type FrameContext = render_manager::WgpuFrameContext;
     }
 
-    pub fn get_handler()
-    -> impl TAsnGuiHandler<GraphContext = asn_wgpu::GraphContext, FrameContext = asn_wgpu::FrameContext>
-    {
+    impl WgpuGuiHandler for DummyGuiHandler {}
+
+    pub fn get_handler() -> impl WgpuGuiHandler {
         DummyGuiHandler {}
     }
 }
@@ -59,8 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let h_safe = Arc::new(Mutex::new(h));
 
-    // let r = asn_wgpu::render_manager::RenderManager {};
-    // let r = asn_wgpu::get_manager(h_safe);
+    let r = asn_wgpu::get_manager(h_safe);
 
     asn_winit::run(r)?;
 
