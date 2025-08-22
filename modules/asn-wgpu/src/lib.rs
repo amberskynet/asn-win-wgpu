@@ -23,7 +23,7 @@ pub trait WgpuGuiHandler:
 {
 }
 
-// Blanket
+// Blanket implementation
 impl<T> WgpuGuiHandler for T where
     T: TAsnGuiHandler<
             GraphContext = render_manager::WgpuContext,

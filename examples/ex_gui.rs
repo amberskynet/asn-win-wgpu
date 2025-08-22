@@ -24,7 +24,7 @@ use asn_wgpu::{WgpuGuiHandler, render_manager};
 // как заполнять gui-компоненты до вызова init ?
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
-// FnOnce() -> TAsnGuiHandler
+// FnOnce(GraphContext) -> new TAsnGuiHandler()
 
 impl TAsnGuiHandler for DummyGuiHandler {
     type GraphContext = render_manager::WgpuContext;
