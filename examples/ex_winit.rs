@@ -7,7 +7,7 @@ use std::{sync::Arc, thread::sleep, time::Duration};
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
-use asn_winit::{WinitRenderManager, WinitWindow};
+use asn_winit::WinitWindow;
 use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_winit";
@@ -36,8 +36,6 @@ impl TAsnRenderManager for DummyRenderManager {
         Ok(())
     }
 }
-
-impl WinitRenderManager for DummyRenderManager {}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
