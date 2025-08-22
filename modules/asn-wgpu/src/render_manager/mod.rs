@@ -4,7 +4,6 @@ mod wgpu_context;
 
 use std::sync::{Arc, Mutex};
 
-use asn_winit::WinitRenderManager;
 pub use frame_context::WgpuFrameContext;
 pub use wgpu_context::WgpuContext;
 
@@ -29,5 +28,3 @@ where
         }
     }
 }
-
-impl<H> WinitRenderManager for RenderManager<H> where H: WgpuGuiHandler {}

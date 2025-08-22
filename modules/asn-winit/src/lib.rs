@@ -20,6 +20,8 @@ pub type WinitWindow = winit::window::Window;
 
 pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> {}
 
+impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> {}
+
 pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
 where
     R: WinitRenderManager,
