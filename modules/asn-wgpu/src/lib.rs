@@ -12,6 +12,9 @@ pub use state_error::StateError;
 
 use crate::render_manager::RenderManager;
 
+// reexport
+pub use wgpu;
+
 pub type GraphContext = render_manager::WgpuContext;
 pub type FrameContext = render_manager::WgpuFrameContext;
 

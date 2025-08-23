@@ -5,7 +5,7 @@ extern crate asn_winit;
 // extern crate wgpu_map;
 
 mod log_utils;
-use wgpu_map::{GuiMap, get_map};
+use wgpu_map::{WgpuMap, get_map};
 
 use std::{
     sync::{Arc, Mutex},
@@ -19,12 +19,14 @@ use log_utils::setup_log;
 pub const LOG_MODULE_NAME: &str = "ex_wgpu";
 
 pub struct GuiList {
-    m: GuiMap,
+    m: WgpuMap,
 }
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuContext) -> Self {
-        let m = get_map();
+        let map_tiles_bytes = include_bytes!("tiles.png");
+
+        let m = get_map(gcx, map_tiles_bytes, 25, 25);
         GuiList { m }
     }
 }
@@ -40,6 +42,7 @@ use asn_wgpu::{WgpuGuiHandler, render_manager};
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
 // FnOnce(GraphContext) -> new TAsnGuiHandler()
+// Для примера сделаем решение с Option<Element>
 
 impl TAsnGuiHandler for DummyGuiHandler {
     type GraphContext = render_manager::WgpuContext;

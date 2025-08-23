@@ -2256,6 +2256,13 @@ dependencies = [
 [[package]]
 name = "wgpu-map"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "asn-wgpu",
+ "bytemuck",
+ "image",
+ "rand",
+]
 
 [[package]]
 name = "wgpu-types"
