@@ -4,3 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+asn-wgpu = { path = "../../../modules/asn-wgpu" }
+bytemuck = { version = "1.23", features = ["derive"] }
+rand = "0.9.2"
+anyhow = "1.0.98"
+asn-gui-core = { path = "../../../modules/asn-gui-core" }
+
+[dependencies.image]
+version = "0.25"
+default-features = false
+features = ["png", "jpeg"]

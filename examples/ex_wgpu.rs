@@ -31,16 +31,17 @@ mod dummy_gui {
             m_info!("init");
         }
 
-        fn update(&mut self) {
+        fn update(&mut self, gcx: &Self::GraphContext) {
+            let _ = gcx;
             m_info!("update");
         }
 
-        fn draw(&mut self, fcx: &Self::FrameContext) {
+        fn draw(&mut self, fcx: &mut Self::FrameContext) {
             let _ = fcx;
             m_info!("draw");
         }
 
-        type GraphContext = render_manager::WgpuContext;
+        type GraphContext = render_manager::WgpuGraphContext;
         type FrameContext = render_manager::WgpuFrameContext;
     }
 

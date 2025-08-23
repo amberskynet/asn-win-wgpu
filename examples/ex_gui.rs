@@ -2,8 +2,10 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 extern crate asn_wgpu;
 extern crate asn_winit;
+// extern crate wgpu_map;
 
 mod log_utils;
+use wgpu_map::{WgpuMap, get_map};
 
 use std::{
     sync::{Arc, Mutex},
@@ -16,37 +18,56 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_wgpu";
 
-pub struct DummyGuiHandler {}
+pub struct GuiList {
+    m: WgpuMap,
+}
 
-use asn_gui_core::TAsnGuiHandler;
+impl GuiList {
+    pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
+        let map_tiles_bytes = include_bytes!("tiles.png");
+
+        let m = get_map(gcx, map_tiles_bytes, 25, 25);
+        GuiList { m }
+    }
+}
+
+pub struct DummyGuiHandler {
+    gui_list: Option<GuiList>,
+}
+
+use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
 use asn_wgpu::{WgpuGuiHandler, render_manager};
 
 // как заполнять gui-компоненты до вызова init ?
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
 // FnOnce(GraphContext) -> new TAsnGuiHandler()
+// Для примера сделаем решение с Option<Element>
 
 impl TAsnGuiHandler for DummyGuiHandler {
-    type GraphContext = render_manager::WgpuContext;
+    type GraphContext = render_manager::WgpuGraphContext;
     type FrameContext = render_manager::WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
         let _ = gcx;
+        let gui_list = GuiList::new(gcx);
+        self.gui_list = Some(gui_list);
         m_info!("init");
     }
 
-    fn update(&mut self) {
-        m_info!("update");
+    fn update(&mut self, gcx: &Self::GraphContext) {
+        self.gui_list.as_mut().unwrap().m.fill_random();
+        self.gui_list.as_mut().unwrap().m.update(gcx);
     }
 
-    fn draw(&mut self, fcx: &Self::FrameContext) {
-        let _ = fcx;
+    fn draw(&mut self, fcx: &mut Self::FrameContext) {
+        self.gui_list.as_mut().unwrap().m.draw(fcx);
         m_info!("draw");
     }
 }
 
 pub fn get_handler() -> impl WgpuGuiHandler {
-    DummyGuiHandler {}
+    DummyGuiHandler { gui_list: None }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -54,7 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
-    let h = DummyGuiHandler {};
+    let h = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
 

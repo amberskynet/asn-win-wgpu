@@ -8,7 +8,7 @@ use crate::{
     data::{LOG_MODULE_NAME, MIN_WINDOW_SIZE},
 };
 
-pub struct WgpuContext {
+pub struct WgpuGraphContext {
     pub window: Arc<WinitWindow>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -17,7 +17,7 @@ pub struct WgpuContext {
     pub config: wgpu::SurfaceConfiguration,
 }
 
-impl WgpuContext {
+impl WgpuGraphContext {
     pub async fn new(window: Arc<WinitWindow>) -> Result<Self, StateError> {
         let size = window.inner_size();
         m_trace!("window size: {size:?}");
@@ -106,7 +106,7 @@ impl WgpuContext {
 
         m_trace!("config ready");
 
-        let mut w = WgpuContext {
+        let mut w = WgpuGraphContext {
             window,
             device,
             queue,
