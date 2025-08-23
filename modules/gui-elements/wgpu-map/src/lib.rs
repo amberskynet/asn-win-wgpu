@@ -1,7 +1,6 @@
 use asn_gui_core::TAsnGuiElement;
-use asn_wgpu::render_manager::WgpuContext;
 use asn_wgpu::wgpu::util::DeviceExt;
-use asn_wgpu::{FrameContext, GraphContext, wgpu};
+use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, wgpu};
 
 use crate::data::rgba_handler::RgbaHandler;
 use crate::data::texture::WgpuTexture;
@@ -34,8 +33,8 @@ impl WgpuMap {
 }
 
 impl TAsnGuiElement for WgpuMap {
-    type GraphContext = GraphContext;
-    type FrameContext = FrameContext;
+    type GraphContext = WgpuGraphContext;
+    type FrameContext = WgpuFrameContext;
 
     fn update(&mut self, gcx: &Self::GraphContext) {
         if self.is_map_updated {
@@ -78,7 +77,7 @@ impl TAsnGuiElement for WgpuMap {
 }
 
 pub fn get_map(
-    gcx: &WgpuContext,
+    gcx: &WgpuGraphContext,
     map_tiles_bytes: &[u8],
     map_width: u32,
     map_height: u32,

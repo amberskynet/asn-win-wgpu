@@ -41,7 +41,7 @@ mod dummy_gui {
             m_info!("draw");
         }
 
-        type GraphContext = render_manager::WgpuContext;
+        type GraphContext = render_manager::WgpuGraphContext;
         type FrameContext = render_manager::WgpuFrameContext;
     }
 

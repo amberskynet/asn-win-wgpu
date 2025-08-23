@@ -3,7 +3,7 @@ use crate::data::LOG_MODULE_NAME;
 
 use super::RenderManager;
 use super::frame_context::WgpuFrameContext;
-use super::wgpu_context::WgpuContext;
+use super::wgpu_context::WgpuGraphContext;
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
@@ -16,7 +16,7 @@ where
     type Window = WinitWindow;
 
     fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        let context = match pollster::block_on(WgpuContext::new(w)) {
+        let context = match pollster::block_on(WgpuGraphContext::new(w)) {
             Ok(context) => context,
             Err(e) => {
                 m_error!("Failed to create GPU state: {e}");

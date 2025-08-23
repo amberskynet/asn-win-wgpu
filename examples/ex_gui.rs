@@ -23,7 +23,7 @@ pub struct GuiList {
 }
 
 impl GuiList {
-    pub fn new(gcx: &render_manager::WgpuContext) -> Self {
+    pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
         let map_tiles_bytes = include_bytes!("tiles.png");
 
         let m = get_map(gcx, map_tiles_bytes, 25, 25);
@@ -45,7 +45,7 @@ use asn_wgpu::{WgpuGuiHandler, render_manager};
 // Для примера сделаем решение с Option<Element>
 
 impl TAsnGuiHandler for DummyGuiHandler {
-    type GraphContext = render_manager::WgpuContext;
+    type GraphContext = render_manager::WgpuGraphContext;
     type FrameContext = render_manager::WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {

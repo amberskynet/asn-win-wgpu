@@ -15,12 +15,12 @@ use crate::render_manager::RenderManager;
 // reexport
 pub use wgpu;
 
-pub type GraphContext = render_manager::WgpuContext;
-pub type FrameContext = render_manager::WgpuFrameContext;
+pub use render_manager::WgpuFrameContext;
+pub use render_manager::WgpuGraphContext;
 
 pub trait WgpuGuiHandler:
     TAsnGuiHandler<
-        GraphContext = render_manager::WgpuContext,
+        GraphContext = render_manager::WgpuGraphContext,
         FrameContext = render_manager::WgpuFrameContext,
     >
 {
@@ -29,7 +29,7 @@ pub trait WgpuGuiHandler:
 // Blanket implementation
 impl<T> WgpuGuiHandler for T where
     T: TAsnGuiHandler<
-            GraphContext = render_manager::WgpuContext,
+            GraphContext = render_manager::WgpuGraphContext,
             FrameContext = render_manager::WgpuFrameContext,
         >
 {
