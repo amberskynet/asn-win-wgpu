@@ -93,6 +93,7 @@ where
                     ))));
                 }
             };
+            h.update(r);
             h.draw(&mut fcx)
         }
         // end frame

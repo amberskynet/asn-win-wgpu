@@ -21,6 +21,18 @@ pub struct WgpuMap {
     is_map_updated: bool,
 }
 
+impl WgpuMap {
+    pub fn update_map(&mut self, rgba: &[u8]) {
+        self.map_handler.update_data(rgba).unwrap();
+        self.is_map_updated = true;
+    }
+
+    pub fn fill_random(&mut self) {
+        self.map_handler.fill_random();
+        self.is_map_updated = true;
+    }
+}
+
 impl TAsnGuiElement for WgpuMap {
     type GraphContext = GraphContext;
     type FrameContext = FrameContext;
@@ -37,7 +49,6 @@ impl TAsnGuiElement for WgpuMap {
 
             self.is_map_updated = false;
         }
-        todo!()
     }
 
     fn draw(&mut self, fcx: &mut Self::FrameContext) {

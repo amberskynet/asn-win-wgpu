@@ -56,6 +56,7 @@ impl TAsnGuiHandler for DummyGuiHandler {
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
+        self.gui_list.as_mut().unwrap().m.fill_random();
         self.gui_list.as_mut().unwrap().m.update(gcx);
     }
 
