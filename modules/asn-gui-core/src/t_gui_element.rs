@@ -1,10 +1,6 @@
-pub trait TAsnGuiHandler {
-    type GraphContext;
+pub trait TAsnGuiElement {
     type FrameContext;
 
-    fn init(&mut self, gcx: &Self::GraphContext);
-
     fn update(&mut self);
-
     fn draw(&mut self, fcx: &mut Self::FrameContext);
 }

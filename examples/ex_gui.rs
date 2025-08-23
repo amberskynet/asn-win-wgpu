@@ -35,7 +35,7 @@ pub struct DummyGuiHandler {
     gui_list: Option<GuiList>,
 }
 
-use asn_gui_core::TAsnGuiHandler;
+use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
 use asn_wgpu::{WgpuGuiHandler, render_manager};
 
 // как заполнять gui-компоненты до вызова init ?
@@ -59,8 +59,8 @@ impl TAsnGuiHandler for DummyGuiHandler {
         m_info!("update");
     }
 
-    fn draw(&mut self, fcx: &Self::FrameContext) {
-        let _ = fcx;
+    fn draw(&mut self, fcx: &mut Self::FrameContext) {
+        self.gui_list.as_mut().unwrap().m.draw(fcx);
         m_info!("draw");
     }
 }

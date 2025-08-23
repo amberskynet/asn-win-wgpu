@@ -35,7 +35,7 @@ mod dummy_gui {
             m_info!("update");
         }
 
-        fn draw(&mut self, fcx: &Self::FrameContext) {
+        fn draw(&mut self, fcx: &mut Self::FrameContext) {
             let _ = fcx;
             m_info!("draw");
         }

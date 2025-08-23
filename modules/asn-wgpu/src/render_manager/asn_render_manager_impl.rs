@@ -75,7 +75,7 @@ where
 
         r.window.request_redraw();
 
-        let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
+        let mut fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
             Ok(fcx) => fcx,
             Err(e) => {
                 return Err(Box::new(std::io::Error::other(format!(
@@ -93,7 +93,7 @@ where
                     ))));
                 }
             };
-            h.draw(&fcx)
+            h.draw(&mut fcx)
         }
         // end frame
 

@@ -2258,6 +2258,7 @@ name = "wgpu-map"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "asn-gui-core",
  "asn-wgpu",
  "bytemuck",
  "image",

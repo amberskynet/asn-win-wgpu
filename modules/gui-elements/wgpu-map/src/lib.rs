@@ -1,11 +1,12 @@
+use asn_gui_core::TAsnGuiElement;
 use asn_wgpu::render_manager::WgpuContext;
-use asn_wgpu::wgpu;
 use asn_wgpu::wgpu::util::DeviceExt;
+use asn_wgpu::{FrameContext, wgpu};
 
 use crate::data::rgba_handler::RgbaHandler;
 use crate::data::texture::WgpuTexture;
 use crate::data::utils::{get_render_pipeline, get_texture_bind_group_layout};
-use crate::data::{INDICES, SHADER_SOURCE, VERTICES};
+use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
 mod data;
 
@@ -18,6 +19,39 @@ pub struct WgpuMap {
     map_handler: RgbaHandler,
     map_texture: WgpuTexture,
     is_map_updated: bool,
+}
+
+impl TAsnGuiElement for WgpuMap {
+    type FrameContext = FrameContext;
+
+    fn update(&mut self) {
+        todo!()
+    }
+
+    fn draw(&mut self, fcx: &mut Self::FrameContext) {
+        // m_trace!("draw");
+        let mut render_pass = fcx.encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("Render Pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &fcx.view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(DEFAULT_CLEAR_COLOR),
+                    store: wgpu::StoreOp::Store,
+                },
+                depth_slice: None,
+            })],
+            depth_stencil_attachment: None,
+            occlusion_query_set: None,
+            timestamp_writes: None,
+        });
+
+        render_pass.set_pipeline(&self.render_pipeline);
+        render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]);
+        render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+        render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+        render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
+    }
 }
 
 pub fn get_map(

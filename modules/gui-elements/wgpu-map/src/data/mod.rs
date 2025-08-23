@@ -1,5 +1,6 @@
 mod vertex;
 
+use asn_wgpu::wgpu;
 pub use vertex::Vertex;
 pub mod rgba_handler;
 pub mod texture;
@@ -8,6 +9,13 @@ pub mod utils;
 pub const SHADER_SOURCE: &str = include_str!("map_shader.wgsl");
 
 pub const LOG_MODULE_NAME: &str = "wgpu_map";
+
+pub const DEFAULT_CLEAR_COLOR: wgpu::Color = wgpu::Color {
+    r: 0.1,
+    g: 0.2,
+    b: 0.3,
+    a: 1.0,
+};
 
 const DELTA_POINT: f32 = 1.0;
 
