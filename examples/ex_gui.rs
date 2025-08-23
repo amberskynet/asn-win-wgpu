@@ -2,8 +2,10 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 extern crate asn_wgpu;
 extern crate asn_winit;
+// extern crate wgpu_map;
 
 mod log_utils;
+use wgpu_map::{GuiMap, get_map};
 
 use std::{
     sync::{Arc, Mutex},
@@ -16,7 +18,20 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_wgpu";
 
-pub struct DummyGuiHandler {}
+pub struct GuiList {
+    m: GuiMap,
+}
+
+impl GuiList {
+    pub fn new(gcx: &render_manager::WgpuContext) -> Self {
+        let m = get_map();
+        GuiList { m }
+    }
+}
+
+pub struct DummyGuiHandler {
+    gui_list: Option<GuiList>,
+}
 
 use asn_gui_core::TAsnGuiHandler;
 use asn_wgpu::{WgpuGuiHandler, render_manager};
@@ -32,6 +47,8 @@ impl TAsnGuiHandler for DummyGuiHandler {
 
     fn init(&mut self, gcx: &Self::GraphContext) {
         let _ = gcx;
+        let gui_list = GuiList::new(gcx);
+        self.gui_list = Some(gui_list);
         m_info!("init");
     }
 
@@ -46,7 +63,7 @@ impl TAsnGuiHandler for DummyGuiHandler {
 }
 
 pub fn get_handler() -> impl WgpuGuiHandler {
-    DummyGuiHandler {}
+    DummyGuiHandler { gui_list: None }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -54,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
-    let h = DummyGuiHandler {};
+    let h = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
 
