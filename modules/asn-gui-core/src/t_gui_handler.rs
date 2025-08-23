@@ -4,7 +4,7 @@ pub trait TAsnGuiHandler {
 
     fn init(&mut self, gcx: &Self::GraphContext);
 
-    fn update(&mut self);
+    fn update(&mut self, gcx: &Self::GraphContext);
 
     fn draw(&mut self, fcx: &mut Self::FrameContext);
 }

@@ -55,8 +55,8 @@ impl TAsnGuiHandler for DummyGuiHandler {
         m_info!("init");
     }
 
-    fn update(&mut self) {
-        m_info!("update");
+    fn update(&mut self, gcx: &Self::GraphContext) {
+        self.gui_list.as_mut().unwrap().m.update(gcx);
     }
 
     fn draw(&mut self, fcx: &mut Self::FrameContext) {

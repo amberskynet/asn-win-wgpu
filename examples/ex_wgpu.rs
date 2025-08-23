@@ -31,7 +31,8 @@ mod dummy_gui {
             m_info!("init");
         }
 
-        fn update(&mut self) {
+        fn update(&mut self, gcx: &Self::GraphContext) {
+            let _ = gcx;
             m_info!("update");
         }
 
