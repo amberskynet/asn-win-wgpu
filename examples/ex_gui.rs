@@ -2,7 +2,6 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 extern crate asn_wgpu;
 extern crate asn_winit;
-// extern crate wgpu_map;
 
 mod log_utils;
 use wgpu_map::{WgpuMap, get_map};
