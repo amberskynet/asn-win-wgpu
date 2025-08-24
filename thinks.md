@@ -5,3 +5,10 @@ asn-winit -> asn-wgpu -> [wgpu-handler]draw(wgpu_context)
 
 [asn-winit] -> [asn-wgpu]
             -> [wgpu-handler]
+
+
+// как заполнять gui-компоненты до вызова init ?
+// State -> Loaded/Unloaded
+// Option -> Option<Element>
+// FnOnce(GraphContext) -> new TAsnGuiHandler()
+// Для примера сделаем решение с Option<Element>

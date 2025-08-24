@@ -7,15 +7,18 @@ mod log_utils;
 use wgpu_map::{WgpuMap, get_map};
 
 use std::{
-    sync::{Arc, Mutex},
-    thread::sleep,
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicBool, Ordering},
+    },
+    thread::{self, sleep},
     time::Duration,
 };
 
 use asn_logger::*;
 use log_utils::setup_log;
 
-pub const LOG_MODULE_NAME: &str = "ex_wgpu";
+pub const LOG_MODULE_NAME: &str = "ex_gui";
 
 pub struct GuiList {
     m: WgpuMap,
@@ -30,20 +33,29 @@ impl GuiList {
     }
 }
 
-pub struct DummyGuiHandler {
+pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
 }
 
+impl MyGuiHandler {
+    fn update_map(&mut self) {
+        let g = match self.gui_list.as_mut() {
+            Some(g) => g,
+            None => {
+                return;
+            }
+        };
+
+        g.m.fill_random();
+
+        m_info!("update")
+    }
+}
+
 use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
-use asn_wgpu::{WgpuGuiHandler, render_manager};
+use asn_wgpu::render_manager;
 
-// как заполнять gui-компоненты до вызова init ?
-// State -> Loaded/Unloaded
-// Option -> Option<Element>
-// FnOnce(GraphContext) -> new TAsnGuiHandler()
-// Для примера сделаем решение с Option<Element>
-
-impl TAsnGuiHandler for DummyGuiHandler {
+impl TAsnGuiHandler for MyGuiHandler {
     type GraphContext = render_manager::WgpuGraphContext;
     type FrameContext = render_manager::WgpuFrameContext;
 
@@ -55,18 +67,17 @@ impl TAsnGuiHandler for DummyGuiHandler {
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
-        self.gui_list.as_mut().unwrap().m.fill_random();
         self.gui_list.as_mut().unwrap().m.update(gcx);
     }
 
     fn draw(&mut self, fcx: &mut Self::FrameContext) {
         self.gui_list.as_mut().unwrap().m.draw(fcx);
-        m_info!("draw");
+        // m_info!("draw");
     }
 }
 
-pub fn get_handler() -> impl WgpuGuiHandler {
-    DummyGuiHandler { gui_list: None }
+pub fn get_handler() -> MyGuiHandler {
+    MyGuiHandler { gui_list: None }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -74,16 +85,42 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
+    let is_running = Arc::new(AtomicBool::new(true));
+    let running_clone = Arc::clone(&is_running);
+
     let h = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
 
+    let h_thread = h_safe.clone();
+
     let r = asn_wgpu::get_manager(h_safe);
+
+    let handle = thread::spawn(move || {
+        // Цикл обработки с отправкой результатов
+        while running_clone.load(Ordering::Relaxed) {
+            {
+                let mut h = match h_thread.lock() {
+                    Ok(h) => h,
+                    Err(e) => {
+                        m_error!("Error: {e}");
+                        return;
+                    }
+                };
+                h.update_map();
+            }
+            thread::sleep(Duration::from_millis(5));
+        }
+        m_info!("Exit from loop");
+    });
 
     asn_winit::run(r)?;
 
+    is_running.store(false, Ordering::Relaxed);
+    handle.join().unwrap();
+
     for i in 0..2 {
-        m_info!("update {i}");
+        m_info!("wait {i}");
         sleep(Duration::from_secs(1));
     }
 
