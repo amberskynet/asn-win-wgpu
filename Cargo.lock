@@ -113,6 +113,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "asn-core"
+version = "0.1.0"
+
+[[package]]
+name = "asn-core-bus"
+version = "0.1.0"
+dependencies = [
+ "asn-core",
+]
+
+[[package]]
 name = "asn-gui-core"
 version = "0.1.0"
 
@@ -151,6 +162,7 @@ dependencies = [
 name = "asn-win-wgpu"
 version = "0.1.0"
 dependencies = [
+ "asn-core-bus",
  "asn-gui-core",
  "asn-logger",
  "asn-wgpu",
