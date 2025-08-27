@@ -1,6 +1,4 @@
-extern crate asn_gui_core;
 extern crate asn_logger;
-extern crate asn_winit;
 
 mod log_utils;
 use std::{sync::Arc, thread::sleep, time::Duration};

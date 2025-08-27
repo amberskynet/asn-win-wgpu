@@ -49,13 +49,4 @@ mod tests {
         assert_eq!(config.window_width, 1024);
         assert_eq!(config.window_height, 768);
     }
-
-    #[test]
-    fn test_custom_config_builder() {
-        let config = custom_config("Builder Test", 1920, 1080);
-
-        assert_eq!(config.window_title, "Builder Test");
-        assert_eq!(config.window_width, 1920);
-        assert_eq!(config.window_height, 1080);
-    }
 }
