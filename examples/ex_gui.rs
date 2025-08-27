@@ -1,4 +1,3 @@
-extern crate asn_gui_core;
 extern crate asn_logger;
 extern crate asn_wgpu;
 extern crate asn_winit;
