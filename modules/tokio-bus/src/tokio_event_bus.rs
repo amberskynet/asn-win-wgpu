@@ -49,8 +49,8 @@ impl<E> TokioEventBus<E>
 where
     E: Clone,
 {
-    fn new() -> Self {
-        let (tx, _) = broadcast::channel::<E>(16);
+    fn new(capacity: usize) -> Self {
+        let (tx, _) = broadcast::channel::<E>(capacity);
         TokioEventBus { tx }
     }
 }
@@ -72,6 +72,6 @@ where
     }
 }
 
-pub fn new_tokio_bus<E: Clone>() -> impl AsnBus<E> {
-    TokioEventBus::new()
+pub fn new_tokio_bus<E: Clone>(capacity: usize) -> impl AsnBus<E> {
+    TokioEventBus::new(capacity)
 }
