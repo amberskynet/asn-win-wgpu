@@ -3,7 +3,7 @@ use std::{fmt, sync::Arc};
 use asn_gui_core::AsnGuiWindowConfig;
 use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
 
-use crate::{WinitRenderManager, winit_utils::new_window};
+use crate::{WinitRenderManager, asn_winit_state::AsnWinitState, winit_utils::new_window};
 
 use asn_logger::log::*;
 
@@ -37,16 +37,17 @@ impl<R> RenderManagerState<R> {
     }
 }
 
-pub fn new_state<R>(r: R) -> RenderManagerState<R>
+pub fn new_state<R>(r: R) -> RenderManagerState<AsnWinitState<R>>
 where
     R: WinitRenderManager,
 {
-    RenderManagerState::Empty(r)
+    let s = AsnWinitState { r };
+    RenderManagerState::Empty(s)
 }
 
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
-impl<R> RenderManagerState<R>
+impl<R> RenderManagerState<AsnWinitState<R>>
 where
     R: WinitRenderManager,
 {
@@ -54,7 +55,7 @@ where
         if let Self::Empty(r) = self {
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
-            r.init(Arc::new(w)).unwrap();
+            r.r.init(Arc::new(w)).unwrap();
 
             let s = self.load();
             *self = s;
@@ -71,7 +72,7 @@ where
     pub fn handle_resize(&mut self, width: u32, height: u32) {
         trace!("Resizing window to {width}x{height}");
         if let Self::Loaded(r) = self {
-            match r.resize(width, height) {
+            match r.r.resize(width, height) {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
@@ -82,7 +83,7 @@ where
 
     pub fn handle_redraw(&mut self) {
         if let Self::Loaded(r) = self {
-            match r.draw() {
+            match r.r.draw() {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
@@ -125,7 +126,7 @@ where
     }
 }
 
-impl<R> ApplicationHandler for RenderManagerState<R>
+impl<R> ApplicationHandler for RenderManagerState<AsnWinitState<R>>
 where
     R: WinitRenderManager,
 {

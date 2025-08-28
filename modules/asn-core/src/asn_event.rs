@@ -2,7 +2,7 @@
 pub enum AsnWindowEvent {
     None,
     // Resized(Size2D<u32>),
-    RedrawRequested,
+    // RedrawRequested,
     CloseRequested,
 }
 

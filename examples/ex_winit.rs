@@ -30,7 +30,7 @@ impl TAsnRenderManager for DummyRenderManager {
     }
 
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        m_info!("draw");
+        // m_info!("draw");
         Ok(())
     }
 }
