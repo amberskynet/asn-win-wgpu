@@ -9,12 +9,13 @@ use data::LOG_MODULE_NAME;
 use winit::event_loop::ControlFlow;
 
 mod app_state;
+mod asn_winit_state;
 mod winit_utils;
 
 // do some re-export
 pub use winit;
 
-use crate::app_state::new_state;
+use app_state::new_state;
 
 pub type WinitWindow = winit::window::Window;
 
