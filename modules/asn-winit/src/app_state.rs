@@ -1,6 +1,6 @@
 use std::{fmt, sync::Arc};
 
-use asn_core::loading_state::LoadingState;
+use asn_core::loading_state::{LoadingState, set_state_loaded};
 
 pub struct RenderManagerState<R>(LoadingState<AsnWinitState<R>>)
 where
@@ -40,7 +40,7 @@ where
             let w = new_window(event_loop, &conf).unwrap();
             r.r.init(Arc::new(w)).unwrap();
 
-            let s = self.0.load();
+            let s = set_state_loaded(&mut self.0);
             self.0 = s;
         }
     }
