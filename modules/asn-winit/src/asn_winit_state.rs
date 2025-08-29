@@ -5,4 +5,5 @@ where
     R: WinitRenderManager,
 {
     pub r: R,
+    pub is_init: bool,
 }

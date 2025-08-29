@@ -26,7 +26,7 @@ pub fn new_state<R>(r: R) -> RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
-    let s = AsnWinitState { r };
+    let s = AsnWinitState { r, is_init: false };
     RenderManagerState(LoadingState::Empty(s))
 }
 
