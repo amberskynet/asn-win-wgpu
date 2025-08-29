@@ -18,15 +18,12 @@ impl<S> fmt::Display for LoadingState<S> {
 }
 
 impl<S> LoadingState<S> {
-    pub fn to_loaded(self) -> LoadingState<S> {
-        match self {
+    pub fn load(&mut self) -> LoadingState<S> {
+        let new_state = std::mem::replace(self, Self::Zero);
+        match new_state {
             Self::Empty(r) => Self::Loaded(r),
             loaded @ Self::Loaded(_) => loaded,
             Self::Zero => panic!("State is zero"),
         }
-    }
-    pub fn load(&mut self) -> LoadingState<S> {
-        let new_state = std::mem::replace(self, Self::Zero);
-        new_state.to_loaded()
     }
 }
