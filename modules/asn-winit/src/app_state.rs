@@ -1,3 +1,7 @@
+//! Модуль для управления состоянием приложения и обработки событий
+//!
+//! Этот модуль содержит реализацию обработчика событий приложения,
+//! управление состоянием рендерера и обработку различных событий окна.
 use std::{fmt, sync::Arc};
 
 use asn_core::loading_state::{LoadingState, set_state_loaded};
@@ -30,10 +34,12 @@ where
     RenderManagerState(LoadingState::Empty(s))
 }
 
+// Блок методов для обработки различных событий приложения
 impl<R> RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
+    /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if let LoadingState::Empty(ref mut r) = self.0 {
             let conf = AsnGuiWindowConfig::default();
@@ -45,13 +51,14 @@ where
         }
     }
 
+    /// Обрабатывает запрос на закрытие приложения
     pub fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info!("Application close requested");
         self.0 = LoadingState::Zero;
         event_loop.exit();
     }
 
-    /// Handles window resize events
+    /// Обрабатывает событие изменения размера окна
     pub fn handle_resize(&mut self, width: u32, height: u32) {
         trace!("Resizing window to {width}x{height}");
         if let LoadingState::Loaded(ref mut r) = self.0 {
@@ -64,6 +71,7 @@ where
         }
     }
 
+    /// Обрабатывает запрос на перерисовку окна
     pub fn handle_redraw(&mut self) {
         if let LoadingState::Loaded(ref mut r) = self.0 {
             match r.r.draw() {
@@ -74,43 +82,11 @@ where
             }
         }
     }
-
-    /// Handles keyboard input events
-    pub fn handle_keyboard_input(
-        &mut self,
-        event_loop: &ActiveEventLoop,
-        event: winit::event::KeyEvent,
-    ) {
-        use winit::event::ElementState;
-
-        if event.state == ElementState::Pressed {
-            match event.logical_key.as_ref() {
-                winit::keyboard::Key::Character("Escape") => {
-                    info!("Escape key pressed - closing application");
-                    self.handle_close(event_loop);
-                }
-                winit::keyboard::Key::Named(winit::keyboard::NamedKey::F11) => {
-                    info!("F11 key pressed - toggling fullscreen");
-                    // TODO: Implement fullscreen toggle
-                    info!("Fullscreen toggle not yet implemented");
-                }
-                winit::keyboard::Key::Named(winit::keyboard::NamedKey::F1) => {
-                    info!("F1 key pressed - showing help");
-                    // TODO: Implement help system
-                }
-                winit::keyboard::Key::Character("r") | winit::keyboard::Key::Character("R") => {
-                    info!("R key pressed...");
-                }
-                _ => {
-                    trace!("Key pressed: {:?}", event.logical_key);
-                }
-            }
-        }
-    }
 }
 
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
+// Блок реализации ApplicationHandler
 impl<R> ApplicationHandler for RenderManagerState<R>
 where
     R: WinitRenderManager,
@@ -147,7 +123,8 @@ where
             }
             WindowEvent::KeyboardInput { event, .. } => {
                 trace!("KeyboardInput event: {event:?}");
-                self.handle_keyboard_input(event_loop, event);
+                // Используем новый модуль обработки клавиатуры
+                crate::keyboard_handler::handle_key_event(event_loop, event);
             }
             WindowEvent::Focused(focused) => {
                 trace!("Window focus changed: {id:?}");
