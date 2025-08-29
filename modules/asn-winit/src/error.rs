@@ -48,26 +48,31 @@ impl fmt::Display for AsnWinitError {
 
 impl std::error::Error for AsnWinitError {}
 
+#[allow(dead_code)]
 /// Создает ошибку создания цикла событий
 pub fn event_loop_creation_error(msg: impl Into<String>) -> AsnWinitError {
     AsnWinitError::EventLoopCreationError(msg.into())
 }
 
+#[allow(dead_code)]
 /// Создает ошибку создания окна
 pub fn window_creation_error(msg: impl Into<String>) -> AsnWinitError {
     AsnWinitError::WindowCreationError(msg.into())
 }
 
+#[allow(dead_code)]
 /// Создает ошибку инициализации рендерера
 pub fn renderer_initialization_error(msg: impl Into<String>) -> AsnWinitError {
     AsnWinitError::RendererInitializationError(msg.into())
 }
 
+#[allow(dead_code)]
 /// Создает ошибку изменения размера окна
 pub fn window_resize_error(msg: impl Into<String>) -> AsnWinitError {
     AsnWinitError::WindowResizeError(msg.into())
 }
 
+#[allow(dead_code)]
 /// Создает ошибку отрисовки
 pub fn render_error(msg: impl Into<String>) -> AsnWinitError {
     AsnWinitError::RenderError(msg.into())
