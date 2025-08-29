@@ -4,10 +4,12 @@ use tokio::sync::broadcast;
 use tokio::sync::broadcast::Receiver;
 use tokio::sync::broadcast::Sender;
 
+/// Трансмиттер событий для Tokio EventBus
 struct TokioTransmitter<E> {
     tx: Sender<E>,
 }
 
+/// Ресивер событий для Tokio EventBus
 struct TokioReceiver<E> {
     rx: Receiver<E>,
 }
@@ -34,13 +36,16 @@ where
                 broadcast::error::TryRecvError::Empty => Err(AsnBusRecvError::Empty),
                 broadcast::error::TryRecvError::Closed => Err(AsnBusRecvError::Closed),
                 broadcast::error::TryRecvError::Lagged(n) => {
-                    panic!("TryRecvError::Lagged {:?}", n)
+                    // Логгируем пропущенные сообщения и возвращаем пустое значение
+                    eprintln!("Warning: Lagged {} messages", n);
+                    Err(AsnBusRecvError::Empty)
                 }
             },
         }
     }
 }
 
+/// Tokio EventBus реализация шины событий
 pub struct TokioEventBus<E> {
     tx: Sender<E>,
 }
@@ -49,6 +54,7 @@ impl<E> TokioEventBus<E>
 where
     E: Clone,
 {
+    /// Создает новый Tokio EventBus с заданной ёмкостью канала
     fn new(capacity: usize) -> Self {
         let (tx, _) = broadcast::channel::<E>(capacity);
         TokioEventBus { tx }
@@ -72,6 +78,7 @@ where
     }
 }
 
+/// Фабричная функция для создания нового Tokio EventBus
 pub fn new_tokio_bus<E: Clone>(capacity: usize) -> impl AsnBus<E> {
     TokioEventBus::new(capacity)
 }
