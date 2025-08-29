@@ -1,5 +1,20 @@
 use std::{fmt, sync::Arc};
 
+use asn_core::loading_state::LoadingState;
+
+pub struct RenderManagerState<R>(LoadingState<AsnWinitState<R>>)
+where
+    R: WinitRenderManager;
+
+impl<R> fmt::Display for RenderManagerState<R>
+where
+    R: WinitRenderManager,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 use asn_gui_core::AsnGuiWindowConfig;
 use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
 
@@ -7,71 +22,39 @@ use crate::{WinitRenderManager, asn_winit_state::AsnWinitState, winit_utils::new
 
 use asn_logger::log::*;
 
-pub enum RenderManagerState<R> {
-    Zero,
-    Empty(R),
-    Loaded(R),
-}
-
-impl<R> fmt::Display for RenderManagerState<R> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RenderManagerState::Zero => write!(f, "RenderManagerState::Zero"),
-            RenderManagerState::Empty(_) => write!(f, "RenderManagerState::Empty"),
-            RenderManagerState::Loaded(_) => write!(f, "RenderManagerState::Loaded"),
-        }
-    }
-}
-
-impl<R> RenderManagerState<R> {
-    pub fn to_loaded(self) -> RenderManagerState<R> {
-        match self {
-            RenderManagerState::Empty(r) => RenderManagerState::Loaded(r),
-            loaded @ RenderManagerState::Loaded(_) => loaded,
-            RenderManagerState::Zero => panic!("State is zero"),
-        }
-    }
-    pub fn load(&mut self) -> RenderManagerState<R> {
-        let new_state = std::mem::replace(self, RenderManagerState::Zero);
-        new_state.to_loaded()
-    }
-}
-
-pub fn new_state<R>(r: R) -> RenderManagerState<AsnWinitState<R>>
+pub fn new_state<R>(r: R) -> RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
     let s = AsnWinitState { r };
-    RenderManagerState::Empty(s)
+    RenderManagerState(LoadingState::Empty(s))
 }
 
-// don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
-
-impl<R> RenderManagerState<AsnWinitState<R>>
+impl<R> RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        if let Self::Empty(r) = self {
+        if let LoadingState::Empty(ref mut r) = self.0 {
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
             r.r.init(Arc::new(w)).unwrap();
 
-            let s = self.load();
-            *self = s;
+            let s = self.0.load();
+            self.0 = s;
         }
     }
 
     pub fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info!("Application close requested");
-        *self = RenderManagerState::Zero;
+        self.0 = LoadingState::Zero;
         event_loop.exit();
     }
 
     /// Handles window resize events
     pub fn handle_resize(&mut self, width: u32, height: u32) {
         trace!("Resizing window to {width}x{height}");
-        if let Self::Loaded(r) = self {
+        if let LoadingState::Loaded(ref mut r) = self.0 {
             match r.r.resize(width, height) {
                 Ok(_) => {}
                 Err(err) => {
@@ -82,7 +65,7 @@ where
     }
 
     pub fn handle_redraw(&mut self) {
-        if let Self::Loaded(r) = self {
+        if let LoadingState::Loaded(ref mut r) = self.0 {
             match r.r.draw() {
                 Ok(_) => {}
                 Err(err) => {
@@ -126,7 +109,9 @@ where
     }
 }
 
-impl<R> ApplicationHandler for RenderManagerState<AsnWinitState<R>>
+// don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
+
+impl<R> ApplicationHandler for RenderManagerState<R>
 where
     R: WinitRenderManager,
 {
