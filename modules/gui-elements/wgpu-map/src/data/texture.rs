@@ -138,7 +138,7 @@ impl WgpuTexture {
             sampler,
         })
     }
-
+    #[allow(dead_code)]
     pub fn update_pixel(&self, queue: &wgpu::Queue, rgba: &[u8; 4], x: u32, y: u32) {
         let size = wgpu::Extent3d {
             width: 1,  // Обновляем только 1 пиксель по ширине

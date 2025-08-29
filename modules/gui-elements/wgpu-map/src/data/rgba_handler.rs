@@ -270,6 +270,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.create_gradient((255, 0, 0, 255), (0, 0, 255, 255)); // От красного к синему
     /// ```
+    #[allow(dead_code)]
     pub fn create_gradient(&mut self, start_color: (u8, u8, u8, u8), end_color: (u8, u8, u8, u8)) {
         for y in 0..self.height {
             let t = y as f32 / (self.height - 1) as f32;
@@ -422,6 +423,7 @@ impl RgbaHandler {
     /// let data = handler.data_mut();
     /// data[0] = 255; // Установка красного компонента первого пикселя
     /// ```
+    #[allow(dead_code)]
     pub fn data_mut(&mut self) -> &mut [u8] {
         &mut self.data
     }
@@ -446,6 +448,7 @@ impl RgbaHandler {
     /// handler.resize(200, 200);
     /// assert_eq!(handler.dimensions(), (200, 200));
     /// ```
+    #[allow(dead_code)]
     pub fn resize(&mut self, new_width: u32, new_height: u32) {
         self.width = new_width;
         self.height = new_height;
@@ -469,6 +472,7 @@ impl RgbaHandler {
     /// let copy = handler.clone();
     /// assert_eq!(handler.dimensions(), copy.dimensions());
     /// ```
+    #[allow(dead_code)]
     pub fn clone(&self) -> Self {
         Self {
             width: self.width,
