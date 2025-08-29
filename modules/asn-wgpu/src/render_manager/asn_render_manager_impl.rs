@@ -26,19 +26,6 @@ fn render_error(msg: &str) -> Box<dyn std::error::Error> {
     Box::new(RenderManagerError(msg.to_string()))
 }
 
-/// Проверяет, что менеджер рендеринга инициализирован, и возвращает ссылку на контекст
-fn ensure_initialized<H>(
-    manager: &RenderManager<H>,
-) -> Result<&WgpuGraphContext, Box<dyn std::error::Error>>
-where
-    H: WgpuGuiHandler,
-{
-    manager
-        .s
-        .as_ref()
-        .ok_or_else(|| render_error("manager not initialized"))
-}
-
 /// Проверяет, что менеджер рендеринга инициализирован, и возвращает мутабельную ссылку на контекст
 fn ensure_initialized_mut<H>(
     manager: &mut RenderManager<H>,
@@ -55,7 +42,7 @@ where
 /// Блокирует обработчик GUI и возвращает мутабельную ссылку на него
 fn lock_handler<H>(
     handler: &std::sync::Arc<std::sync::Mutex<H>>,
-) -> Result<std::sync::MutexGuard<H>, Box<dyn std::error::Error>>
+) -> Result<std::sync::MutexGuard<'_, H>, Box<dyn std::error::Error>>
 where
     H: WgpuGuiHandler,
 {
