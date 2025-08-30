@@ -20,21 +20,20 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_gui";
 
-/// Генерирует случайную карту 2x2 с индексами тайлов от 0 до tiles_width * tiles_height - 1
-fn generate_random_map(map_width: u32, map_height: u32) -> [u32; 4] {
+/// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
+fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
     let mut rng = rand::thread_rng();
     let max_tile_index = map_width * map_height - 1;
-    [
-        rng.gen_range(0..=max_tile_index),
-        rng.gen_range(0..=max_tile_index),
-        rng.gen_range(0..=max_tile_index),
-        rng.gen_range(0..=max_tile_index),
-    ]
+    let mut map = Vec::with_capacity((map_width * map_height) as usize);
+    for _ in 0..map_width * map_height {
+        map.push(rng.gen_range(0..=max_tile_index));
+    }
+    map
 }
 
 pub struct GuiList {
     m: WgpuMap,
-    map: [u32; 4],
+    map: Vec<u32>,
     map_width: u32,
     map_height: u32,
 }
@@ -60,7 +59,7 @@ impl GuiList {
         let map_params = wgpu_map::MapParams {
             map_width: 2,
             map_height: 2,
-            tile_indices: &map,
+            tile_indices: map.as_slice(),
         };
         let m = get_map(gcx, &tiles_params, &map_params);
         GuiList {
@@ -74,7 +73,7 @@ impl GuiList {
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
         self.map = generate_random_map(self.map_width, self.map_height);
-        self.m.update_map(&self.map);
+        self.m.update_map(self.map.as_slice());
     }
 }
 
