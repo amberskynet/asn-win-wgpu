@@ -104,7 +104,6 @@ impl TAsnGuiHandler for MyGuiHandler {
     type FrameContext = render_manager::WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
-        let _ = gcx;
         let gui_list = GuiList::new(gcx);
         self.gui_list = Some(gui_list);
         m_info!("init");
@@ -144,14 +143,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Цикл обработки с отправкой результатов
         while running_clone.load(Ordering::Relaxed) {
             {
-                let mut h = match h_thread.lock() {
-                    Ok(h) => h,
-                    Err(e) => {
-                        m_error!("Error: {e}");
-                        return;
-                    }
-                };
-                h.update_map();
+                // let mut h = match h_thread.lock() {
+                //     Ok(h) => h,
+                //     Err(e) => {
+                //         m_error!("Error: {e}");
+                //         return;
+                //     }
+                // };
+                // h.update_map();
             }
             thread::sleep(Duration::from_millis(5));
         }
