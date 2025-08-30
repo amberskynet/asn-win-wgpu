@@ -3,6 +3,7 @@ extern crate asn_wgpu;
 extern crate asn_winit;
 
 mod log_utils;
+use rand::Rng;
 use wgpu_map::{WgpuMap, get_map};
 
 use std::{
@@ -19,10 +20,23 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_gui";
 
-pub const MAP: [u32; 4] = [1, 2, 3, 4];
+/// Генерирует случайную карту 2x2 с индексами тайлов от 0 до tiles_width * tiles_height - 1
+fn generate_random_map(map_width: u32, map_height: u32) -> [u32; 4] {
+    let mut rng = rand::thread_rng();
+    let max_tile_index = map_width * map_height - 1;
+    [
+        rng.gen_range(0..=max_tile_index),
+        rng.gen_range(0..=max_tile_index),
+        rng.gen_range(0..=max_tile_index),
+        rng.gen_range(0..=max_tile_index),
+    ]
+}
 
 pub struct GuiList {
     m: WgpuMap,
+    map: [u32; 4],
+    map_width: u32,
+    map_height: u32,
 }
 
 impl GuiList {
@@ -31,6 +45,13 @@ impl GuiList {
 
         let tiles_width = 16;
         let tiles_height = 12;
+
+        let map_width = 2;
+        let map_height = 2;
+
+        // Генерируем случайные значения для карты
+        let map = generate_random_map(map_width, map_height);
+
         let tiles_params = wgpu_map::MapTilesParams {
             map_tiles_bytes,
             tiles_width,
@@ -39,10 +60,21 @@ impl GuiList {
         let map_params = wgpu_map::MapParams {
             map_width: 2,
             map_height: 2,
-            tile_indices: &MAP,
+            tile_indices: &map,
         };
         let m = get_map(gcx, &tiles_params, &map_params);
-        GuiList { m }
+        GuiList {
+            m,
+            map,
+            map_width,
+            map_height,
+        }
+    }
+
+    /// Обновляет карту случайными значениями
+    pub fn update_map(&mut self) {
+        self.map = generate_random_map(self.map_width, self.map_height);
+        self.m.update_map(&self.map);
     }
 }
 
@@ -59,7 +91,7 @@ impl MyGuiHandler {
             }
         };
 
-        // g.m.fill_random();
+        // g.update_map();
 
         m_info!("update")
     }

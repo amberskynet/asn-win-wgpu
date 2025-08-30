@@ -25,6 +25,7 @@ asn-winit = { path = "./modules/asn-winit" }
 wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
 tokio-bus = { path = "./modules/tokio-bus"}
 pollster = "0.4"
+rand = "0.8"
 
 [profile.dev]
 opt-level = 0
