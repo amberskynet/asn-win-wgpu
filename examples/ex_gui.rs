@@ -18,7 +18,9 @@ use std::{
 use asn_logger::*;
 use log_utils::setup_log;
 
-pub const LOG_MODULE_NAME: &str = "ex_gui";
+const LOG_MODULE_NAME: &str = "ex_gui";
+
+const UPDATE_MILLIS: u128 = 5;
 
 /// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
 fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
@@ -113,7 +115,7 @@ impl TAsnGuiHandler for MyGuiHandler {
 
         // Периодическое обновление карты
         let now = std::time::Instant::now();
-        if now.duration_since(self.last_update).as_millis() >= 50 {
+        if now.duration_since(self.last_update).as_millis() >= UPDATE_MILLIS {
             self.update_map();
             self.last_update = now;
         }
