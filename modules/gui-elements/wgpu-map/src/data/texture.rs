@@ -2,6 +2,20 @@ use anyhow::*;
 use asn_wgpu::wgpu;
 use image::GenericImageView;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AsnTextureFormat {
+    Rgba8Unorm,
+    Rgba32Uint,
+}
+
+impl AsnTextureFormat {
+    pub fn to_wgpu_format(&self) -> wgpu::TextureFormat {
+        match self {
+            AsnTextureFormat::Rgba8Unorm => wgpu::TextureFormat::Rgba8Unorm,
+            AsnTextureFormat::Rgba32Uint => wgpu::TextureFormat::Rgba32Uint,
+        }
+    }
+}
 pub struct WgpuTexture {
     #[allow(unused)]
     pub texture: wgpu::Texture,
@@ -27,6 +41,7 @@ impl WgpuTexture {
         width: u32,
         height: u32,
         label: &str,
+        format: AsnTextureFormat,
     ) -> Result<Self> {
         let size = wgpu::Extent3d {
             width,
@@ -39,7 +54,7 @@ impl WgpuTexture {
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8Unorm,
+            format: format.to_wgpu_format(),
             usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
             view_formats: &[],
         });

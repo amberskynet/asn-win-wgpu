@@ -3,7 +3,7 @@ use asn_wgpu::wgpu::util::DeviceExt;
 use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, wgpu};
 
 use crate::data::rgba_handler::RgbaHandler;
-use crate::data::texture::WgpuTexture;
+use crate::data::texture::{AsnTextureFormat, WgpuTexture};
 use crate::data::utils::{get_render_pipeline, get_texture_bind_group_layout};
 use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
@@ -153,6 +153,7 @@ pub fn get_map(
         map_handler.width(),
         map_handler.height(),
         "MAP_TEXTURE_0",
+        AsnTextureFormat::Rgba32Uint,
     )
     .unwrap();
 
