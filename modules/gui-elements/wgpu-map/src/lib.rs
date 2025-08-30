@@ -24,14 +24,14 @@ pub struct WgpuMap {
 
 impl WgpuMap {
     pub fn update_map(&mut self, rgba: &[u32]) {
-        self.map_handler.update_data(rgba).unwrap();
+        // self.map_handler.update_data(rgba).unwrap();
         self.is_map_updated = true;
     }
 
-    pub fn fill_random(&mut self) {
-        self.map_handler.fill_random();
-        self.is_map_updated = true;
-    }
+    // pub fn fill_random(&mut self) {
+    //     self.map_handler.fill_random();
+    //     self.is_map_updated = true;
+    // }
 }
 
 impl TAsnGuiElement for WgpuMap {
@@ -39,9 +39,9 @@ impl TAsnGuiElement for WgpuMap {
     type FrameContext = WgpuFrameContext;
 
     fn update(&mut self, gcx: &Self::GraphContext) {
-        if !self.is_map_updated {
-            return;
-        }
+        // if !self.is_map_updated {
+        //     return;
+        // }
 
         // // Обновляем текстуру напрямую
         self.map_texture.update_from_rgba(

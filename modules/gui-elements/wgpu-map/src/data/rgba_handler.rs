@@ -139,7 +139,7 @@ impl RgbaHandler {
             ));
         }
 
-        self.data.copy_from_slice(new_data);
+        // self.data.copy_from_slice(new_data);
         Ok(())
     }
 

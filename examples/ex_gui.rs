@@ -33,7 +33,7 @@ fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
 
 pub struct GuiList {
     m: WgpuMap,
-    map: Vec<u32>,
+    // map: Vec<u32>,
     map_width: u32,
     map_height: u32,
 }
@@ -64,7 +64,7 @@ impl GuiList {
         let m = get_map(gcx, &tiles_params, &map_params);
         GuiList {
             m,
-            map,
+            // map,
             map_width,
             map_height,
         }
@@ -72,8 +72,8 @@ impl GuiList {
 
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
-        self.map = generate_random_map(self.map_width, self.map_height);
-        self.m.update_map(self.map.as_slice());
+        let map = generate_random_map(self.map_width, self.map_height);
+        self.m.update_map(map.as_slice());
     }
 }
 
@@ -143,14 +143,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Цикл обработки с отправкой результатов
         while running_clone.load(Ordering::Relaxed) {
             {
-                // let mut h = match h_thread.lock() {
-                //     Ok(h) => h,
-                //     Err(e) => {
-                //         m_error!("Error: {e}");
-                //         return;
-                //     }
-                // };
-                // h.update_map();
+                let mut h = match h_thread.lock() {
+                    Ok(h) => h,
+                    Err(e) => {
+                        m_error!("Error: {e}");
+                        return;
+                    }
+                };
+                h.update_map();
             }
             thread::sleep(Duration::from_millis(5));
         }
