@@ -25,10 +25,10 @@ pub struct GuiList {
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
-        let map_tiles_bytes = include_bytes!("tiles.png");
+        let map_tiles_bytes = include_bytes!("tile_1_1.png");
 
-        let tiles_width = 16;
-        let tiles_height = 12;
+        let tiles_width = 1;
+        let tiles_height = 1;
         let m = get_map(gcx, map_tiles_bytes, tiles_width, tiles_height, 2, 2);
         GuiList { m }
     }
