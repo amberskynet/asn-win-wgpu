@@ -44,12 +44,13 @@ impl TAsnGuiElement for WgpuMap {
         }
 
         // // Обновляем текстуру напрямую
-        // self.map_texture.update_from_rgba(
-        //     &gcx.queue,
-        //     self.map_handler.data(),
-        //     self.map_handler.width(),
-        //     self.map_handler.height(),
-        // );
+        self.map_texture.update_from_rgba(
+            &gcx.queue,
+            bytemuck::cast_slice(self.map_handler.data()),
+            self.map_handler.width(),
+            self.map_handler.height(),
+            AsnTextureFormat::Rgba32Uint,
+        );
 
         self.is_map_updated = false;
     }
