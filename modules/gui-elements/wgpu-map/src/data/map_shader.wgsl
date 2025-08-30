@@ -59,7 +59,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // fract(in.tex_coords.x * u_tiles_info.tiles_width) - дробная часть координаты X в тайлах
     // Это дает нам координату внутри конкретного тайла (0.0 - 1.0)
     let sub_u = fract(in.tex_coords.x * u_tiles_info.tiles_width) * tile_width;
-    let sub_v = fract(in.tex_coords.y * u_tiles_info.tiles_height) * tile_height;
+    let sub_v = fract((1.0 - in.tex_coords.y) * u_tiles_info.tiles_height) * tile_height;
     
     // Рассчитываем окончательные текстурные координаты для выборки из текстуры тайлов
     // tile_index_x и tile_index_y - индексы тайла
