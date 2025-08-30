@@ -44,8 +44,8 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 32;
-        let map_height = 32;
+        let map_width = 5;
+        let map_height = 5;
 
         // Генерируем случайные значения для карты
         let map = generate_random_map(map_width, map_height);
@@ -71,8 +71,7 @@ impl GuiList {
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
         let map = generate_random_map(self.map_width, self.map_height);
-        // Для тайлсета 16x12 ширина тайлов составляет 16
-        self.m.update_map(map.as_slice(), 16);
+        self.m.update_map(map.as_slice(), self.map_width);
     }
 }
 

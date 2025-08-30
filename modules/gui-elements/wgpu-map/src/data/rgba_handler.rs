@@ -192,7 +192,7 @@ impl RgbaHandler {
         self.data[index + 2] = b;
         self.data[index + 3] = a;
 
-        println!("{x} {y} {r} {g} {b} {a}");
+        // println!("{x} {y} {r} {g} {b} {a}");
         Ok(())
     }
 
