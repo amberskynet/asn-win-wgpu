@@ -66,6 +66,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // Умножаем на размер тайла, чтобы получить смещение в текстуре тайлов
     let tile_uv = vec2<f32>(f32(tile_index_x) * tile_width + sub_u, f32(tile_index_y) * tile_height + sub_v);
     
+    return vec4<f32>(sub_u, sub_v, 0.0, 1.0);
     // Выбираем цвет тайла из текстуры тайлов
-    return textureSample(t_tiles, s_tiles, tile_uv);
+    // return textureSample(t_tiles, s_tiles, tile_uv);
 }
