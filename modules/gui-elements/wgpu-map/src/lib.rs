@@ -17,6 +17,8 @@ pub struct WgpuMap {
     num_indices: u32,
     map_handler: RgbaHandler,
     map_texture: WgpuTexture,
+    tiles_texture: WgpuTexture,
+    tiles_info_buffer: wgpu::Buffer, // Uniform-буфер с информацией о тайлах
     is_map_updated: bool,
 }
 
@@ -81,6 +83,8 @@ impl TAsnGuiElement for WgpuMap {
 pub fn get_map(
     gcx: &WgpuGraphContext,
     map_tiles_bytes: &[u8],
+    tiles_width: u32,
+    tiles_height: u32,
     map_width: u32,
     map_height: u32,
 ) -> WgpuMap {
@@ -88,8 +92,17 @@ pub fn get_map(
     let queue = &gcx.queue;
     let format = gcx.surface_format;
 
-    let diffuse_texture =
-        WgpuTexture::from_bytes(device, queue, map_tiles_bytes, "map-texture.png").unwrap();
+    // Создаем текстуру тайлов
+    let tiles_texture =
+        WgpuTexture::from_bytes(device, queue, map_tiles_bytes, "map-tiles-texture.png").unwrap();
+
+    // Создаем uniform-буфер с информацией о тайлах
+    let tiles_info_data = [tiles_width as f32, tiles_height as f32];
+    let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("Tiles Info Buffer"),
+        contents: bytemuck::cast_slice(&tiles_info_data),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    });
 
     let mut map_handler = RgbaHandler::new(map_width, map_height);
     map_handler.fill_random();
@@ -123,20 +136,29 @@ pub fn get_map(
     let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
         layout: &texture_bind_group_layout,
         entries: &[
+            // Uniform-буфер с информацией о тайлах
             wgpu::BindGroupEntry {
                 binding: 0,
-                resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                resource: wgpu::BindingResource::Buffer(
+                    tiles_info_buffer.as_entire_buffer_binding(),
+                ),
             },
+            // Текстура тайлов
             wgpu::BindGroupEntry {
                 binding: 1,
-                resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                resource: wgpu::BindingResource::TextureView(&tiles_texture.view),
             },
             wgpu::BindGroupEntry {
                 binding: 2,
+                resource: wgpu::BindingResource::Sampler(&tiles_texture.sampler),
+            },
+            // Текстура карты
+            wgpu::BindGroupEntry {
+                binding: 3,
                 resource: wgpu::BindingResource::TextureView(&map_texture.view),
             },
             wgpu::BindGroupEntry {
-                binding: 3,
+                binding: 4,
                 resource: wgpu::BindingResource::Sampler(&map_texture.sampler),
             },
         ],
@@ -158,6 +180,8 @@ pub fn get_map(
         num_indices,
         map_handler,
         map_texture,
+        tiles_texture,
+        tiles_info_buffer,
         is_map_updated: false,
     }
 }

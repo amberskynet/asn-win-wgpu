@@ -27,7 +27,9 @@ impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
         let map_tiles_bytes = include_bytes!("tiles.png");
 
-        let m = get_map(gcx, map_tiles_bytes, 25, 25);
+        let tiles_width = 16;
+        let tiles_height = 12;
+        let m = get_map(gcx, map_tiles_bytes, tiles_width, tiles_height, 2, 2);
         GuiList { m }
     }
 }
