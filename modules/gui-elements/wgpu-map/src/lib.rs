@@ -118,10 +118,12 @@ pub fn get_map(
     )
     .unwrap();
 
-    // Создаем uniform-буфер с информацией о тайлах
+    // Создаем uniform-буфер с информацией о тайлах и карте
     let tiles_info_data = [
         tiles_params.tiles_width as f32,
         tiles_params.tiles_height as f32,
+        map_params.map_width as f32,
+        map_params.map_height as f32,
     ];
     let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("Tiles Info Buffer"),
@@ -136,13 +138,13 @@ pub fn get_map(
 
     print!("map_handler: {:?}", map_handler);
 
-    let new_data: [u8; _] = [
-        1, 1, 1, 1, // 1
-        1, 1, 1, 1, // 2
-        1, 1, 1, 1, // 3
-        1, 1, 1, 1, // 4
-    ];
-    map_handler.update_data(&new_data).unwrap();
+    // let new_data: [u8; _] = [
+    //     1, 1, 1, 1, // 1
+    //     1, 1, 1, 1, // 2
+    //     1, 1, 1, 1, // 3
+    //     1, 1, 1, 1, // 4
+    // ];
+    // map_handler.update_data(&new_data).unwrap();
 
     let map_texture = WgpuTexture::from_rgba(
         device,
