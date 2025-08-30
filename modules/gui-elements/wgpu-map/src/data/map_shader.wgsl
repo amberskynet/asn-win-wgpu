@@ -46,21 +46,25 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let tile_info = textureSample(t_map, s_map, in.tex_coords);
     
     // Извлекаем индексы тайла из красного и зеленого компонентов
-    // Значения нормализованы (0.0 - 1.0), преобразуем в индексы
-    let tile_index_x = u32(tile_info.r * u_tiles_info.tiles_width);
-    let tile_index_y = u32(tile_info.g * u_tiles_info.tiles_height);
+    let tile_index_x = u32(tile_info.r);
+    let tile_index_y = u32(tile_info.g);
     
     // Рассчитываем текстурные координаты для выборки из текстуры тайлов
     // Учитываем размер одного тайла в текстуре
     let tile_width = 1.0 / u_tiles_info.tiles_width;
     let tile_height = 1.0 / u_tiles_info.tiles_height;
     
-    // Центрируем координаты в середине тайла для более точной выборки
-    let tile_center_x = (f32(tile_index_x) + 0.5) * tile_width;
-    let tile_center_y = (f32(tile_index_y) + 0.5) * tile_height;
+    // Рассчитываем суб-координаты внутри тайла на основе входных текстурных координат
+    // in.tex_coords - координаты в текстуре карты (0.0 - 1.0)
+    // fract(in.tex_coords.x * u_tiles_info.tiles_width) - дробная часть координаты X в тайлах
+    // Это дает нам координату внутри конкретного тайла (0.0 - 1.0)
+    let sub_u = fract(in.tex_coords.x * u_tiles_info.tiles_width) * tile_width;
+    let sub_v = fract(in.tex_coords.y * u_tiles_info.tiles_height) * tile_height;
     
-    // Создаем вектор координат для выборки из текстуры тайлов
-    let tile_uv = vec2<f32>(tile_center_x, tile_center_y);
+    // Рассчитываем окончательные текстурные координаты для выборки из текстуры тайлов
+    // tile_index_x и tile_index_y - индексы тайла
+    // Умножаем на размер тайла, чтобы получить смещение в текстуре тайлов
+    let tile_uv = vec2<f32>(f32(tile_index_x) * tile_width + sub_u, f32(tile_index_y) * tile_height + sub_v);
     
     // Выбираем цвет тайла из текстуры тайлов
     return textureSample(t_tiles, s_tiles, tile_uv);
