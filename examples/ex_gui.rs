@@ -19,7 +19,7 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_gui";
 
-pub const Map: [u8; 4] = [1, 2, 3, 4];
+pub const MAP: [u8; 4] = [1, 2, 3, 4];
 
 pub struct GuiList {
     m: WgpuMap,
@@ -39,7 +39,7 @@ impl GuiList {
         let map_params = wgpu_map::MapParams {
             map_width: 2,
             map_height: 2,
-            tile_indices: &Map,
+            tile_indices: &MAP,
         };
         let m = get_map(gcx, &tiles_params, &map_params);
         GuiList { m }

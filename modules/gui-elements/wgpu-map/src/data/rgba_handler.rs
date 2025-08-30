@@ -24,10 +24,11 @@ use rand::Rng;
 /// // Создание градиента
 /// handler.create_gradient((255, 0, 0, 255), (0, 0, 255, 255));
 /// ```
+#[derive(Debug)]
 pub struct RgbaHandler {
     width: u32,
     height: u32,
-    data: Vec<u8>,
+    pub data: Vec<u8>,
 }
 
 impl RgbaHandler {
@@ -183,6 +184,7 @@ impl RgbaHandler {
         self.data[index + 2] = b;
         self.data[index + 3] = a;
 
+        println!("{x} {y} {r} {g} {b} {a}");
         Ok(())
     }
 
