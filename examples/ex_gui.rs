@@ -36,7 +36,12 @@ impl GuiList {
             tiles_width,
             tiles_height,
         };
-        let m = get_map(gcx, tiles_params, 2, 2);
+        let map_dimensions = wgpu_map::MapDimensions {
+            map_width: 2,
+            map_height: 2,
+            tile_indices: &Map,
+        };
+        let m = get_map(gcx, &tiles_params, &map_dimensions);
         GuiList { m }
     }
 }
