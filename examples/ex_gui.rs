@@ -19,7 +19,7 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_gui";
 
-pub const MAP: [u8; 4] = [1, 2, 3, 4];
+pub const MAP: [u8; 4] = [0, 0, 0, 0];
 
 pub struct GuiList {
     m: WgpuMap,
@@ -29,8 +29,8 @@ impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
         let map_tiles_bytes = include_bytes!("tiles_16_12.png");
 
-        let tiles_width = 16;
-        let tiles_height = 12;
+        let tiles_width = 1;
+        let tiles_height = 1;
         let tiles_params = wgpu_map::MapTilesParams {
             map_tiles_bytes,
             tiles_width,

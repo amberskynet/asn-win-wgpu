@@ -138,13 +138,13 @@ pub fn get_map(
 
     print!("map_handler: {:?}", map_handler);
 
-    // let new_data: [u8; _] = [
-    //     1, 1, 1, 1, // 1
-    //     1, 1, 1, 1, // 2
-    //     1, 1, 1, 1, // 3
-    //     1, 1, 1, 1, // 4
-    // ];
-    // map_handler.update_data(&new_data).unwrap();
+    let new_data: [u8; _] = [
+        1, 0, 0, 0, // 1
+        1, 0, 0, 0, // 2
+        1, 0, 0, 0, // 3
+        1, 0, 0, 0, // 4
+    ];
+    map_handler.update_data(&new_data).unwrap();
 
     let map_texture = WgpuTexture::from_rgba(
         device,
