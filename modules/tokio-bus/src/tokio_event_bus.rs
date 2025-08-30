@@ -31,8 +31,7 @@
 //! - `AsnBusSendError::Closed`: When trying to send a message to a closed channel
 //! - `AsnBusRecvError::Empty`: When trying to receive a message from an empty channel
 //! - `AsnBusRecvError::Closed`: When trying to receive a message from a closed channel
-//!
-//! Note: Currently, `TryRecvError::Lagged` causes a panic. This will be improved in future versions.
+//! - `AsnBusRecvError::Lagged(n)`: When the receiver lagged too far behind and missed `n` messages
 
 use asn_core_bus::{AsnBus, AsnBusRecvError, AsnTransmitter};
 use asn_core_bus::{AsnBusSendError, AsnReceiver};
@@ -87,7 +86,7 @@ where
     /// * `Ok(E)` with the received message
     /// * `Err(AsnBusRecvError::Empty)` if no messages are available
     /// * `Err(AsnBusRecvError::Closed)` if the channel is closed
-    /// * Panics if the receiver lagged too far behind (this will be improved)
+    /// * `Err(AsnBusRecvError::Lagged(n))` if the receiver lagged too far behind and missed `n` messages
     fn get_message(&mut self) -> Result<E, AsnBusRecvError> {
         let result = self.rx.try_recv();
         match result {
@@ -95,9 +94,7 @@ where
             Err(err) => match err {
                 broadcast::error::TryRecvError::Empty => Err(AsnBusRecvError::Empty),
                 broadcast::error::TryRecvError::Closed => Err(AsnBusRecvError::Closed),
-                broadcast::error::TryRecvError::Lagged(n) => {
-                    panic!("TryRecvError::Lagged {:?}", n)
-                }
+                broadcast::error::TryRecvError::Lagged(n) => Err(AsnBusRecvError::Lagged(n)),
             },
         }
     }

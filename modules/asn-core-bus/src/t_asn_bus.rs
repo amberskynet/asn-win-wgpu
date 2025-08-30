@@ -9,6 +9,7 @@ pub enum AsnBusSendError {
 pub enum AsnBusRecvError {
     Empty,
     Closed,
+    Lagged(u64),
 }
 
 pub trait AsnTransmitter<M> {

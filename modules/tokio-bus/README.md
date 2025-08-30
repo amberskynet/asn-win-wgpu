@@ -61,8 +61,7 @@ The module handles various error conditions:
 - `AsnBusSendError::Closed`: When trying to send a message to a closed channel
 - `AsnBusRecvError::Empty`: When trying to receive a message from an empty channel
 - `AsnBusRecvError::Closed`: When trying to receive a message from a closed channel
-
-Note: Currently, `TryRecvError::Lagged` causes a panic. This will be improved in future versions.
+- `AsnBusRecvError::Lagged(n)`: When the receiver lagged too far behind and missed `n` messages
 
 ## License
 
