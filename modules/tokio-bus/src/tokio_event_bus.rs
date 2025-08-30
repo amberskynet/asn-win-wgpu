@@ -59,7 +59,10 @@ struct TokioReceiver<E> {
     rx: Receiver<E>,
 }
 
-impl<E> AsnTransmitter<E> for TokioTransmitter<E> {
+impl<E> AsnTransmitter<E> for TokioTransmitter<E>
+where
+    E: Send,
+{
     /// Sends a message through the broadcast channel.
     ///
     /// # Arguments
@@ -90,18 +93,24 @@ impl<E> AsnTransmitter<E> for TokioTransmitter<E> {
     ///
     /// * `Ok(())` if the message was sent successfully
     /// * `Err(AsnBusSendError)` if there was an error sending the message
-    async fn send_message_async(&self, m: E) -> Result<(), AsnBusSendError> {
-        let result = self.tx.send(m);
-        match result {
-            Ok(_) => Ok(()),
-            Err(_) => Err(AsnBusSendError::Closed),
+    fn send_message_async(
+        &self,
+        m: E,
+    ) -> impl std::future::Future<Output = Result<(), AsnBusSendError>> + Send {
+        let tx = self.tx.clone();
+        async move {
+            let result = tx.send(m);
+            match result {
+                Ok(_) => Ok(()),
+                Err(_) => Err(AsnBusSendError::Closed),
+            }
         }
     }
 }
 
 impl<E> AsnReceiver<E> for TokioReceiver<E>
 where
-    E: Clone,
+    E: Clone + Send,
 {
     /// Attempts to receive a message from the broadcast channel.
     ///
@@ -133,11 +142,16 @@ where
     ///
     /// * `Ok(E)` with the received message
     /// * `Err(AsnBusRecvError)` if there was an error receiving the message
-    async fn wait_for_message(&mut self) -> Result<E, AsnBusRecvError> {
-        let result = self.rx.recv().await;
-        match result {
-            Ok(e) => Ok(e),
-            Err(_) => Err(AsnBusRecvError::Closed),
+    fn wait_for_message(
+        &mut self,
+    ) -> impl std::future::Future<Output = Result<E, AsnBusRecvError>> + Send {
+        let fut = self.rx.recv();
+        async move {
+            let result = fut.await;
+            match result {
+                Ok(e) => Ok(e),
+                Err(_) => Err(AsnBusRecvError::Closed),
+            }
         }
     }
 }
@@ -171,7 +185,7 @@ where
 
 impl<E> AsnBus<E> for TokioEventBus<E>
 where
-    E: Clone,
+    E: Clone + Send + Sync,
 {
     /// Gets a transmitter for sending messages.
     ///
@@ -220,6 +234,6 @@ where
 ///
 /// let bus = new_tokio_bus::<Message>(16);
 /// ```
-pub fn new_tokio_bus<E: Clone>(capacity: usize) -> impl AsnBus<E> {
+pub fn new_tokio_bus<E: Clone + Send + Sync>(capacity: usize) -> impl AsnBus<E> {
     TokioEventBus::new(capacity)
 }

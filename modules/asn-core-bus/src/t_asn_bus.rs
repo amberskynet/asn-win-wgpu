@@ -27,7 +27,10 @@ pub trait AsnTransmitter<M> {
     ///
     /// * `Ok(())` if the message was sent successfully
     /// * `Err(AsnBusSendError)` if there was an error sending the message
-    async fn send_message_async(&self, m: M) -> Result<(), AsnBusSendError>;
+    fn send_message_async(
+        &self,
+        m: M,
+    ) -> impl std::future::Future<Output = Result<(), AsnBusSendError>> + Send;
 }
 
 pub trait AsnReceiver<M> {
@@ -41,7 +44,9 @@ pub trait AsnReceiver<M> {
     ///
     /// * `Ok(M)` with the received message
     /// * `Err(AsnBusRecvError)` if there was an error receiving the message
-    async fn wait_for_message(&mut self) -> Result<M, AsnBusRecvError>;
+    fn wait_for_message(
+        &mut self,
+    ) -> impl std::future::Future<Output = Result<M, AsnBusRecvError>> + Send;
 }
 
 pub trait AsnBus<M> {
