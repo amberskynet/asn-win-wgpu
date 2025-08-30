@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use rand::Rng;
 
 /// Класс для инициализации и обработки RGBA-массивов
@@ -561,9 +562,9 @@ mod tests {
         for y in 0..10 {
             for x in 0..10 {
                 let pixel = handler.get_pixel(x, y).unwrap();
-                assert!(pixel.0 >= 128 && pixel.0 <= 255); // R
-                assert!(pixel.1 >= 128 && pixel.1 <= 255); // G
-                assert!(pixel.2 >= 128 && pixel.2 <= 255); // B
+                assert!(pixel.0 >= 128); // R
+                assert!(pixel.1 >= 128); // G
+                assert!(pixel.2 >= 128); // B
                 assert_eq!(pixel.3, 200); // A
             }
         }
