@@ -63,7 +63,6 @@ impl GuiList {
         let m = get_map(gcx, &tiles_params, &map_params);
         GuiList {
             m,
-            // map,
             map_width,
             map_height,
         }
