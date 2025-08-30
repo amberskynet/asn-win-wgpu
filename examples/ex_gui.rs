@@ -90,7 +90,7 @@ impl MyGuiHandler {
             }
         };
 
-        // g.update_map();
+        g.update_map();
 
         m_info!("update")
     }
