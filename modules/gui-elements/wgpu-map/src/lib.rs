@@ -80,11 +80,19 @@ impl TAsnGuiElement for WgpuMap {
     }
 }
 
+/// Параметры для создания карты тайлов
+pub struct MapTilesParams<'a> {
+    /// Байты тайлов карты
+    pub map_tiles_bytes: &'a [u8],
+    /// Ширина тайлов
+    pub tiles_width: u32,
+    /// Высота тайлов
+    pub tiles_height: u32,
+}
+
 pub fn get_map(
     gcx: &WgpuGraphContext,
-    map_tiles_bytes: &[u8],
-    tiles_width: u32,
-    tiles_height: u32,
+    tiles_params: MapTilesParams,
     map_width: u32,
     map_height: u32,
 ) -> WgpuMap {
@@ -93,11 +101,19 @@ pub fn get_map(
     let format = gcx.surface_format;
 
     // Создаем текстуру тайлов
-    let tiles_texture =
-        WgpuTexture::from_bytes(device, queue, map_tiles_bytes, "map-tiles-texture.png").unwrap();
+    let tiles_texture = WgpuTexture::from_bytes(
+        device,
+        queue,
+        tiles_params.map_tiles_bytes,
+        "map-tiles-texture.png",
+    )
+    .unwrap();
 
     // Создаем uniform-буфер с информацией о тайлах
-    let tiles_info_data = [tiles_width as f32, tiles_height as f32];
+    let tiles_info_data = [
+        tiles_params.tiles_width as f32,
+        tiles_params.tiles_height as f32,
+    ];
     let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("Tiles Info Buffer"),
         contents: bytemuck::cast_slice(&tiles_info_data),
