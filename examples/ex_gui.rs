@@ -33,7 +33,6 @@ fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
 
 pub struct GuiList {
     m: WgpuMap,
-    // map: Vec<u32>,
     map_width: u32,
     map_height: u32,
 }
