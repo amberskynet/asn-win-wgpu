@@ -130,7 +130,9 @@ pub fn get_map(
     });
 
     let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
-    map_handler.fill_random();
+    map_handler
+        .set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)
+        .unwrap();
 
     let map_texture = WgpuTexture::from_rgba(
         device,
