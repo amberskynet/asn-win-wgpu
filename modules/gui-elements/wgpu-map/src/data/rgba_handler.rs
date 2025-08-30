@@ -550,10 +550,10 @@ impl RgbaHandler {
 
             // Устанавливаем пиксель с координатами тайла в RGBA формате
             // R = x, G = y, B = 0, A = 0
-            println!(
-                "Tile index {}: x={}, y={}, pixel at ({}, {})",
-                index, x, y, px, py
-            );
+            // println!(
+            //     "Tile index {}: x={}, y={}, pixel at ({}, {})",
+            //     index, x, y, px, py
+            // );
             self.set_pixel(px, py, x as u32, y as u32, 0, 0)?;
         }
 

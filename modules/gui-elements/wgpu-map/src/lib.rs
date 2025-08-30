@@ -23,8 +23,14 @@ pub struct WgpuMap {
 }
 
 impl WgpuMap {
-    pub fn update_map(&mut self, rgba: &[u32]) {
-        self.map_handler.update_data(rgba).unwrap();
+    pub fn update_map(&mut self, tile_indices: &[u32], tiles_width: u32) {
+        // Получаем ширину карты из текущего обработчика
+        let map_width = self.map_handler.width();
+
+        // Устанавливаем индексы тайлов в RGBA-формате
+        self.map_handler
+            .set_tile_indices(tile_indices, tiles_width)
+            .unwrap();
         self.is_map_updated = true;
     }
 

@@ -44,8 +44,8 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 2;
-        let map_height = 2;
+        let map_width = 32;
+        let map_height = 32;
 
         // Генерируем случайные значения для карты
         let map = generate_random_map(map_width, map_height);
@@ -56,8 +56,8 @@ impl GuiList {
             tiles_height,
         };
         let map_params = wgpu_map::MapParams {
-            map_width: 2,
-            map_height: 2,
+            map_width,
+            map_height,
             tile_indices: map.as_slice(),
         };
         let m = get_map(gcx, &tiles_params, &map_params);
@@ -71,12 +71,14 @@ impl GuiList {
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
         let map = generate_random_map(self.map_width, self.map_height);
-        self.m.update_map(map.as_slice());
+        // Для тайлсета 16x12 ширина тайлов составляет 16
+        self.m.update_map(map.as_slice(), 16);
     }
 }
 
 pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
+    last_update: std::time::Instant,
 }
 
 impl MyGuiHandler {
@@ -109,6 +111,13 @@ impl TAsnGuiHandler for MyGuiHandler {
 
     fn update(&mut self, gcx: &Self::GraphContext) {
         self.gui_list.as_mut().unwrap().m.update(gcx);
+
+        // Периодическое обновление карты
+        let now = std::time::Instant::now();
+        if now.duration_since(self.last_update).as_millis() >= 5 {
+            self.update_map();
+            self.last_update = now;
+        }
     }
 
     fn draw(&mut self, fcx: &mut Self::FrameContext) {
@@ -118,7 +127,10 @@ impl TAsnGuiHandler for MyGuiHandler {
 }
 
 pub fn get_handler() -> MyGuiHandler {
-    MyGuiHandler { gui_list: None }
+    MyGuiHandler {
+        gui_list: None,
+        last_update: std::time::Instant::now(),
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -126,44 +138,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
-    let is_running = Arc::new(AtomicBool::new(true));
-    let running_clone = Arc::clone(&is_running);
-
     let h = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
 
-    let h_thread = h_safe.clone();
-
     let r = asn_wgpu::get_manager(h_safe);
 
-    let handle = thread::spawn(move || {
-        // Цикл обработки с отправкой результатов
-        while running_clone.load(Ordering::Relaxed) {
-            {
-                let mut h = match h_thread.lock() {
-                    Ok(h) => h,
-                    Err(e) => {
-                        m_error!("Error: {e}");
-                        return;
-                    }
-                };
-                h.update_map();
-            }
-            thread::sleep(Duration::from_millis(5));
-        }
-        m_info!("Exit from loop");
-    });
-
     asn_winit::run(r)?;
-
-    is_running.store(false, Ordering::Relaxed);
-    handle.join().unwrap();
-
-    for i in 0..2 {
-        m_info!("wait {i}");
-        sleep(Duration::from_secs(1));
-    }
 
     Ok(())
 }
