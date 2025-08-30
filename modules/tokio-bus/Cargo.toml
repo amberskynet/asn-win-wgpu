@@ -2,6 +2,9 @@
 name = "tokio-bus"
 version = "0.1.0"
 edition = "2024"
+description = "Tokio-based implementation of the ASN event bus"
+keywords = ["tokio", "event-bus", "async", "broadcast"]
+categories = ["asynchronous"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
