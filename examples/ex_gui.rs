@@ -27,7 +27,7 @@ pub struct GuiList {
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
-        let map_tiles_bytes = include_bytes!("tiles_16_12.png");
+        let map_tiles_bytes = include_bytes!("tiles_2_2.png");
 
         let tiles_width = 1;
         let tiles_height = 1;
