@@ -24,7 +24,7 @@ pub struct WgpuMap {
 
 impl WgpuMap {
     pub fn update_map(&mut self, rgba: &[u32]) {
-        // self.map_handler.update_data(rgba).unwrap();
+        self.map_handler.update_data(rgba).unwrap();
         self.is_map_updated = true;
     }
 
