@@ -90,8 +90,8 @@ pub struct MapTilesParams<'a> {
     pub tiles_height: u32,
 }
 
-/// Параметры размеров карты
-pub struct MapDimensions<'a> {
+/// Параметры карты
+pub struct MapParams<'a> {
     /// Ширина карты
     pub map_width: u32,
     /// Высота карты
@@ -103,7 +103,7 @@ pub struct MapDimensions<'a> {
 pub fn get_map(
     gcx: &WgpuGraphContext,
     tiles_params: &MapTilesParams,
-    map_dimensions: &MapDimensions,
+    map_params: &MapParams,
 ) -> WgpuMap {
     let device = &gcx.device;
     let queue = &gcx.queue;
@@ -129,7 +129,7 @@ pub fn get_map(
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
     });
 
-    let mut map_handler = RgbaHandler::new(map_dimensions.map_width, map_dimensions.map_height);
+    let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
     map_handler.fill_random();
 
     let map_texture = WgpuTexture::from_rgba(
