@@ -536,14 +536,6 @@ impl RgbaHandler {
             let x = (index as u32) % tiles_width;
             let y = (index as u32) / tiles_width;
 
-            // Проверяем, что координаты не превышают u8::MAX
-            if x > u8::MAX as u32 || y > u8::MAX as u32 {
-                return Err(format!(
-                    "Координаты тайла ({}, {}) превышают максимальное значение u8 (255)",
-                    x, y
-                ));
-            }
-
             // Преобразуем индекс в координаты пикселя
             let px = (i as u32) % self.width;
             let py = (i as u32) / self.width;

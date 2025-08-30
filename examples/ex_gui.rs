@@ -44,8 +44,8 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 5;
-        let map_height = 5;
+        let map_width = 256;
+        let map_height = 256;
 
         // Генерируем случайные значения для карты
         let map = generate_random_map(map_width, map_height);
