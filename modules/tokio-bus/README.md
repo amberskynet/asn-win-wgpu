@@ -13,7 +13,7 @@ The `tokio-bus` module implements the event bus pattern using Tokio's broadcast 
 - Asynchronous message passing
 - Multiple receiver support
 - Integration with the ASN bus traits
-- Non-blocking send and receive operations
+- Non-blocking and blocking send/receive operations
 
 ## Installation
 
@@ -46,6 +46,32 @@ sender.send_message(Message::Update("Hello".to_string())).unwrap();
 let msg = receiver.get_message().unwrap();
 ```
 
+Async usage:
+
+```rust
+use tokio_bus::new_tokio_bus;
+use asn_core_bus::{AsnBus, AsnTransmitter, AsnReceiver};
+
+#[derive(Clone, Debug)]
+enum Message {
+    Update(String),
+    Shutdown,
+}
+
+#[tokio::main]
+async fn main() {
+    let bus = new_tokio_bus::<Message>(16);
+    let sender = bus.get_sender();
+    let mut receiver = bus.get_receiver();
+
+    tokio::spawn(async move {
+        sender.send_message_async(Message::Update("Hello".to_string())).await.unwrap();
+    });
+
+    let msg = receiver.wait_for_message().await.unwrap();
+}
+```
+
 ## API Documentation
 
 For detailed API documentation, see the [tokio_event_bus](src/tokio_event_bus.rs) module.
@@ -62,6 +88,10 @@ The module handles various error conditions:
 - `AsnBusRecvError::Empty`: When trying to receive a message from an empty channel
 - `AsnBusRecvError::Closed`: When trying to receive a message from a closed channel
 - `AsnBusRecvError::Lagged(n)`: When the receiver lagged too far behind and missed `n` messages
+
+Additionally, the module provides asynchronous methods:
+- `send_message_async`: Sends a message asynchronously, waiting if the channel is full
+- `wait_for_message`: Waits asynchronously for a message to be available
 
 ## License
 

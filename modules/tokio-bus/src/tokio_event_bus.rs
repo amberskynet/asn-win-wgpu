@@ -32,6 +32,10 @@
 //! - `AsnBusRecvError::Empty`: When trying to receive a message from an empty channel
 //! - `AsnBusRecvError::Closed`: When trying to receive a message from a closed channel
 //! - `AsnBusRecvError::Lagged(n)`: When the receiver lagged too far behind and missed `n` messages
+//!
+//! Additionally, the module provides asynchronous methods:
+//! - `send_message_async`: Sends a message asynchronously, waiting if the channel is full
+//! - `wait_for_message`: Waits asynchronously for a message to be available
 
 use asn_core_bus::{AsnBus, AsnBusRecvError, AsnTransmitter};
 use asn_core_bus::{AsnBusSendError, AsnReceiver};
@@ -42,6 +46,7 @@ use tokio::sync::broadcast::Sender;
 /// Transmitter implementation for Tokio broadcast channels.
 ///
 /// This struct wraps a Tokio `Sender` and implements the `AsnTransmitter` trait.
+/// It provides both synchronous and asynchronous methods for sending messages.
 struct TokioTransmitter<E> {
     tx: Sender<E>,
 }
@@ -49,6 +54,7 @@ struct TokioTransmitter<E> {
 /// Receiver implementation for Tokio broadcast channels.
 ///
 /// This struct wraps a Tokio `Receiver` and implements the `AsnReceiver` trait.
+/// It provides both synchronous and asynchronous methods for receiving messages.
 struct TokioReceiver<E> {
     rx: Receiver<E>,
 }
@@ -65,6 +71,26 @@ impl<E> AsnTransmitter<E> for TokioTransmitter<E> {
     /// * `Ok(())` if the message was sent successfully
     /// * `Err(AsnBusSendError::Closed)` if the channel is closed
     fn send_message(&self, m: E) -> Result<(), AsnBusSendError> {
+        let result = self.tx.send(m);
+        match result {
+            Ok(_) => Ok(()),
+            Err(_) => Err(AsnBusSendError::Closed),
+        }
+    }
+
+    /// Sends a message asynchronously, waiting if the channel is full.
+    ///
+    /// This method will wait until there is space in the channel to send the message.
+    ///
+    /// # Arguments
+    ///
+    /// * `m` - The message to send
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(())` if the message was sent successfully
+    /// * `Err(AsnBusSendError)` if there was an error sending the message
+    async fn send_message_async(&self, m: E) -> Result<(), AsnBusSendError> {
         let result = self.tx.send(m);
         match result {
             Ok(_) => Ok(()),
@@ -96,6 +122,22 @@ where
                 broadcast::error::TryRecvError::Closed => Err(AsnBusRecvError::Closed),
                 broadcast::error::TryRecvError::Lagged(n) => Err(AsnBusRecvError::Lagged(n)),
             },
+        }
+    }
+
+    /// Waits asynchronously for a message to be available.
+    ///
+    /// This method will wait until a message is available in the channel.
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(E)` with the received message
+    /// * `Err(AsnBusRecvError)` if there was an error receiving the message
+    async fn wait_for_message(&mut self) -> Result<E, AsnBusRecvError> {
+        let result = self.rx.recv().await;
+        match result {
+            Ok(e) => Ok(e),
+            Err(_) => Err(AsnBusRecvError::Closed),
         }
     }
 }
