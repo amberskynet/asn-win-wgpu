@@ -100,7 +100,7 @@ pub fn get_texture_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLa
                     ty: wgpu::BindingType::Texture {
                         multisampled: false,
                         view_dimension: wgpu::TextureViewDimension::D2,
-                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        sample_type: wgpu::TextureSampleType::Uint,
                     },
                     count: None,
                 },

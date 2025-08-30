@@ -38,26 +38,18 @@ var t_tiles: texture_2d<f32>; // Текстура с тайлами
 @group(0) @binding(2)
 var s_tiles: sampler; // Сэмплер для текстуры тайлов
 @group(0) @binding(3)
-var t_map: texture_2d<f32>; // Текстура карты с координатами тайлов
+var t_map: texture_2d<u32>; // Текстура карты с координатами тайлов
 @group(0) @binding(4)
 var s_map: sampler; // Сэмплер для текстуры карты
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // Получаем координаты тайла из текстуры карты (красный и зеленый компоненты)
-    let tile_info = textureSample(t_map, s_map, in.tex_coords);
+    let tile_info = textureLoad(t_map, vec2<i32>(in.tex_coords * vec2<f32>(textureDimensions(t_map))), 0);
     
     // Извлекаем индексы тайла из красного и зеленого компонентов
     let tile_index_x = f32(tile_info.r);
     let tile_index_y = f32(tile_info.g);
-    
-    // Отладка: показываем красный цвет для тайла (1, 0)
-    if (tile_info.r > 0.01) {
-        return vec4<f32>(1.0, 0.0, 0.0, 1.0); // Красный для тайла (1, 0)
-    }
-    
-    // Отладка: показываем значения tile_info
-    return vec4<f32>(tile_info.r, tile_info.g, 0.0, 1.0);
     
     // Рассчитываем текстурные координаты для выборки из текстуры тайлов
     // Учитываем размер одного тайла в текстуре
@@ -73,7 +65,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // fract(in.tex_coords.x * u_tiles_info.tiles_width) - дробная часть координаты X в тайлах
     // Это дает нам координату внутри конкретного тайла (0.0 - 1.0)
     let sub_u = fract(in.tex_coords.x * u_tiles_info.map_width) * tile_width;
-    let sub_v = fract((1.0 - in.tex_coords.y) * u_tiles_info.map_height) * tile_height;
+    let sub_v = fract(in.tex_coords.y * u_tiles_info.map_height) * tile_height;
     
     // Рассчитываем окончательные текстурные координаты для выборки из текстуры тайлов
     // tile_index_x и tile_index_y - индексы тайла
@@ -83,4 +75,3 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // Выбираем цвет тайла из текстуры тайлов
     return textureSample(t_tiles, s_tiles, tile_uv);
 }
-

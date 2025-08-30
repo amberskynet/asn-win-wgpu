@@ -15,6 +15,13 @@ impl AsnTextureFormat {
             AsnTextureFormat::Rgba32Uint => wgpu::TextureFormat::Rgba32Uint,
         }
     }
+
+    pub fn bytes_per_pixel(&self) -> u32 {
+        match self {
+            AsnTextureFormat::Rgba8Unorm => 4,  // 1 байт на канал * 4 канала
+            AsnTextureFormat::Rgba32Uint => 16, // 4 байта на канал * 4 канала
+        }
+    }
 }
 pub struct WgpuTexture {
     #[allow(unused)]
@@ -69,7 +76,7 @@ impl WgpuTexture {
             rgba,
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
-                bytes_per_row: Some(4 * width),
+                bytes_per_row: Some(format.bytes_per_pixel() * width),
                 rows_per_image: Some(height),
             },
             size,
@@ -182,7 +189,14 @@ impl WgpuTexture {
         );
     }
 
-    pub fn update_from_rgba(&self, queue: &wgpu::Queue, rgba: &[u8], width: u32, height: u32) {
+    pub fn update_from_rgba(
+        &self,
+        queue: &wgpu::Queue,
+        rgba: &[u8],
+        width: u32,
+        height: u32,
+        format: AsnTextureFormat,
+    ) {
         let size = wgpu::Extent3d {
             width,
             height,
@@ -198,7 +212,7 @@ impl WgpuTexture {
             rgba,
             wgpu::TexelCopyBufferLayout {
                 offset: 0,
-                bytes_per_row: Some(4 * width),
+                bytes_per_row: Some(format.bytes_per_pixel() * width),
                 rows_per_image: Some(height),
             },
             size,
