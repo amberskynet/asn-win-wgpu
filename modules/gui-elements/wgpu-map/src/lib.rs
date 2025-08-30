@@ -143,8 +143,6 @@ pub fn get_map(
         .set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)
         .unwrap();
 
-    print!("map_handler: {:?}", map_handler);
-
     let map_texture = WgpuTexture::from_rgba(
         device,
         queue,

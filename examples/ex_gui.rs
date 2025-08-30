@@ -44,8 +44,8 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 256;
-        let map_height = 256;
+        let map_width = 10;
+        let map_height = 10;
 
         // Генерируем случайные значения для карты
         let map = generate_random_map(map_width, map_height);
@@ -113,7 +113,7 @@ impl TAsnGuiHandler for MyGuiHandler {
 
         // Периодическое обновление карты
         let now = std::time::Instant::now();
-        if now.duration_since(self.last_update).as_millis() >= 5 {
+        if now.duration_since(self.last_update).as_millis() >= 50 {
             self.update_map();
             self.last_update = now;
         }
