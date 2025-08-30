@@ -481,6 +481,66 @@ impl RgbaHandler {
             data: self.data.clone(),
         }
     }
+
+    /// Устанавливает индексы тайлов в RGBA-формате
+    ///
+    /// Преобразует индексы тайлов в координаты x и y и сохраняет их в RGBA-формате:
+    /// - R-компонента = x
+    /// - G-компонента = y
+    /// - B-компонента = 0
+    /// - A-компонента = 0
+    ///
+    /// # Аргументы
+    ///
+    /// * `tile_indices` - массив индексов тайлов
+    /// * `tiles_width` - ширина тайлсета (количество тайлов по ширине)
+    ///
+    /// # Возвращает
+    ///
+    /// `Result<(), String>` - успех или ошибка
+    ///
+    /// # Ошибки
+    ///
+    /// Возвращает ошибку, если координаты x или y превышают 255
+    ///
+    /// # Пример
+    ///
+    /// ```rust
+    /// use asn_wgpu::RgbaHandler;
+    ///
+    /// let mut handler = RgbaHandler::new(10, 10);
+    /// let tile_indices = vec![0u8, 1, 2, 3];
+    /// handler.set_tile_indices(&tile_indices, 10).unwrap();
+    /// ```
+    pub fn set_tile_indices(
+        &mut self,
+        tile_indices: &[u8],
+        tiles_width: u32,
+    ) -> Result<(), String> {
+        for (i, &index) in tile_indices.iter().enumerate() {
+            // Вычисляем координаты x и y из индекса
+            let x = (index as u32) % tiles_width;
+            let y = (index as u32) / tiles_width;
+
+            // Проверяем, что координаты не превышают u8::MAX
+            if x > u8::MAX as u32 || y > u8::MAX as u32 {
+                return Err(format!(
+                    "Координаты тайла ({}, {}) превышают максимальное значение u8 (255)",
+                    x, y
+                ));
+            }
+
+            // Преобразуем индекс в координаты пикселя
+            let px = (i as u32) % self.width;
+            let py = (i as u32) / self.width;
+
+            // Устанавливаем пиксель с координатами тайла в RGBA формате
+            // R = x, G = y, B = 0, A = 0
+            self.set_pixel(px, py, x as u8, y as u8, 0, 0)?;
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for RgbaHandler {
@@ -568,5 +628,33 @@ mod tests {
                 assert_eq!(pixel.3, 200); // A
             }
         }
+    }
+
+    #[test]
+    fn test_set_tile_indices() {
+        let mut handler = RgbaHandler::new(4, 1);
+        let tile_indices = vec![0u8, 1, 2, 3];
+        handler.set_tile_indices(&tile_indices, 2).unwrap();
+
+        // Проверяем, что пиксели установлены правильно
+        let pixel0 = handler.get_pixel(0, 0).unwrap();
+        assert_eq!(pixel0, (0, 0, 0, 0)); // index 0 -> x=0, y=0
+
+        let pixel1 = handler.get_pixel(1, 0).unwrap();
+        assert_eq!(pixel1, (1, 0, 0, 0)); // index 1 -> x=1, y=0
+
+        let pixel2 = handler.get_pixel(2, 0).unwrap();
+        assert_eq!(pixel2, (0, 1, 0, 0)); // index 2 -> x=0, y=1
+
+        let pixel3 = handler.get_pixel(3, 0).unwrap();
+        assert_eq!(pixel3, (1, 1, 0, 0)); // index 3 -> x=1, y=1
+    }
+
+    #[test]
+    fn test_set_tile_indices_overflow() {
+        let mut handler = RgbaHandler::new(1, 1);
+        let tile_indices = vec![256u8]; // Индекс, который приведет к координате > 255
+        let result = handler.set_tile_indices(&tile_indices, 1);
+        assert!(result.is_err());
     }
 }
