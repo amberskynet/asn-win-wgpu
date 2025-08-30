@@ -20,7 +20,7 @@ use log_utils::setup_log;
 
 const LOG_MODULE_NAME: &str = "ex_gui";
 
-const UPDATE_MILLIS: u128 = 5;
+const UPDATE_MILLIS: u128 = 1;
 
 /// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
 fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
@@ -139,13 +139,43 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     m_info!("hello from main()");
 
+    let is_running = Arc::new(AtomicBool::new(true));
+    let running_clone = Arc::clone(&is_running);
+
     let h = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
+    let h_thread = h_safe.clone();
 
     let r = asn_wgpu::get_manager(h_safe);
 
+    let handle = thread::spawn(move || {
+        // Цикл обработки с отправкой результатов
+        while running_clone.load(Ordering::Relaxed) {
+            {
+                let mut h = match h_thread.lock() {
+                    Ok(h) => h,
+                    Err(e) => {
+                        m_error!("Error: {e}");
+                        return;
+                    }
+                };
+                h.update_map();
+            }
+            thread::sleep(Duration::from_millis(5));
+        }
+        m_info!("Exit from loop");
+    });
+
     asn_winit::run(r)?;
+
+    is_running.store(false, Ordering::Relaxed);
+    handle.join().unwrap();
+
+    for i in 0..2 {
+        m_info!("wait {i}");
+        sleep(Duration::from_secs(1));
+    }
 
     Ok(())
 }
