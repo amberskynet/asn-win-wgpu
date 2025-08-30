@@ -23,7 +23,7 @@ pub struct WgpuMap {
 }
 
 impl WgpuMap {
-    pub fn update_map(&mut self, rgba: &[u8]) {
+    pub fn update_map(&mut self, rgba: &[u32]) {
         self.map_handler.update_data(rgba).unwrap();
         self.is_map_updated = true;
     }
@@ -44,12 +44,12 @@ impl TAsnGuiElement for WgpuMap {
         }
 
         // Обновляем текстуру напрямую
-        self.map_texture.update_from_rgba(
-            &gcx.queue,
-            self.map_handler.data(),
-            self.map_handler.width(),
-            self.map_handler.height(),
-        );
+        // self.map_texture.update_from_rgba(
+        //     &gcx.queue,
+        //     self.map_handler.data(),
+        //     self.map_handler.width(),
+        //     self.map_handler.height(),
+        // );
 
         self.is_map_updated = false;
     }
@@ -97,7 +97,7 @@ pub struct MapParams<'a> {
     /// Высота карты
     pub map_height: u32,
     /// Индексы тайлов на карте
-    pub tile_indices: &'a [u8],
+    pub tile_indices: &'a [u32],
 }
 
 pub fn get_map(
@@ -149,7 +149,7 @@ pub fn get_map(
     let map_texture = WgpuTexture::from_rgba(
         device,
         queue,
-        map_handler.data(),
+        bytemuck::cast_slice(map_handler.data()),
         map_handler.width(),
         map_handler.height(),
         "MAP_TEXTURE_0",

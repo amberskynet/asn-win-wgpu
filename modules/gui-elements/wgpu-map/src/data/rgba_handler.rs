@@ -28,7 +28,7 @@ use rand::Rng;
 pub struct RgbaHandler {
     width: u32,
     height: u32,
-    pub data: Vec<u8>,
+    pub data: Vec<u32>,
 }
 
 impl RgbaHandler {
@@ -53,7 +53,7 @@ impl RgbaHandler {
     /// ```
     pub fn new(width: u32, height: u32) -> Self {
         let size = (width * height * 4) as usize;
-        let data = vec![0u8; size];
+        let data = vec![0u32; size];
 
         Self {
             width,
@@ -87,7 +87,7 @@ impl RgbaHandler {
     /// let rgba_data = vec![255u8; 100 * 100 * 4]; // Белый квадрат
     /// let handler = RgbaHandler::from_rgba(&rgba_data, 100, 100).unwrap();
     /// ```
-    pub fn from_rgba(rgba: &[u8], width: u32, height: u32) -> Result<Self, String> {
+    pub fn from_rgba(rgba: &[u32], width: u32, height: u32) -> Result<Self, String> {
         let expected_size = (width * height * 4) as usize;
 
         if rgba.len() != expected_size {
@@ -128,7 +128,7 @@ impl RgbaHandler {
     /// let new_data = vec![255u8; 100 * 100 * 4];
     /// handler.update_data(&new_data).unwrap();
     /// ```
-    pub fn update_data(&mut self, new_data: &[u8]) -> Result<(), String> {
+    pub fn update_data(&mut self, new_data: &[u32]) -> Result<(), String> {
         let expected_size = (self.width * self.height * 4) as usize;
 
         if new_data.len() != expected_size {
@@ -170,7 +170,15 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.set_pixel(50, 50, 255, 0, 0, 255).unwrap(); // Красный пиксель
     /// ```
-    pub fn set_pixel(&mut self, x: u32, y: u32, r: u8, g: u8, b: u8, a: u8) -> Result<(), String> {
+    pub fn set_pixel(
+        &mut self,
+        x: u32,
+        y: u32,
+        r: u32,
+        g: u32,
+        b: u32,
+        a: u32,
+    ) -> Result<(), String> {
         if x >= self.width || y >= self.height {
             return Err(format!(
                 "Координаты ({}, {}) выходят за границы изображения {}x{}",
@@ -197,7 +205,7 @@ impl RgbaHandler {
     ///
     /// # Возвращает
     ///
-    /// `Result<(u8, u8, u8, u8), String>` - RGBA значения или ошибка
+    /// `Result<(u32, u32, u32), String>` - RGBA значения или ошибка
     ///
     /// # Ошибки
     ///
@@ -213,7 +221,7 @@ impl RgbaHandler {
     /// let pixel = handler.get_pixel(50, 50).unwrap();
     /// assert_eq!(pixel, (255, 128, 64, 255));
     /// ```
-    pub fn get_pixel(&self, x: u32, y: u32) -> Result<(u8, u8, u8, u8), String> {
+    pub fn get_pixel(&self, x: u32, y: u32) -> Result<(u32, u32, u32, u32), String> {
         if x >= self.width || y >= self.height {
             return Err(format!(
                 "Координаты ({}, {}) выходят за границы изображения {}x{}",
@@ -247,7 +255,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.fill(0, 0, 255, 255); // Синий цвет
     /// ```
-    pub fn fill(&mut self, r: u8, g: u8, b: u8, a: u8) {
+    pub fn fill(&mut self, r: u32, g: u32, b: u32, a: u32) {
         for i in (0..self.data.len()).step_by(4) {
             self.data[i] = r;
             self.data[i + 1] = g;
@@ -274,14 +282,18 @@ impl RgbaHandler {
     /// handler.create_gradient((255, 0, 0, 255), (0, 0, 255, 255)); // От красного к синему
     /// ```
     #[allow(dead_code)]
-    pub fn create_gradient(&mut self, start_color: (u8, u8, u8, u8), end_color: (u8, u8, u8, u8)) {
+    pub fn create_gradient(
+        &mut self,
+        start_color: (u32, u32, u32, u32),
+        end_color: (u32, u32, u32, u32),
+    ) {
         for y in 0..self.height {
             let t = y as f32 / (self.height - 1) as f32;
 
-            let r = ((1.0 - t) * start_color.0 as f32 + t * end_color.0 as f32) as u8;
-            let g = ((1.0 - t) * start_color.1 as f32 + t * end_color.1 as f32) as u8;
-            let b = ((1.0 - t) * start_color.2 as f32 + t * end_color.2 as f32) as u8;
-            let a = ((1.0 - t) * start_color.3 as f32 + t * end_color.3 as f32) as u8;
+            let r = ((1.0 - t) * start_color.0 as f32 + t * end_color.0 as f32) as u32;
+            let g = ((1.0 - t) * start_color.1 as f32 + t * end_color.1 as f32) as u32;
+            let b = ((1.0 - t) * start_color.2 as f32 + t * end_color.2 as f32) as u32;
+            let a = ((1.0 - t) * start_color.3 as f32 + t * end_color.3 as f32) as u32;
 
             for x in 0..self.width {
                 self.set_pixel(x, y, r, g, b, a).unwrap();
@@ -353,7 +365,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.fill_random_range(128, 255, 255); // Только светлые цвета
     /// ```
-    pub fn fill_random_range(&mut self, min_value: u8, max_value: u8, alpha: u8) {
+    pub fn fill_random_range(&mut self, min_value: u32, max_value: u32, alpha: u32) {
         let mut rng = rand::rng();
 
         for i in (0..self.data.len()).step_by(4) {
@@ -407,7 +419,7 @@ impl RgbaHandler {
     /// let data = handler.data();
     /// assert_eq!(data.len(), 100 * 100 * 4);
     /// ```
-    pub fn data(&self) -> &[u8] {
+    pub fn data(&self) -> &[u32] {
         &self.data
     }
 
@@ -427,7 +439,7 @@ impl RgbaHandler {
     /// data[0] = 255; // Установка красного компонента первого пикселя
     /// ```
     #[allow(dead_code)]
-    pub fn data_mut(&mut self) -> &mut [u8] {
+    pub fn data_mut(&mut self) -> &mut [u32] {
         &mut self.data
     }
 
@@ -511,12 +523,12 @@ impl RgbaHandler {
     /// use asn_wgpu::RgbaHandler;
     ///
     /// let mut handler = RgbaHandler::new(10, 10);
-    /// let tile_indices = vec![0u8, 1, 2, 3];
+    /// let tile_indices = vec![0u32, 1, 2, 3];
     /// handler.set_tile_indices(&tile_indices, 10).unwrap();
     /// ```
     pub fn set_tile_indices(
         &mut self,
-        tile_indices: &[u8],
+        tile_indices: &[u32],
         tiles_width: u32,
     ) -> Result<(), String> {
         for (i, &index) in tile_indices.iter().enumerate() {
@@ -542,7 +554,7 @@ impl RgbaHandler {
                 "Tile index {}: x={}, y={}, pixel at ({}, {})",
                 index, x, y, px, py
             );
-            self.set_pixel(px, py, x as u8, y as u8, 0, 0)?;
+            self.set_pixel(px, py, x as u32, y as u32, 0, 0)?;
         }
 
         Ok(())
@@ -568,7 +580,7 @@ mod tests {
 
     #[test]
     fn test_from_rgba() {
-        let rgba = vec![255u8; 100 * 200 * 4];
+        let rgba = vec![255u32; 100 * 200 * 4];
         let handler = RgbaHandler::from_rgba(&rgba, 100, 200).unwrap();
         assert_eq!(handler.dimensions(), (100, 200));
     }
@@ -639,7 +651,7 @@ mod tests {
     #[test]
     fn test_set_tile_indices() {
         let mut handler = RgbaHandler::new(4, 1);
-        let tile_indices = vec![0u8, 1, 2, 3];
+        let tile_indices = vec![0u32, 1, 2, 3];
         handler.set_tile_indices(&tile_indices, 2).unwrap();
 
         // Проверяем, что пиксели установлены правильно
@@ -659,7 +671,7 @@ mod tests {
     // #[test]
     // fn test_set_tile_indices_overflow() {
     //     let mut handler = RgbaHandler::new(1, 1);
-    //     let tile_indices = vec![256u8]; // Индекс, который приведет к координате > 255
+    //     let tile_indices = vec![256u32]; // Индекс, который приведет к координате > 255
     //     let result = handler.set_tile_indices(&tile_indices, 1);
     //     assert!(result.is_err());
     // }

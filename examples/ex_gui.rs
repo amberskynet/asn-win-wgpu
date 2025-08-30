@@ -19,7 +19,7 @@ use log_utils::setup_log;
 
 pub const LOG_MODULE_NAME: &str = "ex_gui";
 
-pub const MAP: [u8; 4] = [1, 1, 1, 1];
+pub const MAP: [u32; 4] = [1, 1, 1, 1];
 
 pub struct GuiList {
     m: WgpuMap,
