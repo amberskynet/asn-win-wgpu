@@ -27,19 +27,19 @@ const TEX_1_1: [f32; 2] = [1.0, 1.0];
 pub const VERTICES: &[Vertex] = &[
     Vertex {
         position: [-DELTA_POINT, -DELTA_POINT, 0.0],
-        tex_coords: TEX_1_1,
+        tex_coords: TEX_0_0,
     }, // Top-left
     Vertex {
         position: [DELTA_POINT, -DELTA_POINT, 0.0],
-        tex_coords: TEX_0_1,
+        tex_coords: TEX_1_0,
     }, // Top-right
     Vertex {
         position: [DELTA_POINT, DELTA_POINT, 0.0],
-        tex_coords: TEX_0_0,
+        tex_coords: TEX_1_1,
     }, // Bottom-right
     Vertex {
         position: [-DELTA_POINT, DELTA_POINT, 0.0],
-        tex_coords: TEX_1_0,
+        tex_coords: TEX_0_1,
     }, // Bottom-left
 ];
 
