@@ -70,7 +70,7 @@ impl GuiList {
         let m = get_map(gcx, &tiles_params, &map_params);
 
         // Создаем и устанавливаем MVP-матрицу
-        let mvp_matrix = MVPMatrix::identity();
+        let mvp_matrix = MVPMatrix::flipped_y();
         m.update_mvp_matrix(gcx, mvp_matrix);
 
         GuiList {
@@ -90,6 +90,7 @@ impl GuiList {
 pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
     last_update: std::time::Instant,
+    scale_factor: f32, // Добавляем фактор масштабирования
 }
 
 impl MyGuiHandler {
@@ -117,6 +118,13 @@ impl TAsnGuiHandler for MyGuiHandler {
     fn init(&mut self, gcx: &Self::GraphContext) {
         let gui_list = GuiList::new(gcx);
         self.gui_list = Some(gui_list);
+
+        // Применяем масштабирование вдвое меньше (0.5)
+        if let Some(ref gui_list) = self.gui_list {
+            self.scale_factor = 0.5; // Уменьшаем вдвое
+            gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
+        }
+
         m_info!("init");
     }
 
@@ -131,6 +139,41 @@ impl TAsnGuiHandler for MyGuiHandler {
         }
     }
 
+    // fn handle_keyboard_input(
+    //     &mut self,
+    //     gcx: &Self::GraphContext,
+    //     input: &winit::event::KeyboardInput,
+    // ) {
+    //     if let Some(ref gui_list) = self.gui_list {
+    //         // Обрабатываем нажатия клавиш для изменения масштаба
+    //         if let winit::event::ElementState::Pressed = input.state {
+    //             match input.virtual_keycode {
+    //                 Some(winit::event::VirtualKeyCode::Plus)
+    //                 | Some(winit::event::VirtualKeyCode::Equals) => {
+    //                     // Увеличиваем масштаб
+    //                     self.scale_factor *= 1.1;
+    //                     gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
+    //                     m_info!("Увеличен масштаб до: {}", self.scale_factor);
+    //                 }
+    //                 Some(winit::event::VirtualKeyCode::Minus)
+    //                 | Some(winit::event::VirtualKeyCode::Underline) => {
+    //                     // Уменьшаем масштаб
+    //                     self.scale_factor *= 0.9;
+    //                     gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
+    //                     m_info!("Уменьшен масштаб до: {}", self.scale_factor);
+    //                 }
+    //                 Some(winit::event::VirtualKeyCode::Key0) => {
+    //                     // Сброс масштаба
+    //                     self.scale_factor = 1.0;
+    //                     gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
+    //                     m_info!("Масштаб сброшен до: {}", self.scale_factor);
+    //                 }
+    //                 _ => {}
+    //             }
+    //         }
+    //     }
+    // }
+
     fn draw(&mut self, fcx: &mut Self::FrameContext) {
         self.gui_list.as_mut().unwrap().m.draw(fcx);
         // m_info!("draw");
@@ -141,6 +184,7 @@ pub fn get_handler() -> MyGuiHandler {
     MyGuiHandler {
         gui_list: None,
         last_update: std::time::Instant::now(),
+        scale_factor: 1.0, // Инициализируем фактор масштабирования
     }
 }
 

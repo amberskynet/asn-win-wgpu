@@ -45,6 +45,20 @@ impl WgpuMap {
             bytemuck::cast_slice(&[mvp_matrix]),
         );
     }
+
+    /// Применяет масштабирование к текущей MVP-матрице
+    pub fn apply_scaling(&self, gcx: &WgpuGraphContext, scale_x: f32, scale_y: f32) {
+        let scale_matrix = MVPMatrix::scale(scale_x, scale_y, 1.0);
+        // Для применения масштабирования нам нужно получить текущую матрицу,
+        // но так как мы не храним её в CPU, создадим новую матрицу масштабирования
+        // и обновим буфер
+        self.update_mvp_matrix(gcx, scale_matrix);
+    }
+
+    /// Применяет равномерное масштабирование к текущей MVP-матрице
+    pub fn apply_uniform_scaling(&self, gcx: &WgpuGraphContext, scale: f32) {
+        self.apply_scaling(gcx, scale, scale);
+    }
 }
 
 impl TAsnGuiElement for WgpuMap {

@@ -26,6 +26,48 @@ impl MVPMatrix {
             ],
         }
     }
+
+    /// Создает матрицу с отражением по оси Y
+    pub fn flipped_y() -> Self {
+        Self {
+            data: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, -1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+
+    /// Создает матрицу масштабирования
+    pub fn scale(sx: f32, sy: f32, sz: f32) -> Self {
+        Self {
+            data: [
+                [sx, 0.0, 0.0, 0.0],
+                [0.0, sy, 0.0, 0.0],
+                [0.0, 0.0, sz, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+
+    /// Создает матрицу масштабирования с одинаковым коэффициентом по всем осям
+    pub fn uniform_scale(s: f32) -> Self {
+        Self::scale(s, s, s)
+    }
+
+    /// Умножает две матрицы
+    pub fn multiply(&self, other: &Self) -> Self {
+        let mut result = [[0.0f32; 4]; 4];
+        for i in 0..4 {
+            for j in 0..4 {
+                for k in 0..4 {
+                    result[i][j] += self.data[i][k] * other.data[k][j];
+                }
+            }
+        }
+        Self { data: result }
+    }
 }
 
 impl Vertex {
