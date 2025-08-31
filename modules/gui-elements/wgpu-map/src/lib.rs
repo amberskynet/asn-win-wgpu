@@ -1,3 +1,4 @@
+use asn_core::OPENGL_TO_WGPU_MATRIX;
 use asn_core::cgmath::{Matrix4, SquareMatrix};
 use asn_gui_core::TAsnGuiElement;
 use asn_wgpu::wgpu::util::DeviceExt;
@@ -145,7 +146,7 @@ pub fn get_map(
     });
 
     // Создаем uniform-буфер для MVP-матрицы
-    let mvp_matrix: [[f32; 4]; 4] = Matrix4::<f32>::identity().into();
+    let mvp_matrix: [[f32; 4]; 4] = OPENGL_TO_WGPU_MATRIX.into(); //Matrix4::<f32>::identity().into();
     let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("MVP Matrix Buffer"),
         contents: bytemuck::cast_slice(&[mvp_matrix]),

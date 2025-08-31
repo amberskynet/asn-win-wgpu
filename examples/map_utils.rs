@@ -5,7 +5,9 @@ pub fn generate_random_map(map_width: u32, map_height: u32, max_tile_index: u32)
     let mut rng = rand::thread_rng();
     let mut map = Vec::with_capacity((map_width * map_height) as usize);
     for _ in 0..map_width * map_height {
-        map.push(rng.gen_range(0..=max_tile_index));
+        let cell = rng.gen_range(0..=max_tile_index);
+        // println!("cell: {cell}");
+        map.push(cell);
     }
     map
 }

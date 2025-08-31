@@ -5,7 +5,11 @@ extern crate asn_winit;
 mod log_utils;
 mod map_utils;
 
-use asn_core::{cgmath::Vector3, transform_set::TransformSet};
+use asn_core::{
+    OPENGL_TO_WGPU_MATRIX,
+    cgmath::{Matrix4, Vector3},
+    transform_set::TransformSet,
+};
 use map_utils::generate_random_map;
 use wgpu_map::{WgpuMap, get_map};
 
@@ -23,8 +27,7 @@ use log_utils::setup_log;
 
 const LOG_MODULE_NAME: &str = "ex_gui";
 
-// const UPDATE_MILLIS: u128 = 1;
-const LOOP_MILLIS: u64 = 5;
+const LOOP_MILLIS: u64 = 500;
 
 pub struct GuiList {
     m: WgpuMap,
@@ -36,10 +39,11 @@ pub struct GuiList {
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
-        let map_tiles_bytes = include_bytes!("tiles_16_12.png");
+        // let map_tiles_bytes = include_bytes!("tiles_16_12.png");
 
-        let tiles_width = 16;
-        let tiles_height = 12;
+        let map_tiles_bytes = include_bytes!("tiles_64_95.png");
+        let tiles_width = 64;
+        let tiles_height = 95;
 
         let map_width = 2;
         let map_height = 2;
@@ -52,6 +56,8 @@ impl GuiList {
         map[2] = 3;
         map[3] = 4;
 
+        println!("map: {:?}", map);
+
         let tiles_params = wgpu_map::MapTilesParams {
             map_tiles_bytes,
             tiles_width,
@@ -63,10 +69,6 @@ impl GuiList {
             tile_indices: map.as_slice(),
         };
         let m = get_map(gcx, &tiles_params, &map_params);
-
-        // // Создаем и устанавливаем MVP-матрицу
-        // let mvp_matrix = MVPMatrix::flipped_y();
-        // m.update_mvp_matrix(gcx, mvp_matrix);
 
         let s = TransformSet {
             pos: Vector3 {
@@ -86,6 +88,7 @@ impl GuiList {
             },
         };
 
+        // // Создаем и устанавливаем MVP-матрицу
         let mvp_matrix = s.matrix_calculated();
         m.update_mvp_matrix(gcx, mvp_matrix.into());
 
@@ -111,8 +114,6 @@ impl GuiList {
 
 pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
-    scale_factor: f32, // Добавляем фактор масштабирования
-    is_flipped: bool,  // Добавляем флаг переворота по вертикали
 }
 
 impl MyGuiHandler {
@@ -189,11 +190,7 @@ impl TAsnGuiHandler for MyGuiHandler {
 }
 
 pub fn get_handler() -> MyGuiHandler {
-    MyGuiHandler {
-        gui_list: None,
-        scale_factor: 1.0, // Инициализируем фактор масштабирования
-        is_flipped: false, // Инициализируем флаг переворота
-    }
+    MyGuiHandler { gui_list: None }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -222,7 +219,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                h.update_map();
+                // h.update_map();
             }
             thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }
