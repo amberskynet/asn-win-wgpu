@@ -3,7 +3,9 @@ extern crate asn_wgpu;
 extern crate asn_winit;
 
 mod log_utils;
-use rand::Rng;
+mod map_utils;
+
+use map_utils::generate_random_map;
 use wgpu_map::{MVPMatrix, WgpuMap, get_map};
 
 use std::{
@@ -21,17 +23,6 @@ use log_utils::setup_log;
 const LOG_MODULE_NAME: &str = "ex_gui";
 
 const UPDATE_MILLIS: u128 = 10000;
-
-/// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
-fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
-    let mut rng = rand::thread_rng();
-    let max_tile_index = map_width * map_height - 1;
-    let mut map = Vec::with_capacity((map_width * map_height) as usize);
-    for _ in 0..map_width * map_height {
-        map.push(rng.gen_range(0..=max_tile_index));
-    }
-    map
-}
 
 pub struct GuiList {
     m: WgpuMap,
