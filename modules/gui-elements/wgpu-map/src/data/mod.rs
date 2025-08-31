@@ -19,22 +19,27 @@ pub const DEFAULT_CLEAR_COLOR: wgpu::Color = wgpu::Color {
 
 const DELTA_POINT: f32 = 1.0;
 
+const TEX_0_0: [f32; 2] = [0.0, 0.0];
+const TEX_1_0: [f32; 2] = [1.0, 0.0];
+const TEX_0_1: [f32; 2] = [0.0, 1.0];
+const TEX_1_1: [f32; 2] = [1.0, 1.0];
+
 pub const VERTICES: &[Vertex] = &[
     Vertex {
         position: [-DELTA_POINT, -DELTA_POINT, 0.0],
-        tex_coords: [0.0, 0.0],
+        tex_coords: TEX_1_1,
     }, // Top-left
     Vertex {
         position: [DELTA_POINT, -DELTA_POINT, 0.0],
-        tex_coords: [1.0, 0.0],
+        tex_coords: TEX_0_1,
     }, // Top-right
     Vertex {
         position: [DELTA_POINT, DELTA_POINT, 0.0],
-        tex_coords: [1.0, 1.0],
+        tex_coords: TEX_0_0,
     }, // Bottom-right
     Vertex {
         position: [-DELTA_POINT, DELTA_POINT, 0.0],
-        tex_coords: [0.0, 1.0],
+        tex_coords: TEX_1_0,
     }, // Bottom-left
 ];
 

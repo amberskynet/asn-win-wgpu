@@ -5,11 +5,7 @@ extern crate asn_winit;
 mod log_utils;
 mod map_utils;
 
-use asn_core::{
-    OPENGL_TO_WGPU_MATRIX,
-    cgmath::{Matrix4, Vector3},
-    transform_set::TransformSet,
-};
+use asn_core::{cgmath::Vector3, transform_set::TransformSet};
 use map_utils::generate_random_map;
 use wgpu_map::{WgpuMap, get_map};
 
@@ -39,11 +35,13 @@ pub struct GuiList {
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
-        // let map_tiles_bytes = include_bytes!("tiles_16_12.png");
+        // let map_tiles_bytes = include_bytes!("tiles_64_95.png");
+        // let tiles_width = 64;
+        // let tiles_height = 95;
 
-        let map_tiles_bytes = include_bytes!("tiles_64_95.png");
-        let tiles_width = 64;
-        let tiles_height = 95;
+        let map_tiles_bytes = include_bytes!("tiles_16_12.png");
+        let tiles_width = 16;
+        let tiles_height = 12;
 
         let map_width = 2;
         let map_height = 2;
