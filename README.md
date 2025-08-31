@@ -92,6 +92,35 @@ asn-win-wgpu/
 
 ## Quick Start
 
+### Native Build
+
+```bash
+# Clone the repository
+git clone https://github.com/amberskynet/asn-win-wgpu.git
+cd asn-win-wgpu
+
+# Build and run
+cargo run --example ex_wgpu
+```
+
+### Web Build
+
+```bash
+# Build for web
+./build-web.sh
+
+# Run web server
+./run-web.sh
+# or manually:
+# cd web && python3 -m http.server 8080
+```
+
+Then open http://localhost:8080 in your browser.
+
+For more details, see [WEB_BUILD.md](WEB_BUILD.md).
+
+### Code Example
+
 ```rust
 use asn_win_wgpu::{run, asn_win_config::AppConfig};
 

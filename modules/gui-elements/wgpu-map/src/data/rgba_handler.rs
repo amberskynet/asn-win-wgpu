@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#[cfg(not(target_arch = "wasm32"))]
 use rand::Rng;
 
 /// Класс для инициализации и обработки RGBA-массивов
@@ -314,6 +315,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.fill_random(); // Заполнение случайными цветами
     /// ```
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn fill_random(&mut self) {
         let mut rng = rand::rng();
 
@@ -321,6 +323,17 @@ impl RgbaHandler {
             self.data[i] = rng.random_range(0..=255); // R
             self.data[i + 1] = rng.random_range(0..=255); // G
             self.data[i + 2] = rng.random_range(0..=255); // B
+            self.data[i + 3] = 255; // A (полная непрозрачность)
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn fill_random(&mut self) {
+        // Для WASM используем простую последовательность вместо случайных чисел
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = ((i * 7) % 256) as u32; // R
+            self.data[i + 1] = ((i * 13) % 256) as u32; // G
+            self.data[i + 2] = ((i * 17) % 256) as u32; // B
             self.data[i + 3] = 255; // A (полная непрозрачность)
         }
     }
@@ -338,6 +351,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.fill_random_with_alpha(); // Заполнение случайными цветами с случайной прозрачностью
     /// ```
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn fill_random_with_alpha(&mut self) {
         let mut rng = rand::rng();
 
@@ -346,6 +360,17 @@ impl RgbaHandler {
             self.data[i + 1] = rng.random_range(0..=255); // G
             self.data[i + 2] = rng.random_range(0..=255); // B
             self.data[i + 3] = rng.random_range(0..=255); // A
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn fill_random_with_alpha(&mut self) {
+        // Для WASM используем простую последовательность вместо случайных чисел
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = ((i * 7) % 256) as u32; // R
+            self.data[i + 1] = ((i * 13) % 256) as u32; // G
+            self.data[i + 2] = ((i * 17) % 256) as u32; // B
+            self.data[i + 3] = ((i * 19) % 256) as u32; // A
         }
     }
 
@@ -365,6 +390,7 @@ impl RgbaHandler {
     /// let mut handler = RgbaHandler::new(100, 100);
     /// handler.fill_random_range(128, 255, 255); // Только светлые цвета
     /// ```
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn fill_random_range(&mut self, min_value: u32, max_value: u32, alpha: u32) {
         let mut rng = rand::rng();
 
@@ -372,6 +398,17 @@ impl RgbaHandler {
             self.data[i] = rng.random_range(min_value..=max_value); // R
             self.data[i + 1] = rng.random_range(min_value..=max_value); // G
             self.data[i + 2] = rng.random_range(min_value..=max_value); // B
+            self.data[i + 3] = alpha; // A
+        }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn fill_random_range(&mut self, min_value: u32, max_value: u32, alpha: u32) {
+        // Для WASM используем простую последовательность вместо случайных чисел
+        for i in (0..self.data.len()).step_by(4) {
+            self.data[i] = min_value + ((i * 7) % (max_value - min_value + 1)) as u32; // R
+            self.data[i + 1] = min_value + ((i * 13) % (max_value - min_value + 1)) as u32; // G
+            self.data[i + 2] = min_value + ((i * 17) % (max_value - min_value + 1)) as u32; // B
             self.data[i + 3] = alpha; // A
         }
     }
