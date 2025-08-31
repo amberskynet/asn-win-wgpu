@@ -1,5 +1,3 @@
-use std::convert::identity;
-
 use asn_core::cgmath::{Matrix4, SquareMatrix};
 use asn_gui_core::TAsnGuiElement;
 use asn_wgpu::wgpu::util::DeviceExt;
