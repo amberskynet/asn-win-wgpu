@@ -22,12 +22,15 @@ use log_utils::setup_log;
 
 const LOG_MODULE_NAME: &str = "ex_gui";
 
-const UPDATE_MILLIS: u128 = 10000;
+// const UPDATE_MILLIS: u128 = 1;
+const LOOP_MILLIS: u64 = 5;
 
 pub struct GuiList {
     m: WgpuMap,
     map_width: u32,
     map_height: u32,
+    tiles_width: u32,
+    tiles_height: u32,
 }
 
 impl GuiList {
@@ -37,11 +40,11 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 2;
-        let map_height = 2;
+        let map_width = 15;
+        let map_height = 15;
 
         // Генерируем случайные значения для карты
-        let mut map = generate_random_map(map_width, map_height);
+        let mut map = generate_random_map(map_width, map_height, map_width * map_height - 1);
 
         map[0] = 1;
         map[1] = 2;
@@ -68,19 +71,24 @@ impl GuiList {
             m,
             map_width,
             map_height,
+            tiles_width,
+            tiles_height,
         }
     }
 
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
-        let map = generate_random_map(self.map_width, self.map_height);
+        let map = generate_random_map(
+            self.map_width,
+            self.map_height,
+            self.tiles_width * self.tiles_height - 1,
+        );
         self.m.update_map(map.as_slice());
     }
 }
 
 pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
-    last_update: std::time::Instant,
     scale_factor: f32, // Добавляем фактор масштабирования
     is_flipped: bool,  // Добавляем флаг переворота по вертикали
 }
@@ -126,13 +134,6 @@ impl TAsnGuiHandler for MyGuiHandler {
 
     fn update(&mut self, gcx: &Self::GraphContext) {
         self.gui_list.as_mut().unwrap().m.update(gcx);
-
-        // Периодическое обновление карты
-        let now = std::time::Instant::now();
-        if now.duration_since(self.last_update).as_millis() >= UPDATE_MILLIS {
-            // self.update_map();
-            self.last_update = now;
-        }
     }
 
     // fn handle_keyboard_input(
@@ -179,7 +180,6 @@ impl TAsnGuiHandler for MyGuiHandler {
 pub fn get_handler() -> MyGuiHandler {
     MyGuiHandler {
         gui_list: None,
-        last_update: std::time::Instant::now(),
         scale_factor: 1.0, // Инициализируем фактор масштабирования
         is_flipped: false, // Инициализируем флаг переворота
     }
@@ -211,9 +211,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                // h.update_map();
+                h.update_map();
             }
-            thread::sleep(Duration::from_millis(5));
+            thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }
         m_info!("Exit from loop");
     });
