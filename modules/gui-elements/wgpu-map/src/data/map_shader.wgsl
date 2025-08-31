@@ -10,13 +10,21 @@ struct VertexOutput {
     @location(0) tex_coords: vec2<f32>,
 }
 
+// Структура для MVP-матрицы
+struct MVPMatrix {
+    data: mat4x4<f32>,
+}
+
+@group(0) @binding(5)
+var<uniform> u_mvp_matrix: MVPMatrix;
+
 @vertex
 fn vs_main(
     model: VertexInput,
 ) -> VertexOutput {
     var out: VertexOutput;
     out.tex_coords = model.tex_coords;
-    out.clip_position = vec4<f32>(model.position, 1.0);
+    out.clip_position = u_mvp_matrix.data * vec4<f32>(model.position, 1.0);
     return out;
 }
 

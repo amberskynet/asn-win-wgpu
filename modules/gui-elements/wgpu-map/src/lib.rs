@@ -9,6 +9,8 @@ use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
 mod data;
 
+pub use data::MVPMatrix;
+
 pub struct WgpuMap {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
@@ -19,6 +21,7 @@ pub struct WgpuMap {
     map_texture: WgpuTexture,
     tiles_texture: WgpuTexture,
     tiles_info_buffer: wgpu::Buffer, // Uniform-буфер с информацией о тайлах
+    mvp_matrix_buffer: wgpu::Buffer, // Uniform-буфер для MVP-матрицы
     is_map_updated: bool,
 }
 
@@ -32,6 +35,15 @@ impl WgpuMap {
             .set_tile_indices(map_indices, map_width)
             .unwrap();
         self.is_map_updated = true;
+    }
+
+    /// Обновляет MVP-матрицу
+    pub fn update_mvp_matrix(&self, gcx: &WgpuGraphContext, mvp_matrix: MVPMatrix) {
+        gcx.queue.write_buffer(
+            &self.mvp_matrix_buffer,
+            0,
+            bytemuck::cast_slice(&[mvp_matrix]),
+        );
     }
 }
 
@@ -133,6 +145,14 @@ pub fn get_map(
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
     });
 
+    // Создаем uniform-буфер для MVP-матрицы
+    let mvp_matrix = MVPMatrix::identity();
+    let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("MVP Matrix Buffer"),
+        contents: bytemuck::cast_slice(&[mvp_matrix]),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    });
+
     let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
     map_handler
         .set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)
@@ -193,6 +213,13 @@ pub fn get_map(
                 binding: 4,
                 resource: wgpu::BindingResource::Sampler(&map_texture.sampler),
             },
+            // Uniform-буфер для MVP-матрицы
+            wgpu::BindGroupEntry {
+                binding: 5,
+                resource: wgpu::BindingResource::Buffer(
+                    mvp_matrix_buffer.as_entire_buffer_binding(),
+                ),
+            },
         ],
         label: Some("map_diffuse_bind_group"),
     });
@@ -214,6 +241,7 @@ pub fn get_map(
         map_texture,
         tiles_texture,
         tiles_info_buffer,
+        mvp_matrix_buffer,
         is_map_updated: false,
     }
 }

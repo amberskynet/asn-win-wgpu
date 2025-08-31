@@ -4,7 +4,7 @@ extern crate asn_winit;
 
 mod log_utils;
 use rand::Rng;
-use wgpu_map::{WgpuMap, get_map};
+use wgpu_map::{MVPMatrix, WgpuMap, get_map};
 
 use std::{
     sync::{
@@ -68,6 +68,11 @@ impl GuiList {
             tile_indices: map.as_slice(),
         };
         let m = get_map(gcx, &tiles_params, &map_params);
+
+        // Создаем и устанавливаем MVP-матрицу
+        let mvp_matrix = MVPMatrix::identity();
+        m.update_mvp_matrix(gcx, mvp_matrix);
+
         GuiList {
             m,
             map_width,

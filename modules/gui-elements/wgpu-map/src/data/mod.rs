@@ -1,7 +1,7 @@
 mod vertex;
 
 use asn_wgpu::wgpu;
-pub use vertex::Vertex;
+pub use vertex::{MVPMatrix, Vertex};
 pub mod rgba_handler;
 pub mod texture;
 pub mod utils;

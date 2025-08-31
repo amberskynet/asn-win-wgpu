@@ -7,6 +7,27 @@ pub struct Vertex {
     pub tex_coords: [f32; 2],
 }
 
+/// Структура для MVP-матрицы (4x4 матрица)
+#[repr(C)]
+#[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct MVPMatrix {
+    pub data: [[f32; 4]; 4],
+}
+
+impl MVPMatrix {
+    /// Создает единичную матрицу
+    pub fn identity() -> Self {
+        Self {
+            data: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+}
+
 impl Vertex {
     pub fn desc() -> wgpu::VertexBufferLayout<'static> {
         use std::mem;
