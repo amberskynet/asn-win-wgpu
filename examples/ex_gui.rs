@@ -20,7 +20,7 @@ use log_utils::setup_log;
 
 const LOG_MODULE_NAME: &str = "ex_gui";
 
-const UPDATE_MILLIS: u128 = 1;
+const UPDATE_MILLIS: u128 = 10000;
 
 /// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
 fn generate_random_map(map_width: u32, map_height: u32) -> Vec<u32> {
@@ -46,11 +46,16 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 10;
-        let map_height = 10;
+        let map_width = 2;
+        let map_height = 2;
 
         // Генерируем случайные значения для карты
-        let map = generate_random_map(map_width, map_height);
+        let mut map = generate_random_map(map_width, map_height);
+
+        map[0] = 1;
+        map[1] = 2;
+        map[2] = 3;
+        map[3] = 4;
 
         let tiles_params = wgpu_map::MapTilesParams {
             map_tiles_bytes,
@@ -73,7 +78,7 @@ impl GuiList {
     /// Обновляет карту случайными значениями
     pub fn update_map(&mut self) {
         let map = generate_random_map(self.map_width, self.map_height);
-        self.m.update_map(map.as_slice(), self.map_width);
+        self.m.update_map(map.as_slice());
     }
 }
 
@@ -116,7 +121,7 @@ impl TAsnGuiHandler for MyGuiHandler {
         // Периодическое обновление карты
         let now = std::time::Instant::now();
         if now.duration_since(self.last_update).as_millis() >= UPDATE_MILLIS {
-            self.update_map();
+            // self.update_map();
             self.last_update = now;
         }
     }
@@ -160,7 +165,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                h.update_map();
+                // h.update_map();
             }
             thread::sleep(Duration::from_millis(5));
         }

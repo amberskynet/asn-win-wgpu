@@ -23,7 +23,7 @@ pub struct WgpuMap {
 }
 
 impl WgpuMap {
-    pub fn update_map(&mut self, map_indices: &[u32], map_width: u32) {
+    pub fn update_map(&mut self, map_indices: &[u32]) {
         // Получаем ширину карты из текущего обработчика
         let map_width = self.map_handler.width();
 
@@ -33,11 +33,6 @@ impl WgpuMap {
             .unwrap();
         self.is_map_updated = true;
     }
-
-    // pub fn fill_random(&mut self) {
-    //     self.map_handler.fill_random();
-    //     self.is_map_updated = true;
-    // }
 }
 
 impl TAsnGuiElement for WgpuMap {
