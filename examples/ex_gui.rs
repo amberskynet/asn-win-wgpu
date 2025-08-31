@@ -23,7 +23,7 @@ use log_utils::setup_log;
 
 const LOG_MODULE_NAME: &str = "ex_gui";
 
-const LOOP_MILLIS: u64 = 500;
+const LOOP_MILLIS: u64 = 1;
 
 pub struct GuiList {
     m: WgpuMap,
@@ -35,16 +35,16 @@ pub struct GuiList {
 
 impl GuiList {
     pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
-        // let map_tiles_bytes = include_bytes!("tiles_64_95.png");
-        // let tiles_width = 64;
-        // let tiles_height = 95;
+        let map_tiles_bytes = include_bytes!("tiles_64_95.png");
+        let tiles_width = 64;
+        let tiles_height = 95;
 
-        let map_tiles_bytes = include_bytes!("tiles_16_12.png");
-        let tiles_width = 16;
-        let tiles_height = 12;
+        // let map_tiles_bytes = include_bytes!("tiles_16_12.png");
+        // let tiles_width = 16;
+        // let tiles_height = 12;
 
-        let map_width = 2;
-        let map_height = 2;
+        let map_width = 32;
+        let map_height = 32;
 
         // Генерируем случайные значения для карты
         let mut map = generate_random_map(map_width, map_height, map_width * map_height - 1);
@@ -80,8 +80,8 @@ impl GuiList {
                 z: 0.0,
             },
             scale: Vector3 {
-                x: 0.5,
-                y: 0.5,
+                x: 1.0,
+                y: 1.0,
                 z: 1.0,
             },
         };
@@ -217,7 +217,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                // h.update_map();
+                h.update_map();
             }
             thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }
