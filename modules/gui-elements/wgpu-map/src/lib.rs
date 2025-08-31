@@ -59,6 +59,12 @@ impl WgpuMap {
     pub fn apply_uniform_scaling(&self, gcx: &WgpuGraphContext, scale: f32) {
         self.apply_scaling(gcx, scale, scale);
     }
+
+    /// Применяет переворот по вертикали
+    pub fn apply_flip_y(&self, gcx: &WgpuGraphContext) {
+        let flip_matrix = MVPMatrix::flip_y();
+        self.update_mvp_matrix(gcx, flip_matrix);
+    }
 }
 
 impl TAsnGuiElement for WgpuMap {

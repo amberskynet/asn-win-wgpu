@@ -56,6 +56,11 @@ impl MVPMatrix {
         Self::scale(s, s, s)
     }
 
+    /// Создает матрицу переворота по вертикали
+    pub fn flip_y() -> Self {
+        Self::scale(1.0, -1.0, 1.0)
+    }
+
     /// Умножает две матрицы
     pub fn multiply(&self, other: &Self) -> Self {
         let mut result = [[0.0f32; 4]; 4];

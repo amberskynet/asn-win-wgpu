@@ -91,6 +91,7 @@ pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
     last_update: std::time::Instant,
     scale_factor: f32, // Добавляем фактор масштабирования
+    is_flipped: bool,  // Добавляем флаг переворота по вертикали
 }
 
 impl MyGuiHandler {
@@ -123,6 +124,10 @@ impl TAsnGuiHandler for MyGuiHandler {
         if let Some(ref gui_list) = self.gui_list {
             self.scale_factor = 0.5; // Уменьшаем вдвое
             gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
+
+            // Применяем переворот по вертикали
+            self.is_flipped = true;
+            // gui_list.m.apply_flip_y(gcx);
         }
 
         m_info!("init");
@@ -185,6 +190,7 @@ pub fn get_handler() -> MyGuiHandler {
         gui_list: None,
         last_update: std::time::Instant::now(),
         scale_factor: 1.0, // Инициализируем фактор масштабирования
+        is_flipped: false, // Инициализируем флаг переворота
     }
 }
 
