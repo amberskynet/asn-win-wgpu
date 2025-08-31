@@ -53,7 +53,7 @@ var s_map: sampler; // Сэмплер для текстуры карты
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // Получаем координаты тайла из текстуры карты (красный и зеленый компоненты)
-    let tile_info = textureLoad(t_map, vec2<i32>(in.tex_coords * vec2<f32>(textureDimensions(t_map))), 0);
+    let tile_info = textureLoad(t_map, vec2<i32>(vec2<f32>(in.tex_coords.x, 1.0 - in.tex_coords.y) * vec2<f32>(textureDimensions(t_map))), 0);
     
     // Извлекаем индексы тайла из красного и зеленого компонентов
     let tile_index_x = f32(tile_info.r);
