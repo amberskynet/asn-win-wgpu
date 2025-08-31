@@ -51,9 +51,9 @@ impl TAsnGuiElement for WgpuMap {
     type FrameContext = WgpuFrameContext;
 
     fn update(&mut self, gcx: &Self::GraphContext) {
-        // if !self.is_map_updated {
-        //     return;
-        // }
+        if !self.is_map_updated {
+            return;
+        }
 
         // // Обновляем текстуру напрямую
         self.map_texture.update_from_rgba(

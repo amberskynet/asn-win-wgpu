@@ -222,7 +222,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                // h.update_map();
+                h.update_map();
             }
             thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }
