@@ -5,8 +5,9 @@ extern crate asn_winit;
 mod log_utils;
 mod map_utils;
 
+use asn_core::{cgmath::Vector3, transform_set::TransformSet};
 use map_utils::generate_random_map;
-use wgpu_map::{MVPMatrix, WgpuMap, get_map};
+use wgpu_map::{WgpuMap, get_map};
 
 use std::{
     sync::{
@@ -40,8 +41,8 @@ impl GuiList {
         let tiles_width = 16;
         let tiles_height = 12;
 
-        let map_width = 15;
-        let map_height = 15;
+        let map_width = 2;
+        let map_height = 2;
 
         // Генерируем случайные значения для карты
         let mut map = generate_random_map(map_width, map_height, map_width * map_height - 1);
@@ -63,9 +64,30 @@ impl GuiList {
         };
         let m = get_map(gcx, &tiles_params, &map_params);
 
-        // Создаем и устанавливаем MVP-матрицу
-        let mvp_matrix = MVPMatrix::flipped_y();
-        m.update_mvp_matrix(gcx, mvp_matrix);
+        // // Создаем и устанавливаем MVP-матрицу
+        // let mvp_matrix = MVPMatrix::flipped_y();
+        // m.update_mvp_matrix(gcx, mvp_matrix);
+
+        let s = TransformSet {
+            pos: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            rot: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            scale: Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 1.0,
+            },
+        };
+
+        let mvp_matrix = s.matrix_calculated();
+        m.update_mvp_matrix(gcx, mvp_matrix.into());
 
         GuiList {
             m,
@@ -118,17 +140,6 @@ impl TAsnGuiHandler for MyGuiHandler {
     fn init(&mut self, gcx: &Self::GraphContext) {
         let gui_list = GuiList::new(gcx);
         self.gui_list = Some(gui_list);
-
-        // Применяем масштабирование вдвое меньше (0.5)
-        if let Some(ref gui_list) = self.gui_list {
-            self.scale_factor = 0.5; // Уменьшаем вдвое
-            gui_list.m.apply_uniform_scaling(gcx, self.scale_factor);
-
-            // Применяем переворот по вертикали
-            self.is_flipped = true;
-            // gui_list.m.apply_flip_y(gcx);
-        }
-
         m_info!("init");
     }
 
@@ -211,7 +222,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         return;
                     }
                 };
-                h.update_map();
+                // h.update_map();
             }
             thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }

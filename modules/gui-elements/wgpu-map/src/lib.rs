@@ -38,32 +38,12 @@ impl WgpuMap {
     }
 
     /// Обновляет MVP-матрицу
-    pub fn update_mvp_matrix(&self, gcx: &WgpuGraphContext, mvp_matrix: MVPMatrix) {
+    pub fn update_mvp_matrix(&self, gcx: &WgpuGraphContext, mvp_matrix: [[f32; 4]; 4]) {
         gcx.queue.write_buffer(
             &self.mvp_matrix_buffer,
             0,
             bytemuck::cast_slice(&[mvp_matrix]),
         );
-    }
-
-    /// Применяет масштабирование к текущей MVP-матрице
-    pub fn apply_scaling(&self, gcx: &WgpuGraphContext, scale_x: f32, scale_y: f32) {
-        let scale_matrix = MVPMatrix::scale(scale_x, scale_y, 1.0);
-        // Для применения масштабирования нам нужно получить текущую матрицу,
-        // но так как мы не храним её в CPU, создадим новую матрицу масштабирования
-        // и обновим буфер
-        self.update_mvp_matrix(gcx, scale_matrix);
-    }
-
-    /// Применяет равномерное масштабирование к текущей MVP-матрице
-    pub fn apply_uniform_scaling(&self, gcx: &WgpuGraphContext, scale: f32) {
-        self.apply_scaling(gcx, scale, scale);
-    }
-
-    /// Применяет переворот по вертикали
-    pub fn apply_flip_y(&self, gcx: &WgpuGraphContext) {
-        let flip_matrix = MVPMatrix::flip_y();
-        self.update_mvp_matrix(gcx, flip_matrix);
     }
 }
 
