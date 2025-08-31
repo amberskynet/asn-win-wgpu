@@ -9,6 +9,7 @@ bytemuck = { version = "1.23", features = ["derive"] }
 rand = "0.9.2"
 anyhow = "1.0.98"
 asn-gui-core = { path = "../../../modules/asn-gui-core" }
+asn-core = { path = "../../../modules/asn-core" }
 
 [dependencies.image]
 version = "0.25"

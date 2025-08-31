@@ -1,3 +1,6 @@
+use std::convert::identity;
+
+use asn_core::cgmath::{Matrix4, SquareMatrix};
 use asn_gui_core::TAsnGuiElement;
 use asn_wgpu::wgpu::util::DeviceExt;
 use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, wgpu};
@@ -8,8 +11,6 @@ use crate::data::utils::{get_render_pipeline, get_texture_bind_group_layout};
 use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
 mod data;
-
-pub use data::MVPMatrix;
 
 pub struct WgpuMap {
     render_pipeline: wgpu::RenderPipeline,
@@ -146,7 +147,7 @@ pub fn get_map(
     });
 
     // Создаем uniform-буфер для MVP-матрицы
-    let mvp_matrix = MVPMatrix::identity();
+    let mvp_matrix: [[f32; 4]; 4] = Matrix4::<f32>::identity().into();
     let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("MVP Matrix Buffer"),
         contents: bytemuck::cast_slice(&[mvp_matrix]),
