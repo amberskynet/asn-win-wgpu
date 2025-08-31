@@ -40,21 +40,21 @@ impl GuiList {
         // let tiles_height = 95;
 
         let map_tiles_bytes = include_bytes!("tiles_16_12.png");
-        let tiles_width = 1;
-        let tiles_height = 1;
+        let tiles_width = 16;
+        let tiles_height = 12;
 
-        let map_width = 1;
-        let map_height = 1;
+        let map_width = 2;
+        let map_height = 2;
 
         // Генерируем случайные значения для карты
         let mut map = generate_random_map(map_width, map_height, map_width * map_height - 1);
 
-        map[0] = 0;
-        // map[1] = 0;
-        // map[2] = 0;
-        // map[3] = 0;
+        map[0] = 1;
+        map[1] = 2;
+        map[2] = 3;
+        map[3] = 4;
 
-        println!("map: {:?}", map);
+        // println!("map: {:?}", map);
 
         let tiles_params = wgpu_map::MapTilesParams {
             map_tiles_bytes,
