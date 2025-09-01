@@ -1,15 +1,19 @@
+use asn_logger::log::info;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::console;
 
 extern crate asn_logger;
+mod log_utils;
 
 pub const LOG_MODULE_NAME: &str = "ex_web";
 
 #[wasm_bindgen]
 pub fn init_web_app() -> Result<(), JsValue> {
+    log_utils::setup_log();
+
     // Простая инициализация для web
-    console::log_1(&"ASN Web App initialized".into());
+    info!("ASN Web App initialized");
 
     // Здесь можно добавить базовую логику без проблемных зависимостей
     spawn_local(async move {

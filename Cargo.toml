@@ -66,3 +66,8 @@ wasm-opt = false
 
 [package.metadata.wasm-pack.profile.dev]
 wasm-opt = false
+
+[[example]]
+name = "ex_web"
+path = "examples/ex_web/src/lib.rs"
+crate-type = ["cdylib"]
