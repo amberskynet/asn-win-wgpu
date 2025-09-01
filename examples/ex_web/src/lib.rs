@@ -4,8 +4,6 @@ use web_sys::console;
 
 extern crate asn_logger;
 
-use asn_logger::*;
-
 pub const LOG_MODULE_NAME: &str = "ex_web";
 
 #[wasm_bindgen]
