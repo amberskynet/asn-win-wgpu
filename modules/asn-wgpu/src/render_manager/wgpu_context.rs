@@ -29,9 +29,6 @@ impl WgpuGraphContext {
             });
         }
 
-        let backend_features = wgpu::Instance::enabled_backend_features();
-        m_trace!("backend_features: {backend_features:?}");
-
         // Create GPU instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
             #[cfg(not(target_arch = "wasm32"))]
@@ -61,11 +58,12 @@ impl WgpuGraphContext {
 
         m_trace!("adapter ok");
 
-        // Create device and queue
+        // Create device and queue with better feature handling
+        let required_features = wgpu::Features::empty();
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
                 label: Some("ASN WGPU Device"),
-                required_features: wgpu::Features::empty(),
+                required_features,
                 required_limits: if cfg!(target_arch = "wasm32") {
                     wgpu::Limits::downlevel_webgl2_defaults()
                 } else {
@@ -79,10 +77,9 @@ impl WgpuGraphContext {
 
         m_trace!("device, queue ok");
 
-        // Configure surface
+        // Configure surface with better error handling
         let surface_caps = surface.get_capabilities(&adapter);
-
-        m_trace!("surface_caps {:?}", surface_caps);
+        m_trace!("surface_caps: {:?}", surface_caps);
 
         let surface_format = surface_caps
             .formats
@@ -91,15 +88,21 @@ impl WgpuGraphContext {
             .copied()
             .unwrap_or(surface_caps.formats[0]);
 
-        m_trace!("surface_format {:?}", surface_format);
+        m_trace!("surface_format: {:?}", surface_format);
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
             width: size.width,
             height: size.height,
-            present_mode: surface_caps.present_modes[0],
-            alpha_mode: surface_caps.alpha_modes[0],
+            present_mode: surface_caps.present_modes
+                .first()
+                .copied()
+                .unwrap_or(wgpu::PresentMode::Fifo),
+            alpha_mode: surface_caps.alpha_modes
+                .first()
+                .copied()
+                .unwrap_or(wgpu::CompositeAlphaMode::Auto),
             view_formats: vec![],
             desired_maximum_frame_latency: 2,
         };
