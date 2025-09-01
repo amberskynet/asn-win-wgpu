@@ -11,9 +11,9 @@ if [ ! -d "pkg" ]; then
 fi
 
 # Start HTTP server
-echo "🌐 Starting HTTP server on http://localhost:8080"
-echo "📱 Open your browser and navigate to: http://localhost:8080"
+echo "🌐 Starting HTTP server on http://localhost:8091"
+echo "📱 Open your browser and navigate to: http://localhost:8091"
 echo "🛑 Press Ctrl+C to stop the server"
 echo ""
 
-python3 -m http.server 8080
+python3 -m http.server 8091

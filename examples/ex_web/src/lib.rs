@@ -10,12 +10,12 @@ pub const LOG_MODULE_NAME: &str = "ex_web";
 pub fn init_web_app() -> Result<(), JsValue> {
     // Простая инициализация для web
     console::log_1(&"ASN Web App initialized".into());
-    
+
     // Здесь можно добавить базовую логику без проблемных зависимостей
     spawn_local(async move {
         console::log_1(&"Async task started".into());
-        // Простая задержка
-        std::thread::sleep(std::time::Duration::from_millis(100));
+
+        // Простая асинхронная задача без задержки
         console::log_1(&"Async task completed".into());
     });
 
