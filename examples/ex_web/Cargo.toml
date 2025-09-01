@@ -1,0 +1,44 @@
+[package]
+name = "ex-web"
+version = "0.1.0"
+edition = "2021"
+authors = ["Amberskynet Team"]
+description = "Web example for ASN WGPU"
+license = "MIT"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "3.0.0", features = [] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "console",
+    "Document",
+    "Element",
+    "HtmlElement",
+    "Node",
+    "Window",
+    "WebGlRenderingContext",
+    "WebGl2RenderingContext",
+] }
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false
