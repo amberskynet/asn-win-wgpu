@@ -2,6 +2,9 @@
 name = "tokio-bus"
 version = "0.1.0"
 edition = "2024"
+description = "Tokio-based implementation of the ASN event bus"
+keywords = ["tokio", "event-bus", "async", "broadcast"]
+categories = ["asynchronous"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -9,4 +12,10 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 asn-core = { path = "../../modules/asn-core" }
 asn-core-bus = { path = "../../modules/asn-core-bus" }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"

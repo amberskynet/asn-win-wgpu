@@ -13,19 +13,113 @@ A modern window system implementation using Winit + WGPU for the Amberskynet pro
 
 ## Architecture
 
+The project follows a modular architecture with separate components for different functionalities:
+
+- **Core modules** (`modules/asn-core*`) - Provide fundamental application infrastructure including event handling and module management
+- **GUI core** (`modules/asn-gui-core`) - Defines GUI element interfaces and rendering manager traits
+- **WGPU rendering** (`modules/asn-wgpu`) - Implements hardware-accelerated rendering using WGPU
+- **Window management** (`modules/asn-winit`) - Handles cross-platform window creation and event loop
+- **Logging** (`asn-logger`) - Provides structured logging as part of the Amberskynet ecosystem
+- **Async infrastructure** (`modules/tokio-*`) - Provides async event bus and worker pool implementations
+- **GUI elements** (`modules/gui-elements`) - Concrete implementations of GUI components
+
+## Project Structure
+
 ```
 asn-win-wgpu/
-├── src/                    # Main application logic
-│   ├── app.rs             # Application event handling
-│   ├── asn_win_config.rs  # Configuration management
-│   └── lib.rs             # Public API
-├── modules/
-│   ├── asn-wgpu/          # WGPU rendering engine
-│   └── asn-node-quad/     # Node.js integration
-└── examples/              # Usage examples
+├── Cargo.lock              # Dependency lock file
+├── Cargo.toml              # Project manifest
+├── README.md               # This file
+├── examples/               # Usage examples
+│   ├── ex_bus.rs          # Event bus example
+│   ├── ex_gui.rs          # GUI example
+│   ├── ex_wgpu.rs         # WGPU rendering example
+│   ├── ex_winit.rs        # Window management example
+│   └── tiles.png          # Example texture
+├── modules/                # Project modules
+│   ├── asn-core/           # Core application infrastructure
+│   ├── asn-core-bus/       # Core event bus implementation
+│   ├── asn-gui-core/       # GUI element interfaces
+│   ├── asn-wgpu/           # WGPU rendering implementation
+│   ├── asn-wgpu_old/       # Legacy WGPU implementation
+│   ├── asn-winit/          # Window management
+│   ├── gui-elements/       # GUI element implementations
+│   ├── tokio-bus/          # Async event bus
+│   └── tokio-worker-pool/  # Async worker pool
+└── src/                    # Main application logic (if any)
 ```
 
+### Module Details
+
+**asn-core** - Provides fundamental application infrastructure including:
+- Event handling system
+- Loading state management
+- Module lifecycle management
+
+**asn-core-bus** - Implements a synchronous event bus system:
+- Module communication interface
+- Worker pool management
+- Event distribution mechanisms
+
+**asn-gui-core** - Defines GUI element interfaces and rendering:
+- GUI element traits
+- Event handler interfaces
+- Rendering manager abstraction
+
+**asn-wgpu** - Implements hardware-accelerated rendering:
+- WGPU context management
+- Render manager implementation
+- Frame rendering context
+
+**asn-winit** - Handles cross-platform window management:
+- Window creation and configuration
+- Event loop processing
+- Application state management
+
+**tokio-bus** - Provides asynchronous event bus:
+- Async event distribution
+- Tokio-based implementation
+
+**tokio-worker-pool** - Implements async worker pool:
+- Job queuing system
+- Worker thread management
+- Async task execution
+
+**gui-elements** - Contains concrete GUI implementations:
+- WGPU-based map rendering
+- Texture handling utilities
+- Vertex data management
+
 ## Quick Start
+
+### Native Build
+
+```bash
+# Clone the repository
+git clone https://github.com/amberskynet/asn-win-wgpu.git
+cd asn-win-wgpu
+
+# Build and run
+cargo run --example ex_wgpu
+```
+
+### Web Build
+
+```bash
+# Build for web
+./build-web.sh
+
+# Run web server
+./run-web.sh
+# or manually:
+# cd web && python3 -m http.server 8080
+```
+
+Then open http://localhost:8080 in your browser.
+
+For more details, see [WEB_BUILD.md](WEB_BUILD.md).
+
+### Code Example
 
 ```rust
 use asn_win_wgpu::{run, asn_win_config::AppConfig};

@@ -2,6 +2,8 @@ extern crate asn_gui_core;
 extern crate asn_logger;
 
 mod data;
+mod error;
+mod keyboard_handler;
 
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
@@ -13,9 +15,11 @@ mod asn_winit_state;
 mod winit_utils;
 
 // do some re-export
+pub use error::AsnWinitError;
 pub use winit;
 
 use app_state::new_state;
+use error::event_loop_creation_error;
 
 pub type WinitWindow = winit::window::Window;
 
@@ -24,7 +28,7 @@ pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> {}
 // Blanket implementation
 impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> {}
 
-pub fn run<R>(r: R) -> Result<(), Box<dyn std::error::Error>>
+pub fn run<R>(r: R) -> Result<(), AsnWinitError>
 where
     R: WinitRenderManager,
 {
@@ -33,7 +37,7 @@ where
     let mut runner = new_state(r);
 
     let event_loop = winit::event_loop::EventLoop::new()
-        .map_err(|e| format!("Failed to create event loop: {e}"))?;
+        .map_err(|e| event_loop_creation_error(format!("Failed to create event loop: {e}")))?;
 
     event_loop.set_control_flow(ControlFlow::Poll);
     let result = event_loop.run_app(&mut runner);
@@ -45,9 +49,9 @@ where
         }
         Err(e) => {
             asn_logger::m_error!("Application error: {}", e);
-            Err(Box::new(std::io::Error::other(format!(
+            Err(error::event_loop_creation_error(format!(
                 "Application error: {e}"
-            ))))
+            )))
         }
     }
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASN Web Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ASN Web Example</h1>
+        <p>Этот пример демонстрирует использование ASN WGPU в веб-среде.</p>
+        
+        <button onclick="initApp()">Инициализировать приложение</button>
+        <button onclick="getVersion()">Получить версию</button>
+        <button onclick="greetUser()">Приветствие</button>
+        
+        <div id="output">
+            <p>Нажмите кнопки выше для тестирования функций...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { init_web_app, greet, get_version } from './pkg/ex_web.js';
+
+        // Инициализация WASM модуля
+        await init();
+
+        // Глобальные функции для кнопок
+        window.initApp = async function() {
+            try {
+                await init_web_app();
+                document.getElementById('output').innerHTML += '<p>✅ Приложение инициализировано успешно!</p>';
+            } catch (error) {
+                document.getElementById('output').innerHTML += `<p>❌ Ошибка инициализации: ${error}</p>`;
+            }
+        };
+
+        window.getVersion = function() {
+            try {
+                const version = get_version();
+                document.getElementById('output').innerHTML += `<p>📦 Версия: ${version}</p>`;
+            } catch (error) {
+                document.getElementById('output').innerHTML += `<p>❌ Ошибка получения версии: ${error}</p>`;
+            }
+        };
+
+        window.greetUser = function() {
+            try {
+                const greeting = greet('Пользователь');
+                document.getElementById('output').innerHTML += `<p>👋 ${greeting}</p>`;
+            } catch (error) {
+                document.getElementById('output').innerHTML += `<p>❌ Ошибка приветствия: ${error}</p>`;
+            }
+        };
+
+        console.log('ASN Web Example загружен успешно!');
+    </script>
+</body>
+</html>

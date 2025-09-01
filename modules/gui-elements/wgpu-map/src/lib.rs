@@ -1,9 +1,10 @@
+use asn_core::OPENGL_TO_WGPU_MATRIX;
 use asn_gui_core::TAsnGuiElement;
 use asn_wgpu::wgpu::util::DeviceExt;
 use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, wgpu};
 
 use crate::data::rgba_handler::RgbaHandler;
-use crate::data::texture::WgpuTexture;
+use crate::data::texture::{AsnTextureFormat, WgpuTexture};
 use crate::data::utils::{get_render_pipeline, get_texture_bind_group_layout};
 use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
@@ -17,18 +18,31 @@ pub struct WgpuMap {
     num_indices: u32,
     map_handler: RgbaHandler,
     map_texture: WgpuTexture,
+    tiles_texture: WgpuTexture,
+    tiles_info_buffer: wgpu::Buffer, // Uniform-буфер с информацией о тайлах
+    mvp_matrix_buffer: wgpu::Buffer, // Uniform-буфер для MVP-матрицы
     is_map_updated: bool,
 }
 
 impl WgpuMap {
-    pub fn update_map(&mut self, rgba: &[u8]) {
-        self.map_handler.update_data(rgba).unwrap();
+    pub fn update_map(&mut self, map_indices: &[u32]) {
+        // Получаем ширину карты из текущего обработчика
+        let map_width = self.map_handler.width();
+
+        // Устанавливаем индексы тайлов в RGBA-формате
+        self.map_handler
+            .set_tile_indices(map_indices, map_width)
+            .unwrap();
         self.is_map_updated = true;
     }
 
-    pub fn fill_random(&mut self) {
-        self.map_handler.fill_random();
-        self.is_map_updated = true;
+    /// Обновляет MVP-матрицу
+    pub fn update_mvp_matrix(&self, gcx: &WgpuGraphContext, mvp_matrix: [[f32; 4]; 4]) {
+        gcx.queue.write_buffer(
+            &self.mvp_matrix_buffer,
+            0,
+            bytemuck::cast_slice(&[mvp_matrix]),
+        );
     }
 }
 
@@ -41,12 +55,13 @@ impl TAsnGuiElement for WgpuMap {
             return;
         }
 
-        // Обновляем текстуру напрямую
+        // // Обновляем текстуру напрямую
         self.map_texture.update_from_rgba(
             &gcx.queue,
-            self.map_handler.data(),
+            bytemuck::cast_slice(self.map_handler.data()),
             self.map_handler.width(),
             self.map_handler.height(),
+            AsnTextureFormat::Rgba32Uint,
         );
 
         self.is_map_updated = false;
@@ -78,29 +93,78 @@ impl TAsnGuiElement for WgpuMap {
     }
 }
 
+/// Параметры для создания карты тайлов
+pub struct MapTilesParams<'a> {
+    /// Байты тайлов карты
+    pub map_tiles_bytes: &'a [u8],
+    /// Ширина тайлов
+    pub tiles_width: u32,
+    /// Высота тайлов
+    pub tiles_height: u32,
+}
+
+/// Параметры карты
+pub struct MapParams<'a> {
+    /// Ширина карты
+    pub map_width: u32,
+    /// Высота карты
+    pub map_height: u32,
+    /// Индексы тайлов на карте
+    pub tile_indices: &'a [u32],
+}
+
 pub fn get_map(
     gcx: &WgpuGraphContext,
-    map_tiles_bytes: &[u8],
-    map_width: u32,
-    map_height: u32,
+    tiles_params: &MapTilesParams,
+    map_params: &MapParams,
 ) -> WgpuMap {
     let device = &gcx.device;
     let queue = &gcx.queue;
     let format = gcx.surface_format;
 
-    let diffuse_texture =
-        WgpuTexture::from_bytes(device, queue, map_tiles_bytes, "map-texture.png").unwrap();
+    // Создаем текстуру тайлов
+    let tiles_texture = WgpuTexture::from_bytes(
+        device,
+        queue,
+        tiles_params.map_tiles_bytes,
+        "map-tiles-texture.png",
+    )
+    .unwrap();
 
-    let mut map_handler = RgbaHandler::new(map_width, map_height);
-    map_handler.fill_random();
+    // Создаем uniform-буфер с информацией о тайлах и карте
+    let tiles_info_data = [
+        tiles_params.tiles_width as f32,
+        tiles_params.tiles_height as f32,
+        map_params.map_width as f32,
+        map_params.map_height as f32,
+    ];
+    let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("Tiles Info Buffer"),
+        contents: bytemuck::cast_slice(&tiles_info_data),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    });
+
+    // Создаем uniform-буфер для MVP-матрицы
+    let mvp_matrix: [[f32; 4]; 4] = OPENGL_TO_WGPU_MATRIX.into(); //Matrix4::<f32>::identity().into();
+    let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("MVP Matrix Buffer"),
+        contents: bytemuck::cast_slice(&[mvp_matrix]),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    });
+
+    let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
+    map_handler
+        .set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)
+        .unwrap();
 
     let map_texture = WgpuTexture::from_rgba(
         device,
         queue,
-        map_handler.data(),
+        bytemuck::cast_slice(map_handler.data()),
         map_handler.width(),
         map_handler.height(),
         "MAP_TEXTURE_0",
+        AsnTextureFormat::Rgba32Uint,
     )
     .unwrap();
 
@@ -123,21 +187,37 @@ pub fn get_map(
     let diffuse_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
         layout: &texture_bind_group_layout,
         entries: &[
+            // Uniform-буфер с информацией о тайлах
             wgpu::BindGroupEntry {
                 binding: 0,
-                resource: wgpu::BindingResource::TextureView(&diffuse_texture.view),
+                resource: wgpu::BindingResource::Buffer(
+                    tiles_info_buffer.as_entire_buffer_binding(),
+                ),
             },
+            // Текстура тайлов
             wgpu::BindGroupEntry {
                 binding: 1,
-                resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler),
+                resource: wgpu::BindingResource::TextureView(&tiles_texture.view),
             },
             wgpu::BindGroupEntry {
                 binding: 2,
+                resource: wgpu::BindingResource::Sampler(&tiles_texture.sampler),
+            },
+            // Текстура карты
+            wgpu::BindGroupEntry {
+                binding: 3,
                 resource: wgpu::BindingResource::TextureView(&map_texture.view),
             },
             wgpu::BindGroupEntry {
-                binding: 3,
+                binding: 4,
                 resource: wgpu::BindingResource::Sampler(&map_texture.sampler),
+            },
+            // Uniform-буфер для MVP-матрицы
+            wgpu::BindGroupEntry {
+                binding: 5,
+                resource: wgpu::BindingResource::Buffer(
+                    mvp_matrix_buffer.as_entire_buffer_binding(),
+                ),
             },
         ],
         label: Some("map_diffuse_bind_group"),
@@ -158,6 +238,9 @@ pub fn get_map(
         num_indices,
         map_handler,
         map_texture,
+        tiles_texture,
+        tiles_info_buffer,
+        mvp_matrix_buffer,
         is_map_updated: false,
     }
 }
