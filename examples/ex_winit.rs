@@ -42,8 +42,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let r = DummyRenderManager { w: None };
 
-    asn_winit::run(r)?;
+    // Запуск приложения с обработкой ошибок
+    match asn_winit::run(r) {
+        Ok(_) => {
+            m_info!("Application finished successfully");
+        }
+        Err(e) => {
+            m_error!("Application failed with error: {}", e);
+            return Err(e);
+        }
+    }
 
+    // Добавлено для демонстрации работы
     for i in 0..2 {
         m_info!("update {i}");
         sleep(Duration::from_secs(1));
