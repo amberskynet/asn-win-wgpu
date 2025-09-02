@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(e) => {
             m_error!("Application failed with error: {}", e);
-            return Err(e);
+            return Err(Box::new(e));
         }
     }
 
