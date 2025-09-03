@@ -23,5 +23,5 @@ pub fn setup_log() -> Result<(), String> {
 
 #[allow(dead_code)]
 pub fn main() {
-    setup_log();
+    setup_log().unwrap();
 }
