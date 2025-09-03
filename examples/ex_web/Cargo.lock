@@ -20,7 +20,7 @@ dependencies = [
 [[package]]
 name = "asn-logger"
 version = "3.0.0"
-source = "git+https://github.com/amberskynet/asn-logger.git?tag=3.0.0#8cdc5e68c500da6a525f4e8eb2768e350e2e3ee5"
+source = "git+https://github.com/mrstreamer963/asn-logger.git?branch=dev#d3f004539df2de1d492722a7fa1df68017f2c007"
 dependencies = [
  "cfg-if",
  "chrono",
