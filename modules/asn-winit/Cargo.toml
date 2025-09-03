@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 winit = { version = "0.30" }
 asn-gui-core = { path = "../asn-gui-core" }
-asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "3.0.0" }
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "3.1.0" }
 asn-core = { path = "../asn-core" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

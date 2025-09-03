@@ -12,7 +12,7 @@ license = "MIT"
 crate-type = ["cdylib"]
 
 [dependencies]
-asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "3.0.0", features = [] }
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "3.1.0", features = [] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"

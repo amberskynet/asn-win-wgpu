@@ -9,7 +9,9 @@ use web_sys::console;
 
 #[wasm_bindgen]
 pub fn init_web_app() -> Result<(), JsValue> {
-    log_utils::setup_log();
+    if let Err(e) = log_utils::setup_log() {
+        return Err(e.into());
+    }
 
     // Простая инициализация для web
     info!("ASN Web App initialized");
