@@ -1,6 +1,6 @@
 use asn_logger::{AsnLogConfig, AsnLogLevel, init_log};
 
-pub fn setup_log() {
+pub fn setup_log() -> Result<(), String> {
     let mut c = AsnLogConfig {
         global_level: AsnLogLevel::Trace,
         module_levels: Default::default(),
@@ -18,7 +18,7 @@ pub fn setup_log() {
     c.module_levels
         .insert(String::from("wgpu_map"), AsnLogLevel::Error);
 
-    init_log(&c).unwrap();
+    init_log(&c)
 }
 
 #[allow(dead_code)]
