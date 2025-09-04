@@ -1,4 +1,5 @@
 use asn_logger::log::info;
+mod gui;
 mod log_utils;
 
 pub const LOG_MODULE_NAME: &str = "ex_web";
@@ -6,6 +7,8 @@ pub const LOG_MODULE_NAME: &str = "ex_web";
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::console;
+
+use crate::gui::run_gui;
 
 #[wasm_bindgen]
 pub fn init_web_app() -> Result<(), JsValue> {
@@ -23,6 +26,8 @@ pub fn init_web_app() -> Result<(), JsValue> {
         // Простая асинхронная задача без задержки
         console::log_1(&"Async task completed".into());
     });
+
+    run_gui();
 
     Ok(())
 }
