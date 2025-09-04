@@ -74,12 +74,20 @@ pub fn calculate_fibonacci(n: u32) -> u64 {
 
 #[wasm_bindgen]
 pub fn get_memory_usage() -> String {
-    // В WASM мы не можем получить реальную информацию о памяти,
-    // но можем показать примерную информацию
-    format!(
-        "Memory usage: ~{} KB (estimated)",
-        std::mem::size_of::<usize>() * 1024
-    )
+    // Получаем информацию о памяти из WebAssembly
+    let memory = wasm_bindgen::memory();
+    let js_memory: js_sys::WebAssembly::Memory = memory.into();
+    let buffer = js_memory.buffer();
+
+    // Получаем размер буфера в байтах
+    let memory_size = js_sys::Reflect::get(&buffer, &"byteLength".into())
+        .map(|v| v.as_f64().unwrap_or(0.0) as u32)
+        .unwrap_or(0);
+
+    // Конвертируем в килобайты
+    let memory_kb = memory_size / 1024;
+
+    format!("Memory usage: {} KB", memory_kb)
 }
 
 #[wasm_bindgen]
