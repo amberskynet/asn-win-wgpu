@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +13,14 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .container {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         button {
             background: #007bff;
             color: white;
@@ -27,9 +30,11 @@
             cursor: pointer;
             margin: 5px;
         }
+
         button:hover {
             background: #0056b3;
         }
+
         #output {
             margin-top: 20px;
             padding: 10px;
@@ -39,15 +44,16 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>ASN Web Example</h1>
         <p>Этот пример демонстрирует использование ASN WGPU в веб-среде.</p>
-        
+
         <button onclick="initApp()">Инициализировать приложение</button>
         <button onclick="getVersion()">Получить версию</button>
         <button onclick="greetUser()">Приветствие</button>
-        
+
         <div id="output">
             <p>Нажмите кнопки выше для тестирования функций...</p>
         </div>
@@ -60,16 +66,21 @@
         await init();
 
         // Глобальные функции для кнопок
-        window.initApp = async function() {
+        window.initApp = async function () {
             try {
                 await init_web_app();
                 document.getElementById('output').innerHTML += '<p>✅ Приложение инициализировано успешно!</p>';
             } catch (error) {
-                document.getElementById('output').innerHTML += `<p>❌ Ошибка инициализации: ${error}</p>`;
+                if (error.message && error.message.startsWith("Using exceptions for control flow,")) {
+                    console.log(error.message)
+                }
+                else {
+                    document.getElementById('output').innerHTML += `<p>❌ Ошибка инициализации: ${error}</p>`;
+                }
             }
         };
 
-        window.getVersion = function() {
+        window.getVersion = function () {
             try {
                 const version = get_version();
                 document.getElementById('output').innerHTML += `<p>📦 Версия: ${version}</p>`;
@@ -78,7 +89,7 @@
             }
         };
 
-        window.greetUser = function() {
+        window.greetUser = function () {
             try {
                 const greeting = greet('Пользователь');
                 document.getElementById('output').innerHTML += `<p>👋 ${greeting}</p>`;
@@ -90,4 +101,5 @@
         console.log('ASN Web Example загружен успешно!');
     </script>
 </body>
+
 </html>
