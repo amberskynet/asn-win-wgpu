@@ -31,7 +31,7 @@ impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow
 
 pub fn run<R>(r: R) -> Result<(), AsnWinitError>
 where
-    R: WinitRenderManager + std::fmt::Debug + 'static,
+    R: WinitRenderManager + 'static,
 {
     m_info!("run()");
 
