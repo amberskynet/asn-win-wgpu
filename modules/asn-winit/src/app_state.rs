@@ -18,16 +18,6 @@ where
     proxy: EventLoopProxy<UserEvents<R>>,
 }
 
-impl<S> fmt::Display for RenderManagerState<S> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RenderManagerState::Zero => write!(f, "RenderManagerState::Zero"),
-            RenderManagerState::Empty(_) => write!(f, "RenderManagerState::Empty"),
-            RenderManagerState::Loaded(_) => write!(f, "RenderManagerState::Loaded"),
-        }
-    }
-}
-
 use asn_gui_core::AsnGuiWindowConfig;
 use winit::{
     application::ApplicationHandler,
