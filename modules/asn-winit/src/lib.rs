@@ -39,6 +39,8 @@ where
     let event_loop = winit::event_loop::EventLoop::new()
         .map_err(|e| event_loop_creation_error(format!("Failed to create event loop: {e}")))?;
 
+    let proxy = Some(event_loop.create_proxy());
+
     event_loop.set_control_flow(ControlFlow::Poll);
     let result = event_loop.run_app(&mut runner);
 

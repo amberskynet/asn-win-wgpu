@@ -4,18 +4,19 @@
 //! управление состоянием рендерера и обработку различных событий окна.
 use std::{fmt, sync::Arc};
 
-use asn_core::loading_state::{LoadingState, set_state_loaded};
+pub enum RenderManagerState<S> {
+    Zero,
+    Empty(S),
+    Loaded(S),
+}
 
-pub struct RenderManagerState<R>(LoadingState<AsnWinitState<R>>)
-where
-    R: WinitRenderManager;
-
-impl<R> fmt::Display for RenderManagerState<R>
-where
-    R: WinitRenderManager,
-{
+impl<S> fmt::Display for RenderManagerState<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+        match self {
+            RenderManagerState::Zero => write!(f, "RenderManagerState::Zero"),
+            RenderManagerState::Empty(_) => write!(f, "RenderManagerState::Empty"),
+            RenderManagerState::Loaded(_) => write!(f, "RenderManagerState::Loaded"),
+        }
     }
 }
 
@@ -26,12 +27,12 @@ use crate::{WinitRenderManager, asn_winit_state::AsnWinitState, winit_utils::new
 
 use asn_logger::log::*;
 
-pub fn new_state<R>(r: R) -> RenderManagerState<R>
+pub fn new_state<R>(r: R) -> RenderManagerState<AsnWinitState<R>>
 where
     R: WinitRenderManager,
 {
     let s = AsnWinitState { r, is_init: false };
-    RenderManagerState(LoadingState::Empty(s))
+    RenderManagerState::Empty(s)
 }
 
 // Блок методов для обработки различных событий приложения
@@ -41,28 +42,27 @@ where
 {
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        if let LoadingState::Empty(ref mut r) = self.0 {
+        if let RenderManagerState::Empty(r) = self {
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
-            r.r.init(Arc::new(w)).unwrap();
+            r.init(Arc::new(w)).unwrap();
 
-            let s = set_state_loaded(&mut self.0);
-            self.0 = s;
+            *self = RenderManagerState::Loaded(r);
         }
     }
 
     /// Обрабатывает запрос на закрытие приложения
     pub fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info!("Application close requested");
-        self.0 = LoadingState::Zero;
+        *self = RenderManagerState::Zero;
         event_loop.exit();
     }
 
     /// Обрабатывает событие изменения размера окна
     pub fn handle_resize(&mut self, width: u32, height: u32) {
         trace!("Resizing window to {width}x{height}");
-        if let LoadingState::Loaded(ref mut r) = self.0 {
-            match r.r.resize(width, height) {
+        if let RenderManagerState::Loaded(r) = self {
+            match r.resize(width, height) {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
@@ -73,8 +73,8 @@ where
 
     /// Обрабатывает запрос на перерисовку окна
     pub fn handle_redraw(&mut self) {
-        if let LoadingState::Loaded(ref mut r) = self.0 {
-            match r.r.draw() {
+        if let RenderManagerState::Loaded(r) = self {
+            match r.draw() {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
