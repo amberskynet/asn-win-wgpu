@@ -30,7 +30,7 @@ impl<S> fmt::Display for RenderManagerState<S> {
 use asn_gui_core::AsnGuiWindowConfig;
 use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
 
-use crate::{WinitRenderManager, asn_winit_state::AsnWinitState, winit_utils::new_window};
+use crate::{WinitRenderManager, winit_utils::new_window};
 
 use asn_logger::log::*;
 
@@ -49,7 +49,7 @@ where
 {
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        if let RenderManagerState::Empty(_) = self.s {
+        if let RenderManagerState::Empty(ref mut r) = self.s {
             // Take ownership of the value by replacing it with a temporary value
             let RenderManagerState::Empty(mut r) =
                 std::mem::replace(&mut self.s, RenderManagerState::Zero)
