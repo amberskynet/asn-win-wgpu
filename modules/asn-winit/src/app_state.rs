@@ -15,6 +15,7 @@ where
     R: WinitRenderManager,
 {
     pub s: RenderManagerState<R>,
+    proxy: EventLoopProxy<UserEvents<R>>,
 }
 
 impl<S> fmt::Display for RenderManagerState<S> {
@@ -38,17 +39,18 @@ use crate::{WinitRenderManager, winit_utils::new_window};
 
 use asn_logger::log::*;
 
-pub enum UserEvents {
+#[derive(Debug)]
+pub enum UserEvents<W: WinitRenderManager> {
     Zero,
+    UploadManager(W),
 }
 
-pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents>) -> App<R>
+pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents<R>>) -> App<R>
 where
     R: WinitRenderManager,
 {
-    let _ = proxy;
     let s = RenderManagerState::Empty(r);
-    App { s }
+    App { s, proxy }
 }
 
 // Блок методов для обработки различных событий приложения
@@ -60,18 +62,19 @@ where
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if let RenderManagerState::Empty(ref mut r) = self.s {
             // Take ownership of the value by replacing it with a temporary value
-            let RenderManagerState::Empty(mut r) =
-                std::mem::replace(&mut self.s, RenderManagerState::Zero)
-            else {
-                unreachable!()
-            };
+            // let RenderManagerState::Empty(mut r) =
+            // std::mem::replace(&mut self.s, RenderManagerState::Zero)
+            // else {
+            // unreachable!()
+            // };
 
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
             r.init(Arc::new(w)).unwrap();
 
             let m = RenderManagerState::Loaded(r);
-            self.s = m;
+            self.proxy.send_event(UserEvents::Zero).unwrap();
+            self.s = RenderManagerState::Zero;
         }
     }
 
@@ -111,7 +114,7 @@ where
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
 // Блок реализации ApplicationHandler
-impl<R> ApplicationHandler<UserEvents> for App<R>
+impl<R> ApplicationHandler<UserEvents<R>> for App<R>
 where
     R: WinitRenderManager,
 {
