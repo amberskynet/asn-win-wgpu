@@ -2,7 +2,7 @@
 //!
 //! Этот модуль содержит реализацию обработчика событий приложения,
 //! управление состоянием рендерера и обработку различных событий окна.
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 pub enum RenderManagerState<S> {
     Zero,
@@ -58,8 +58,14 @@ where
                 let w = new_window(event_loop, &conf).unwrap();
                 r.init(Arc::new(w)).unwrap();
 
-                self.proxy.send_event(UserEvents::UploadManager(r)).unwrap();
-                // Не устанавливаем состояние в Zero, так как оно будет изменено при обработке события UploadManager
+                match self.proxy.send_event(UserEvents::UploadManager(r)) {
+                    Ok(_) => {
+                        self.s = RenderManagerState::Zero;
+                    }
+                    Err(err) => {
+                        error!("handle_resumed error: {err}");
+                    }
+                };
             }
         }
     }

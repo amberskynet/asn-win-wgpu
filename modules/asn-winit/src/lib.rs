@@ -24,10 +24,10 @@ use crate::app_state::UserEvents;
 
 pub type WinitWindow = winit::window::Window;
 
-pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> + std::fmt::Debug {}
+pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> {}
 
 // Blanket implementation
-impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> + std::fmt::Debug {}
+impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> {}
 
 pub fn run<R>(r: R) -> Result<(), AsnWinitError>
 where
