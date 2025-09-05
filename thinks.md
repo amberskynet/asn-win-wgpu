@@ -8,6 +8,8 @@ asn-winit -> asn-wgpu -> [wgpu-handler]draw(wgpu_context)
             -> [wgpu-handler]
 
 
+Сделать run и run_web двумя разными функциями модуля (!)
+
 // как заполнять gui-компоненты до вызова init ?
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
