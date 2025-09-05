@@ -2,70 +2,91 @@
 //!
 //! Этот модуль содержит реализацию обработчика событий приложения,
 //! управление состоянием рендерера и обработку различных событий окна.
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
-use asn_core::loading_state::{LoadingState, set_state_loaded};
+pub enum RenderManagerState<S> {
+    Zero,
+    Empty(S),
+    Loaded(S),
+}
 
-pub struct RenderManagerState<R>(LoadingState<AsnWinitState<R>>)
+pub struct App<R>
 where
-    R: WinitRenderManager;
-
-impl<R> fmt::Display for RenderManagerState<R>
-where
-    R: WinitRenderManager,
+    R: WinitRenderManager + 'static,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
+    pub s: RenderManagerState<R>,
+    proxy: EventLoopProxy<UserEvents<R>>,
 }
 
 use asn_gui_core::AsnGuiWindowConfig;
-use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
+use winit::{
+    application::ApplicationHandler,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, EventLoopProxy},
+};
 
-use crate::{WinitRenderManager, asn_winit_state::AsnWinitState, winit_utils::new_window};
+use crate::{WinitRenderManager, winit_utils::new_window};
 
 use asn_logger::log::*;
 
-pub fn new_state<R>(r: R) -> RenderManagerState<R>
+#[derive(Debug)]
+#[allow(dead_code)]
+pub enum UserEvents<W: WinitRenderManager> {
+    UploadManager(W),
+    Zero,
+}
+
+pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents<R>>) -> App<R>
 where
     R: WinitRenderManager,
 {
-    let s = AsnWinitState { r, is_init: false };
-    RenderManagerState(LoadingState::Empty(s))
+    let s = RenderManagerState::Empty(r);
+    App { s, proxy }
 }
 
 // Блок методов для обработки различных событий приложения
-impl<R> RenderManagerState<R>
+impl<R> App<R>
 where
     R: WinitRenderManager,
 {
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        if let LoadingState::Empty(ref mut r) = self.0 {
-            let conf = AsnGuiWindowConfig::default();
-            let w = new_window(event_loop, &conf).unwrap();
-            r.r.init(Arc::new(w)).unwrap();
+        if let RenderManagerState::Empty(_) = self.s {
+            let r = std::mem::replace(&mut self.s, RenderManagerState::Zero);
+            if let RenderManagerState::Empty(mut r) = r {
+                let conf = AsnGuiWindowConfig::default();
+                let w = new_window(event_loop, &conf).unwrap();
+                r.init(Arc::new(w)).unwrap();
 
-            let s = set_state_loaded(&mut self.0);
-            self.0 = s;
+                match self.proxy.send_event(UserEvents::UploadManager(r)) {
+                    Ok(_) => {
+                        self.s = RenderManagerState::Zero;
+                    }
+                    Err(err) => {
+                        error!("handle_resumed error: {err}");
+                    }
+                };
+            }
         }
     }
 
     /// Обрабатывает запрос на закрытие приложения
     pub fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         info!("Application close requested");
-        self.0 = LoadingState::Zero;
+        self.s = RenderManagerState::Zero;
         event_loop.exit();
     }
 
     /// Обрабатывает событие изменения размера окна
     pub fn handle_resize(&mut self, width: u32, height: u32) {
         trace!("Resizing window to {width}x{height}");
-        if let LoadingState::Loaded(ref mut r) = self.0 {
-            match r.r.resize(width, height) {
+        if let RenderManagerState::Loaded(ref mut r) = self.s {
+            match r.resize(width, height) {
                 Ok(_) => {}
                 Err(err) => {
-                    error!("handle_redraw draw failed: {err}");
+                    error!("handle_resize failed: {err}");
+                    // При критической ошибке устанавливаем состояние в Zero
+                    self.s = RenderManagerState::Zero;
                 }
             }
         }
@@ -73,13 +94,22 @@ where
 
     /// Обрабатывает запрос на перерисовку окна
     pub fn handle_redraw(&mut self) {
-        if let LoadingState::Loaded(ref mut r) = self.0 {
-            match r.r.draw() {
+        if let RenderManagerState::Loaded(ref mut r) = self.s {
+            match r.draw() {
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
+                    // При критической ошибке устанавливаем состояние в Zero
+                    self.s = RenderManagerState::Zero;
                 }
             }
+        }
+    }
+
+    pub fn handle_user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvents<R>) {
+        let _ = event_loop;
+        if let UserEvents::UploadManager(r) = event {
+            self.s = RenderManagerState::Loaded(r);
         }
     }
 }
@@ -87,14 +117,19 @@ where
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
 // Блок реализации ApplicationHandler
-impl<R> ApplicationHandler for RenderManagerState<R>
+impl<R> ApplicationHandler<UserEvents<R>> for App<R>
 where
     R: WinitRenderManager,
 {
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvents<R>) {
+        trace!("ApplicationHandler user_event");
+        self.handle_user_event(event_loop, event);
+    }
+
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        trace!("ApplicationHandler resumed: {self}");
+        trace!("ApplicationHandler resumed");
         self.handle_resumed(event_loop);
-        trace!("ApplicationHandler resumed: {self}");
+        trace!("ApplicationHandler resumed");
     }
 
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
