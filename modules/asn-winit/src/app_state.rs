@@ -61,19 +61,11 @@ where
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if let RenderManagerState::Empty(ref mut r) = self.s {
-            // Take ownership of the value by replacing it with a temporary value
-            // let RenderManagerState::Empty(mut r) =
-            // std::mem::replace(&mut self.s, RenderManagerState::Zero)
-            // else {
-            // unreachable!()
-            // };
-
             let conf = AsnGuiWindowConfig::default();
             let w = new_window(event_loop, &conf).unwrap();
             r.init(Arc::new(w)).unwrap();
 
-            let m = RenderManagerState::Loaded(r);
-            self.proxy.send_event(UserEvents::Zero).unwrap();
+            self.proxy.send_event(UserEvents::UploadManager(r)).unwrap();
             self.s = RenderManagerState::Zero;
         }
     }
