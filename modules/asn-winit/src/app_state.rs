@@ -12,7 +12,7 @@ pub enum RenderManagerState<S> {
 
 pub struct App<R>
 where
-    R: WinitRenderManager + 'static + std::fmt::Debug,
+    R: WinitRenderManager + 'static,
 {
     pub s: RenderManagerState<R>,
     proxy: EventLoopProxy<UserEvents<R>>,
@@ -40,14 +40,15 @@ use crate::{WinitRenderManager, winit_utils::new_window};
 use asn_logger::log::*;
 
 #[derive(Debug)]
-pub enum UserEvents<W: WinitRenderManager + std::fmt::Debug> {
-    Zero,
+#[allow(dead_code)]
+pub enum UserEvents<W: WinitRenderManager> {
     UploadManager(W),
+    Zero,
 }
 
 pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents<R>>) -> App<R>
 where
-    R: WinitRenderManager + std::fmt::Debug,
+    R: WinitRenderManager,
 {
     let s = RenderManagerState::Empty(r);
     App { s, proxy }
@@ -56,7 +57,7 @@ where
 // Блок методов для обработки различных событий приложения
 impl<R> App<R>
 where
-    R: WinitRenderManager + std::fmt::Debug,
+    R: WinitRenderManager,
 {
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
@@ -108,6 +109,13 @@ where
             }
         }
     }
+
+    pub fn handle_user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvents<R>) {
+        let _ = event_loop;
+        if let UserEvents::UploadManager(r) = event {
+            self.s = RenderManagerState::Loaded(r);
+        }
+    }
 }
 
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
@@ -115,8 +123,13 @@ where
 // Блок реализации ApplicationHandler
 impl<R> ApplicationHandler<UserEvents<R>> for App<R>
 where
-    R: WinitRenderManager + std::fmt::Debug,
+    R: WinitRenderManager,
 {
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvents<R>) {
+        trace!("ApplicationHandler user_event");
+        self.handle_user_event(event_loop, event);
+    }
+
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         trace!("ApplicationHandler resumed");
         self.handle_resumed(event_loop);
