@@ -24,18 +24,18 @@ use crate::app_state::UserEvents;
 
 pub type WinitWindow = winit::window::Window;
 
-pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> {}
+pub trait WinitRenderManager: TAsnRenderManager<Window = WinitWindow> + std::fmt::Debug {}
 
 // Blanket implementation
-impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> {}
+impl<T> WinitRenderManager for T where T: TAsnRenderManager<Window = WinitWindow> + std::fmt::Debug {}
 
 pub fn run<R>(r: R) -> Result<(), AsnWinitError>
 where
-    R: WinitRenderManager,
+    R: WinitRenderManager + std::fmt::Debug + 'static,
 {
     m_info!("run()");
 
-    let event_loop = winit::event_loop::EventLoop::<(UserEvents)>::with_user_event()
+    let event_loop = winit::event_loop::EventLoop::<UserEvents<R>>::with_user_event()
         .build()
         .map_err(|e| event_loop_creation_error(format!("Failed to create event loop: {e}")))?;
 

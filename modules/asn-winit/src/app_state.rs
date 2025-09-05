@@ -12,7 +12,7 @@ pub enum RenderManagerState<S> {
 
 pub struct App<R>
 where
-    R: WinitRenderManager,
+    R: WinitRenderManager + 'static + std::fmt::Debug,
 {
     pub s: RenderManagerState<R>,
     proxy: EventLoopProxy<UserEvents<R>>,
@@ -40,14 +40,14 @@ use crate::{WinitRenderManager, winit_utils::new_window};
 use asn_logger::log::*;
 
 #[derive(Debug)]
-pub enum UserEvents<W: WinitRenderManager> {
+pub enum UserEvents<W: WinitRenderManager + std::fmt::Debug> {
     Zero,
     UploadManager(W),
 }
 
 pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents<R>>) -> App<R>
 where
-    R: WinitRenderManager,
+    R: WinitRenderManager + std::fmt::Debug,
 {
     let s = RenderManagerState::Empty(r);
     App { s, proxy }
@@ -56,17 +56,20 @@ where
 // Блок методов для обработки различных событий приложения
 impl<R> App<R>
 where
-    R: WinitRenderManager,
+    R: WinitRenderManager + std::fmt::Debug,
 {
     /// Обрабатывает событие возобновления работы приложения
     pub fn handle_resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        if let RenderManagerState::Empty(ref mut r) = self.s {
-            let conf = AsnGuiWindowConfig::default();
-            let w = new_window(event_loop, &conf).unwrap();
-            r.init(Arc::new(w)).unwrap();
+        if let RenderManagerState::Empty(_) = self.s {
+            let r = std::mem::replace(&mut self.s, RenderManagerState::Zero);
+            if let RenderManagerState::Empty(mut r) = r {
+                let conf = AsnGuiWindowConfig::default();
+                let w = new_window(event_loop, &conf).unwrap();
+                r.init(Arc::new(w)).unwrap();
 
-            self.proxy.send_event(UserEvents::UploadManager(r)).unwrap();
-            self.s = RenderManagerState::Zero;
+                self.proxy.send_event(UserEvents::UploadManager(r)).unwrap();
+                // Не устанавливаем состояние в Zero, так как оно будет изменено при обработке события UploadManager
+            }
         }
     }
 
@@ -85,6 +88,8 @@ where
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_resize failed: {err}");
+                    // При критической ошибке устанавливаем состояние в Zero
+                    self.s = RenderManagerState::Zero;
                 }
             }
         }
@@ -97,6 +102,8 @@ where
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_redraw draw failed: {err}");
+                    // При критической ошибке устанавливаем состояние в Zero
+                    self.s = RenderManagerState::Zero;
                 }
             }
         }
@@ -108,7 +115,7 @@ where
 // Блок реализации ApplicationHandler
 impl<R> ApplicationHandler<UserEvents<R>> for App<R>
 where
-    R: WinitRenderManager,
+    R: WinitRenderManager + std::fmt::Debug,
 {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         trace!("ApplicationHandler resumed");
