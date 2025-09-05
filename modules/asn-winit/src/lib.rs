@@ -8,7 +8,7 @@ mod keyboard_handler;
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
-use winit::event_loop::{ControlFlow, EventLoopProxy};
+use winit::event_loop::ControlFlow;
 
 mod app_state;
 mod winit_utils;
