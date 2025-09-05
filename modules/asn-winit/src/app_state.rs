@@ -28,16 +28,25 @@ impl<S> fmt::Display for RenderManagerState<S> {
 }
 
 use asn_gui_core::AsnGuiWindowConfig;
-use winit::{application::ApplicationHandler, event::WindowEvent, event_loop::ActiveEventLoop};
+use winit::{
+    application::ApplicationHandler,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, EventLoopProxy},
+};
 
 use crate::{WinitRenderManager, winit_utils::new_window};
 
 use asn_logger::log::*;
 
-pub fn new_state<R>(r: R) -> App<R>
+pub enum UserEvents {
+    Zero,
+}
+
+pub fn new_state<R>(r: R, proxy: EventLoopProxy<UserEvents>) -> App<R>
 where
     R: WinitRenderManager,
 {
+    let _ = proxy;
     let s = RenderManagerState::Empty(r);
     App { s }
 }
@@ -102,7 +111,7 @@ where
 // don't change new_state(r) to new_state(f: FnOnce() -> R) -  we need external render manager for start_frame()/end_frame()
 
 // Блок реализации ApplicationHandler
-impl<R> ApplicationHandler for App<R>
+impl<R> ApplicationHandler<UserEvents> for App<R>
 where
     R: WinitRenderManager,
 {

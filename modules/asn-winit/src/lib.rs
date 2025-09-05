@@ -8,7 +8,7 @@ mod keyboard_handler;
 use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use data::LOG_MODULE_NAME;
-use winit::event_loop::ControlFlow;
+use winit::event_loop::{ControlFlow, EventLoopProxy};
 
 mod app_state;
 mod winit_utils;
@@ -19,6 +19,8 @@ pub use winit;
 
 use app_state::new_state;
 use error::event_loop_creation_error;
+
+use crate::app_state::UserEvents;
 
 pub type WinitWindow = winit::window::Window;
 
@@ -33,12 +35,13 @@ where
 {
     m_info!("run()");
 
-    let mut runner = new_state(r);
-
-    let event_loop = winit::event_loop::EventLoop::new()
+    let event_loop = winit::event_loop::EventLoop::<(UserEvents)>::with_user_event()
+        .build()
         .map_err(|e| event_loop_creation_error(format!("Failed to create event loop: {e}")))?;
 
-    let proxy = Some(event_loop.create_proxy());
+    let proxy = event_loop.create_proxy();
+
+    let mut runner = new_state(r, proxy);
 
     event_loop.set_control_flow(ControlFlow::Poll);
     let result = event_loop.run_app(&mut runner);
