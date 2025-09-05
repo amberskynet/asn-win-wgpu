@@ -99,9 +99,17 @@
             margin-right: 8px;
         }
 
-        .status-ready { background: #28a745; }
-        .status-loading { background: #ffc107; }
-        .status-error { background: #dc3545; }
+        .status-ready {
+            background: #28a745;
+        }
+
+        .status-loading {
+            background: #ffc107;
+        }
+
+        .status-error {
+            background: #dc3545;
+        }
 
         .button-group {
             margin: 20px 0;
@@ -154,14 +162,14 @@
     </div>
 
     <script type="module">
-        import init, { 
-            init_web_app, 
-            greet, 
-            get_version, 
-            get_system_info, 
-            calculate_fibonacci, 
-            get_memory_usage, 
-            test_async_operation 
+        import init, {
+            init_web_app,
+            greet,
+            get_version,
+            get_system_info,
+            calculate_fibonacci,
+            get_memory_usage,
+            test_async_operation
         } from './pkg/ex_web.js';
 
         // Глобальные переменные состояния
@@ -173,7 +181,7 @@
             const output = document.getElementById('output');
             const timestamp = new Date().toLocaleTimeString();
             const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
-            
+
             const logEntry = document.createElement('div');
             logEntry.className = className;
             logEntry.innerHTML = `
@@ -186,7 +194,7 @@
         function updateStatus(status, text) {
             const indicator = document.getElementById('statusIndicator');
             const statusText = document.getElementById('statusText');
-            
+
             indicator.className = `status-indicator status-${status}`;
             statusText.textContent = text;
         }
@@ -203,17 +211,17 @@
         try {
             logMessage('🔄 Загрузка WASM модуля...', 'info');
             updateStatus('loading', 'Загрузка WASM...');
-            
+
             await init();
             wasmInitialized = true;
             updateStatus('ready', 'Готов к работе');
             logMessage('✅ WASM модуль загружен успешно!', 'success');
-            
+
             // Включаем кнопки после успешной загрузки
             setButtonState('initApp', true);
             setButtonState('getVersion', true);
             setButtonState('greetUser', true);
-            
+
         } catch (error) {
             updateStatus('error', 'Ошибка загрузки');
             logMessage(`❌ Ошибка загрузки WASM модуля: ${error.message}`, 'error');
@@ -231,22 +239,22 @@
                 setButtonState('initApp', false);
                 logMessage('🔄 Инициализация приложения...', 'info');
                 updateStatus('loading', 'Инициализация...');
-                
+
                 await init_web_app();
                 appInitialized = true;
                 updateStatus('ready', 'Приложение готово');
                 logMessage('✅ Приложение инициализировано успешно!', 'success');
-                
+
             } catch (error) {
                 updateStatus('error', 'Ошибка инициализации');
-                
+
                 if (error.message && error.message.startsWith("Using exceptions for control flow,")) {
                     // Это нормальное поведение для некоторых WASM функций
                     logMessage('ℹ️ Инициализация завершена (исключение для управления потоком)', 'info');
                     appInitialized = true;
                     updateStatus('ready', 'Приложение готово');
                 } else {
-                    logMessage(`❌ Ошибка инициализации: ${error.message}`, 'error');
+                    logMessage(`❌ Ошибка инициализации: ${error}`, 'error');
                     console.error('App initialization error:', error);
                 }
             } finally {
@@ -311,7 +319,7 @@
                 const result = calculate_fibonacci(40);
                 const endTime = performance.now();
                 const duration = (endTime - startTime).toFixed(2);
-                
+
                 logMessage(`🧮 Число Фибоначчи(40) = ${result} (вычислено за ${duration}мс)`, 'success');
             } catch (error) {
                 logMessage(`❌ Ошибка вычисления Фибоначчи: ${error.message}`, 'error');
@@ -351,12 +359,12 @@
         };
 
         // Обработка ошибок на уровне страницы
-        window.addEventListener('error', function(event) {
+        window.addEventListener('error', function (event) {
             logMessage(`❌ Глобальная ошибка: ${event.error?.message || event.message}`, 'error');
             console.error('Global error:', event.error);
         });
 
-        window.addEventListener('unhandledrejection', function(event) {
+        window.addEventListener('unhandledrejection', function (event) {
             logMessage(`❌ Необработанное отклонение Promise: ${event.reason}`, 'error');
             console.error('Unhandled promise rejection:', event.reason);
         });
