@@ -7,16 +7,16 @@ pub fn setup_log() -> Result<(), String> {
     };
 
     c.module_levels
-        .insert(String::from("wgpu_core"), AsnLogLevel::Error);
+        .insert(String::from("wgpu_core"), AsnLogLevel::Trace);
     c.module_levels
-        .insert(String::from("wgpu_hal"), AsnLogLevel::Error);
+        .insert(String::from("wgpu_hal"), AsnLogLevel::Trace);
     c.module_levels
-        .insert(String::from("naga"), AsnLogLevel::Error);
+        .insert(String::from("naga"), AsnLogLevel::Trace);
     c.module_levels
-        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Error);
+        .insert(String::from("asn-win-wgpu"), AsnLogLevel::Trace);
 
     c.module_levels
-        .insert(String::from("wgpu_map"), AsnLogLevel::Error);
+        .insert(String::from("wgpu_map"), AsnLogLevel::Trace);
 
     init_log(&c)
 }
