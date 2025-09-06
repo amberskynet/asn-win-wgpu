@@ -27,7 +27,7 @@ use winit::{
 
 use crate::{WinitRenderManager, winit_utils::new_window};
 
-use asn_logger::{log::*, m_error};
+use asn_logger::log::*;
 
 #[derive(Debug)]
 #[allow(dead_code)]
