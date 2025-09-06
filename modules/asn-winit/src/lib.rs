@@ -43,6 +43,7 @@ where
 
     let proxy = event_loop.create_proxy();
 
+    #[allow(unused_mut)]
     let mut runner = new_state(r, proxy);
 
     event_loop.set_control_flow(ControlFlow::Poll);
