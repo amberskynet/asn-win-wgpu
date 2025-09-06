@@ -11,19 +11,19 @@ impl TAsnRenderManager for MyRenderManager {
 
     fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
         let _ = w;
-        println!("init");
+        m_info!("init");
         Ok(())
     }
 
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
         let _ = height;
         let _ = width;
-        println!("resize");
+        m_info!("resize");
         Ok(())
     }
 
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("draw");
+        m_info!("draw");
         Ok(())
     }
 }
