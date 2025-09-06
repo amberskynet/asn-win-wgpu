@@ -36,24 +36,19 @@ pub fn new_window(
 
     #[cfg(target_arch = "wasm32")]
     {
+        use wasm_bindgen::JsCast;
+        use wasm_bindgen::UnwrapThrowExt;
         use winit::platform::web::WindowAttributesExtWebSys;
-        window_attributes = window_attributes.with_append(true);
+
+        const CANVAS_ID: &str = "asn-canvas";
+
+        let window = web_sys::window().unwrap_throw();
+        let document = window.document().unwrap_throw();
+        let canvas = document.get_element_by_id(CANVAS_ID).unwrap_throw();
+        let html_canvas_element = canvas.unchecked_into();
+        window_attributes = window_attributes.with_canvas(Some(html_canvas_element));
+        m_info!("window_attributes: {:?}", window_attributes);
     }
-
-    // {
-    //     use wasm_bindgen::JsCast;
-    //     use wasm_bindgen::UnwrapThrowExt;
-    //     use winit::platform::web::WindowAttributesExtWebSys;
-
-    //     const CANVAS_ID: &str = "asn-canvas";
-
-    //     let window = web_sys::window().unwrap_throw();
-    //     let document = window.document().unwrap_throw();
-    //     let canvas = document.get_element_by_id(CANVAS_ID).unwrap_throw();
-    //     let html_canvas_element = canvas.unchecked_into();
-    //     window_attributes = window_attributes.with_canvas(Some(html_canvas_element));
-    //     m_info!("window_attributes: {:?}", window_attributes);
-    // }
 
     let window = match event_loop.create_window(window_attributes) {
         Ok(window) => window,
