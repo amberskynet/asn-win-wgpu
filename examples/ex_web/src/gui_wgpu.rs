@@ -2,7 +2,7 @@ use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
-const LOG_MODULE_NAME: &str = "gui_empty";
+const LOG_MODULE_NAME: &str = "gui_wgpu";
 
 struct MyRenderManager {}
 
