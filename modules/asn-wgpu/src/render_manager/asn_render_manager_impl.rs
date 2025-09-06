@@ -59,7 +59,8 @@ where
     type Window = WinitWindow;
 
     fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        info!("RenderManager init...");
+        info!("RenderManager init2...");
+
         let context = pollster::block_on(WgpuGraphContext::new(w)).map_err(|e| {
             m_error!("Failed to create GPU state: {e}");
             render_error(&format!("init error: {e}"))

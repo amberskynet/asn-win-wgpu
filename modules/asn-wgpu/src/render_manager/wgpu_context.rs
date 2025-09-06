@@ -125,7 +125,7 @@ impl WgpuGraphContext {
             config,
         };
 
-        w.resize(size.width, size.height)?;
+        w.resize(width, height)?;
 
         Ok(w)
     }

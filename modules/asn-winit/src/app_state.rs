@@ -57,13 +57,14 @@ where
                 let conf = AsnGuiWindowConfig::default();
                 let w = new_window(event_loop, &conf).unwrap();
 
-                match r.init(Arc::new(w)) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        error!("RenderManagerState init error: {e}");
-                        return;
-                    }
-                }
+                r.init(Arc::new(w)).unwrap();
+                // match r.init(Arc::new(w)) {
+                //     Ok(_) => {}
+                //     Err(e) => {
+                //         error!("RenderManagerState init error: {e}");
+                //         return;
+                //     }
+                // }
 
                 match self.proxy.send_event(UserEvents::UploadManager(r)) {
                     Ok(_) => {
