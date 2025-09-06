@@ -2,10 +2,8 @@ use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
-#[allow(dead_code)]
-const LOG_MODULE_NAME: &str = "gui_wgpu";
+const LOG_MODULE_NAME: &str = "gui_empty";
 
-#[allow(dead_code)]
 struct MyRenderManager {}
 
 impl TAsnRenderManager for MyRenderManager {
@@ -30,7 +28,6 @@ impl TAsnRenderManager for MyRenderManager {
     }
 }
 
-#[allow(dead_code)]
 pub fn run_gui() {
     let r = MyRenderManager {};
 
