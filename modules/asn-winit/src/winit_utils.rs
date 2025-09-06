@@ -5,7 +5,7 @@ use asn_logger::{m_error, m_info};
 use crate::data::LOG_MODULE_NAME;
 use crate::error::{AsnWinitError, window_creation_error};
 use winit::event_loop::ActiveEventLoop;
-use winit::window::{Window, WindowAttributes};
+use winit::window::Window;
 
 /// Создает новое окно с заданной конфигурацией
 ///

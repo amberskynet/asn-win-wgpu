@@ -19,6 +19,8 @@ pub struct WgpuGraphContext {
 
 impl WgpuGraphContext {
     pub async fn new(window: Arc<WinitWindow>) -> Result<Self, StateError> {
+        m_trace!("new...");
+
         // if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
         //     return Err(StateError::InvalidWindowSize {
         //         width: size.width,
