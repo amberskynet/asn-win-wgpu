@@ -1,4 +1,5 @@
 use asn_logger::log::info;
+mod gui;
 mod gui_empty;
 mod gui_wgpu;
 mod log_utils;
@@ -10,7 +11,8 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::console;
 
-use crate::gui_wgpu::run_gui;
+use crate::gui::run_gui;
+// use crate::gui_wgpu::run_gui;
 // use crate::gui_empty::run_gui;
 
 #[wasm_bindgen]
