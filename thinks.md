@@ -8,6 +8,8 @@ asn-winit -> asn-wgpu -> [wgpu-handler]draw(wgpu_context)
             -> [wgpu-handler]
 
 
+Сделать run и run_web двумя разными функциями модуля (!)
+
 // как заполнять gui-компоненты до вызова init ?
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
@@ -37,4 +39,7 @@ modules, некоторые из них - это то, что должно в б
 не забыть про реализацию под web :)
 в будущем подумать над hot-reload....
 
+Для web нужно переходить на event_proxy для однократного асинхронного вызова инициализации окна
+
 Перейдем на event_proxy (?) - будем передавать событие UserEvent::Exit (?)
+

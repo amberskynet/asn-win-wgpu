@@ -11,6 +11,7 @@ help:
 	@echo "==================="
 	@echo "Available targets:"
 	@echo "  web      - Build the web example using wasm-pack"
+	@echo "  web-clean - Build the web example with clean"
 	@echo "  run-web  - Run the web example (builds if necessary)"
 	@echo "  clean-web - Clean the web example build artifacts"
 	@echo "  help     - Show this help message"
@@ -26,6 +27,12 @@ web:
 run-web:
 	@echo "🚀 Running web example..."
 	@cd examples/ex_web && ./run.sh
+
+# Web build with clean target
+.PHONY: web-clean
+web-clean:
+	@echo "🚀 Building web example with clean..."
+	@cd examples/ex_web && ./build.sh --clean
 
 # Web clean target
 .PHONY: clean-web

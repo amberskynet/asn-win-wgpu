@@ -11,10 +11,14 @@ license = "MIT"
 [lib]
 crate-type = ["cdylib"]
 
+[build]
+target = "wasm32-unknown-unknown"
+
 [dependencies]
 asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "3.1.0", features = [] }
 asn-gui-core = { path = "../../modules/asn-gui-core" }
 asn-winit = { path = "../../modules/asn-winit" }
+asn-wgpu = { path = "../../modules/asn-wgpu" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
