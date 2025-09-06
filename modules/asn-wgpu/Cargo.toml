@@ -12,6 +12,7 @@ thiserror = "2.0"
 anyhow = "1.0.98"
 bytemuck = { version = "1.23", features = ["derive"] }
 pollster = "0.4"
+web-time = "1.0"
 
 [dependencies.image]
 version = "0.25"

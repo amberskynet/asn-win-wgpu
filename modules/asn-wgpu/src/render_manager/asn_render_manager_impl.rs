@@ -121,7 +121,7 @@ where
                 .render_stats
                 .total_render_time
                 .checked_div(frame_count)
-                .unwrap_or(std::time::Duration::new(0, 0));
+                .unwrap_or(web_time::Duration::new(0, 0));
             let fps = 1.0 / avg_frame_time.as_secs_f64();
             m_trace!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time);
         }

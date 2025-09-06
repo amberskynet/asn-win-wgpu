@@ -27,7 +27,7 @@ struct RenderStats {
     /// Количество отрендеренных кадров
     frame_count: u64,
     /// Общее время рендеринга
-    total_render_time: std::time::Duration,
+    total_render_time: web_time::Duration,
 }
 
 impl<H> RenderManager<H>
@@ -40,7 +40,7 @@ where
             h: h.clone(),
             render_stats: RenderStats {
                 frame_count: 0,
-                total_render_time: std::time::Duration::new(0, 0),
+                total_render_time: web_time::Duration::new(0, 0),
             },
         }
     }

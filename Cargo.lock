@@ -176,6 +176,7 @@ dependencies = [
  "pollster",
  "rand",
  "thiserror 2.0.16",
+ "web-time",
  "wgpu",
 ]
 
