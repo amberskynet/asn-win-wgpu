@@ -18,6 +18,7 @@ pub fn new_window(
     event_loop: &ActiveEventLoop,
     conf: &AsnGuiWindowConfig,
 ) -> Result<Window, AsnWinitError> {
+    #[allow(unused_mut)]
     let mut window_attributes = WindowAttributes::default()
         .with_title(&conf.window_title)
         .with_inner_size(winit::dpi::LogicalSize::new(
