@@ -76,6 +76,7 @@ where
     }
 
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        m_info!("resize {width}, {height}");
         let s = ensure_initialized_mut(self)?;
         s.resize(width, height)
             .map_err(|e| render_error(&format!("resize error - {e}")))?;
