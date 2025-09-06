@@ -1,50 +1,36 @@
+use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
-use std::sync::{Arc, Mutex};
+use asn_winit::WinitWindow;
 
 #[allow(dead_code)]
 const LOG_MODULE_NAME: &str = "gui_empty";
 
-mod dummy_gui {
-    use asn_logger::*;
-    pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
+struct MyRenderManager {}
 
-    pub struct DummyGuiHandler {}
+impl TAsnRenderManager for MyRenderManager {
+    type Window = WinitWindow;
 
-    use asn_gui_core::TAsnGuiHandler;
-    use asn_wgpu::{WgpuGuiHandler, render_manager};
-
-    impl TAsnGuiHandler for DummyGuiHandler {
-        fn init(&mut self, gcx: &Self::GraphContext) {
-            let _ = gcx;
-            m_info!("init");
-        }
-
-        fn update(&mut self, gcx: &Self::GraphContext) {
-            let _ = gcx;
-            m_info!("update");
-        }
-
-        fn draw(&mut self, fcx: &mut Self::FrameContext) {
-            let _ = fcx;
-            m_info!("draw");
-        }
-
-        type GraphContext = render_manager::WgpuGraphContext;
-        type FrameContext = render_manager::WgpuFrameContext;
+    fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
+        let _ = w;
+        m_info!("init");
+        Ok(())
     }
 
-    pub fn get_handler() -> impl WgpuGuiHandler {
-        DummyGuiHandler {}
+    fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
+        let _ = height;
+        let _ = width;
+        m_info!("resize");
+        Ok(())
+    }
+
+    fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        m_info!("draw");
+        Ok(())
     }
 }
 
-#[allow(dead_code)]
 pub fn run_gui() {
-    let h = dummy_gui::get_handler();
-
-    let h_safe = Arc::new(Mutex::new(h));
-
-    let r = asn_wgpu::get_manager(h_safe);
+    let r = MyRenderManager {};
 
     match asn_winit::run(r) {
         Ok(_) => {

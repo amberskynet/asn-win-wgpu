@@ -36,10 +36,14 @@ if ! rustup target list --installed | grep -q "wasm32-unknown-unknown"; then
     rustup target add wasm32-unknown-unknown
 fi
 
-# Clean previous builds
-echo -e "${BLUE}🧹 Cleaning previous builds...${NC}"
-rm -rf target/wasm32-unknown-unknown
-rm -rf pkg
+# Clean previous builds (optional)
+# Run with --clean flag to remove previous builds:
+# ./build.sh --clean
+if [ "$1" = "--clean" ]; then
+    echo -e "${BLUE}🧹 Cleaning previous builds...${NC}"
+    rm -rf target/wasm32-unknown-unknown
+    rm -rf pkg
+fi
 
 # Build for wasm32-unknown-unknown target
 echo -e "${BLUE}🔨 Building for WASM target...${NC}"

@@ -11,7 +11,7 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::console;
 
 // use crate::gui_empty::run_gui;
-use crate::gui_wgpu::run_gui;
+use crate::gui_empty::run_gui;
 
 #[wasm_bindgen]
 pub fn init_web_app() -> Result<(), JsValue> {
