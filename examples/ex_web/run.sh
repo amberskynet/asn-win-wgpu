@@ -17,6 +17,11 @@ if [ ! -f "Cargo.toml" ]; then
     exit 1
 fi
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" &> /dev/null
+}
+
 # Check if web build exists
 if [ ! -d "pkg" ]; then
     echo -e "${YELLOW}⚠️  Web build not found. Building first...${NC}"
@@ -38,7 +43,7 @@ if [ ! -f "pkg/ex_web.js" ] || [ ! -f "pkg/ex_web_bg.wasm" ]; then
 fi
 
 # Check if Python is available
-if ! command -v python3 &> /dev/null; then
+if ! command_exists python3; then
     echo -e "${RED}❌ Python3 is not installed or not in PATH${NC}"
     echo -e "${YELLOW}💡 Please install Python3 to run the HTTP server${NC}"
     exit 1
@@ -46,9 +51,14 @@ fi
 
 # Find available port
 PORT=8091
+MAX_PORT=8191
 while lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; do
     echo -e "${YELLOW}⚠️  Port $PORT is in use, trying $((PORT+1))...${NC}"
     PORT=$((PORT+1))
+    if [ $PORT -gt $MAX_PORT ]; then
+        echo -e "${RED}❌ No available ports found between $PORT and $MAX_PORT${NC}"
+        exit 1
+    fi
 done
 
 echo -e "${GREEN}✅ Build verified successfully!${NC}"
@@ -58,11 +68,15 @@ echo -e "${BLUE}📱 Open your browser and navigate to: ${GREEN}http://localhost
 echo -e "${YELLOW}🛑 Press Ctrl+C to stop the server${NC}"
 echo ""
 
-# Try to open browser automatically (macOS)
-if command -v open &> /dev/null; then
+# Try to open browser automatically
+if command_exists open; then
     echo -e "${BLUE}🔗 Opening browser automatically...${NC}"
     sleep 2
     open "http://localhost:$PORT" &
+elif command_exists xdg-open; then
+    echo -e "${BLUE}🔗 Opening browser automatically...${NC}"
+    sleep 2
+    xdg-open "http://localhost:$PORT" &
 fi
 
 # Start HTTP server
