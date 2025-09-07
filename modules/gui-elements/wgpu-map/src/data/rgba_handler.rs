@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 #[cfg(not(target_arch = "wasm32"))]
 use rand::Rng;
 
@@ -206,7 +205,7 @@ impl RgbaHandler {
     ///
     /// # Возвращает
     ///
-    /// `Result<(u32, u32, u32), String>` - RGBA значения или ошибка
+    /// `Result<(u32, u32, u32, u32), String>` - RGBA значения или ошибка
     ///
     /// # Ошибки
     ///
@@ -405,10 +404,11 @@ impl RgbaHandler {
     #[cfg(target_arch = "wasm32")]
     pub fn fill_random_range(&mut self, min_value: u32, max_value: u32, alpha: u32) {
         // Для WASM используем простую последовательность вместо случайных чисел
+        let range = (max_value - min_value + 1) as usize;
         for i in (0..self.data.len()).step_by(4) {
-            self.data[i] = min_value + ((i * 7) % (max_value - min_value + 1)) as u32; // R
-            self.data[i + 1] = min_value + ((i * 13) % (max_value - min_value + 1)) as u32; // G
-            self.data[i + 2] = min_value + ((i * 17) % (max_value - min_value + 1)) as u32; // B
+            self.data[i] = min_value + ((i * 7) % range) as u32; // R
+            self.data[i + 1] = min_value + ((i * 13) % range) as u32; // G
+            self.data[i + 2] = min_value + ((i * 17) % range) as u32; // B
             self.data[i + 3] = alpha; // A
         }
     }
