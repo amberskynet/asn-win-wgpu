@@ -1,8 +1,9 @@
 use asn_wgpu::WgpuGraphContext;
-use std::time::Instant;
 use wgpu_map::{MapParams, MapTilesParams, WgpuMap};
 
 use crate::gui_handler::map_utils::generate_random_map;
+use crate::gui_handler::time::Instant;
+
 pub struct GuiHandlerState {
     pub m: WgpuMap,
     pub map_width: u32,
