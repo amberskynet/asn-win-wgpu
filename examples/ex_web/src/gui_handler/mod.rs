@@ -1,6 +1,5 @@
 use asn_logger::*;
 pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
-pub const LOOP_MILLIS: u64 = 16; // Примерно 60 FPS
 
 mod gui_handler_state;
 mod map_utils;

@@ -4,6 +4,8 @@ use wgpu_map::{MapParams, MapTilesParams, WgpuMap};
 use crate::gui_handler::map_utils::generate_random_map;
 use crate::gui_handler::time::Instant;
 
+pub const LOOP_MILLIS: u128 = 16;
+
 pub struct GuiHandlerState {
     pub m: WgpuMap,
     pub map_width: u32,
@@ -15,7 +17,7 @@ pub struct GuiHandlerState {
 impl GuiHandlerState {
     pub fn update(&mut self) {
         let now = Instant::now();
-        if now.duration_since(self.last_update).as_millis() >= super::LOOP_MILLIS as u128 {
+        if now.duration_since(self.last_update).as_millis() >= LOOP_MILLIS as u128 {
             self.last_update = now;
 
             let map = generate_random_map(
