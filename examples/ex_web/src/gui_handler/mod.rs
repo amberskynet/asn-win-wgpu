@@ -1,5 +1,6 @@
 use asn_logger::*;
 pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
+pub const LOOP_MILLIS: u64 = 16; // Примерно 60 FPS
 
 mod gui_handler_state;
 mod map_utils;
@@ -25,6 +26,7 @@ impl TAsnGuiHandler for WebGuiHandler {
 
     fn update(&mut self, gcx: &Self::GraphContext) {
         if let Self::Loaded(h) = self {
+            h.update();
             h.m.update(gcx);
         }
     }
