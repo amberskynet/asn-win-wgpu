@@ -19,15 +19,14 @@ pub struct WgpuGraphContext {
 
 impl WgpuGraphContext {
     pub async fn new(window: Arc<WinitWindow>) -> Result<Self, StateError> {
-        let size = window.inner_size();
-        m_trace!("window size: {size:?}");
+        m_trace!("new...");
 
-        if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
-            return Err(StateError::InvalidWindowSize {
-                width: size.width,
-                height: size.height,
-            });
-        }
+        // if size.width < MIN_WINDOW_SIZE || size.height < MIN_WINDOW_SIZE {
+        //     return Err(StateError::InvalidWindowSize {
+        //         width: size.width,
+        //         height: size.height,
+        //     });
+        // }
 
         // Create GPU instance
         let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
@@ -90,16 +89,24 @@ impl WgpuGraphContext {
 
         m_trace!("surface_format: {:?}", surface_format);
 
+        let size = window.inner_size();
+        m_trace!("window size: {size:?}");
+
+        let width = size.width.max(1);
+        let height = size.height.max(1);
+
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
-            width: size.width,
-            height: size.height,
-            present_mode: surface_caps.present_modes
+            width,
+            height,
+            present_mode: surface_caps
+                .present_modes
                 .first()
                 .copied()
                 .unwrap_or(wgpu::PresentMode::Fifo),
-            alpha_mode: surface_caps.alpha_modes
+            alpha_mode: surface_caps
+                .alpha_modes
                 .first()
                 .copied()
                 .unwrap_or(wgpu::CompositeAlphaMode::Auto),
@@ -118,7 +125,7 @@ impl WgpuGraphContext {
             config,
         };
 
-        w.resize(size.width, size.height)?;
+        w.resize(width, height)?;
 
         Ok(w)
     }

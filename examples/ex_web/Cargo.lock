@@ -160,6 +160,7 @@ dependencies = [
  "pollster",
  "rand",
  "thiserror 2.0.16",
+ "web-time",
  "wgpu",
 ]
 
@@ -560,10 +561,13 @@ dependencies = [
  "asn-logger",
  "asn-wgpu",
  "asn-winit",
+ "getrandom",
  "js-sys",
+ "rand",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "wgpu-map",
 ]
 
 [[package]]
@@ -645,9 +649,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "r-efi",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2280,6 +2286,19 @@ dependencies = [
  "wgpu-types",
  "windows",
  "windows-core 0.58.0",
+]
+
+[[package]]
+name = "wgpu-map"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "asn-core",
+ "asn-gui-core",
+ "asn-wgpu",
+ "bytemuck",
+ "image",
+ "rand",
 ]
 
 [[package]]

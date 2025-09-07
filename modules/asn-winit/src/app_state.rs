@@ -56,7 +56,15 @@ where
             if let RenderManagerState::Empty(mut r) = r {
                 let conf = AsnGuiWindowConfig::default();
                 let w = new_window(event_loop, &conf).unwrap();
+
                 r.init(Arc::new(w)).unwrap();
+                // match r.init(Arc::new(w)) {
+                //     Ok(_) => {}
+                //     Err(e) => {
+                //         error!("RenderManagerState init error: {e}");
+                //         return;
+                //     }
+                // }
 
                 match self.proxy.send_event(UserEvents::UploadManager(r)) {
                     Ok(_) => {

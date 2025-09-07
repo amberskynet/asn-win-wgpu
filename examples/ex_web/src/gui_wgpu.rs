@@ -21,12 +21,12 @@ mod dummy_gui {
 
         fn update(&mut self, gcx: &Self::GraphContext) {
             let _ = gcx;
-            m_info!("update");
+            // m_info!("update");
         }
 
         fn draw(&mut self, fcx: &mut Self::FrameContext) {
             let _ = fcx;
-            m_info!("draw");
+            // m_info!("draw");
         }
 
         type GraphContext = render_manager::WgpuGraphContext;
