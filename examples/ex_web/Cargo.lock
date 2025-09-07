@@ -565,6 +565,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "wgpu-map",
 ]
 
 [[package]]
@@ -2281,6 +2282,19 @@ dependencies = [
  "wgpu-types",
  "windows",
  "windows-core 0.58.0",
+]
+
+[[package]]
+name = "wgpu-map"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "asn-core",
+ "asn-gui-core",
+ "asn-wgpu",
+ "bytemuck",
+ "image",
+ "rand",
 ]
 
 [[package]]

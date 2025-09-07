@@ -1,12 +1,20 @@
 use asn_logger::*;
 pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
 
-pub struct DummyGuiHandler {}
-
+mod gui_handler_state;
 use asn_gui_core::TAsnGuiHandler;
 use asn_wgpu::{WgpuGuiHandler, render_manager};
+use gui_handler_state::GuiHandlerState;
 
-impl TAsnGuiHandler for DummyGuiHandler {
+enum WebGuiHandler {
+    Zero,
+    Loaded(GuiHandlerState),
+}
+
+impl TAsnGuiHandler for WebGuiHandler {
+    type GraphContext = render_manager::WgpuGraphContext;
+    type FrameContext = render_manager::WgpuFrameContext;
+
     fn init(&mut self, gcx: &Self::GraphContext) {
         let _ = gcx;
         m_info!("init");
@@ -21,11 +29,8 @@ impl TAsnGuiHandler for DummyGuiHandler {
         let _ = fcx;
         // m_info!("draw");
     }
-
-    type GraphContext = render_manager::WgpuGraphContext;
-    type FrameContext = render_manager::WgpuFrameContext;
 }
 
 pub fn get_handler() -> impl WgpuGuiHandler {
-    DummyGuiHandler {}
+    WebGuiHandler::Zero
 }
