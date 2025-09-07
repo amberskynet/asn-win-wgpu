@@ -23,6 +23,7 @@ wgpu-map = { path = "../../modules/gui-elements/wgpu-map" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
+rand = "0.9"
 web-sys = { version = "0.3", features = [
     "console",
     "Document",
@@ -34,6 +35,10 @@ web-sys = { version = "0.3", features = [
     "WebGlRenderingContext",
     "WebGl2RenderingContext",
 ] }
+
+[dependencies.getrandom]
+version = "0.3"
+features = ["wasm_js"]
 
 [profile.dev]
 opt-level = 0
