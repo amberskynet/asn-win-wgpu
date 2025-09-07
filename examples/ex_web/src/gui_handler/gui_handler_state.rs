@@ -11,6 +11,10 @@ pub struct GuiHandlerState {
     pub tiles_height: u32,
 }
 
+impl GuiHandlerState {
+    pub fn update(&mut self) {}
+}
+
 pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
     // let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
     // let tiles_width = 64;
