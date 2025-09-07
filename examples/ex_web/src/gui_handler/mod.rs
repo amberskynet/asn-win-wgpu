@@ -3,7 +3,7 @@ pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
 
 mod gui_handler_state;
 mod map_utils;
-use asn_gui_core::TAsnGuiHandler;
+use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
 use asn_wgpu::{WgpuGuiHandler, render_manager};
 use gui_handler_state::GuiHandlerState;
 use gui_handler_state::new_handler_state;
@@ -24,13 +24,15 @@ impl TAsnGuiHandler for WebGuiHandler {
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
-        let _ = gcx;
-        // m_info!("update");
+        if let Self::Loaded(h) = self {
+            h.m.update(gcx);
+        }
     }
 
     fn draw(&mut self, fcx: &mut Self::FrameContext) {
-        let _ = fcx;
-        // m_info!("draw");
+        if let Self::Loaded(h) = self {
+            h.m.draw(fcx);
+        }
     }
 }
 
