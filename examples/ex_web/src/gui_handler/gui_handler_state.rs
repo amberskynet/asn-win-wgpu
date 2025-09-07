@@ -11,20 +11,14 @@ pub struct GuiHandlerState {
     tiles_height: u32,
 }
 
-pub fn new_handler_state() -> GuiHandlerState {
-    GuiHandlerState {
-        m: todo!(),
-        map_width: todo!(),
-        map_height: todo!(),
-        tiles_width: todo!(),
-        tiles_height: todo!(),
-    }
-}
+pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
+    // let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
+    // let tiles_width = 64;
+    // let tiles_height = 95;
 
-fn get_map(gcx: &WgpuGraphContext) -> WgpuMap {
-    let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
-    let tiles_width = 64;
-    let tiles_height = 95;
+    let map_tiles_bytes = include_bytes!("../../../tiles_16_12.png");
+    let tiles_width = 16;
+    let tiles_height = 12;
 
     let tiles_params = MapTilesParams {
         map_tiles_bytes,
@@ -34,7 +28,7 @@ fn get_map(gcx: &WgpuGraphContext) -> WgpuMap {
 
     let map_width = 32;
     let map_height = 32;
-    let mut map = generate_random_map(map_width, map_height, map_width * map_height - 1);
+    let map = generate_random_map(map_width, map_height, map_width * map_height - 1);
 
     let map_params = MapParams {
         map_width,
@@ -42,5 +36,13 @@ fn get_map(gcx: &WgpuGraphContext) -> WgpuMap {
         tile_indices: &map,
     };
 
-    wgpu_map::get_map(gcx, &tiles_params, &map_params)
+    let m = wgpu_map::get_map(gcx, &tiles_params, &map_params);
+
+    GuiHandlerState {
+        m,
+        map_width,
+        map_height,
+        tiles_width,
+        tiles_height,
+    }
 }

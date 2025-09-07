@@ -6,6 +6,7 @@ mod map_utils;
 use asn_gui_core::TAsnGuiHandler;
 use asn_wgpu::{WgpuGuiHandler, render_manager};
 use gui_handler_state::GuiHandlerState;
+use gui_handler_state::new_handler_state;
 
 enum WebGuiHandler {
     Zero,
@@ -17,8 +18,9 @@ impl TAsnGuiHandler for WebGuiHandler {
     type FrameContext = render_manager::WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
-        let _ = gcx;
         m_info!("init");
+        let h = new_handler_state(gcx);
+        *self = WebGuiHandler::Loaded(h);
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
