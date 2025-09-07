@@ -14,6 +14,7 @@ pub struct GuiHandlerState {
     pub tiles_height: u32,
     pub last_update: Instant,
 }
+
 impl GuiHandlerState {
     pub fn update(&mut self) {
         let now = Instant::now();
