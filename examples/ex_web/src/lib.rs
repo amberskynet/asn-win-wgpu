@@ -1,6 +1,7 @@
 use asn_logger::log::info;
 mod gui;
 mod gui_empty;
+mod gui_handler;
 mod gui_wgpu;
 mod log_utils;
 
