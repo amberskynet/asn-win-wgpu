@@ -6,4 +6,5 @@ pub trait TAsnRenderManager {
     fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>>;
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>>;
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>>;
+    fn update(&mut self) -> Result<(), Box<dyn std::error::Error>>;
 }
