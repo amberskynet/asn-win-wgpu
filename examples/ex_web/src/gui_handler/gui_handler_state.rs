@@ -1,3 +1,5 @@
+use asn_core::cgmath::Vector3;
+use asn_core::transform_set::TransformSet;
 use asn_wgpu::WgpuGraphContext;
 use wgpu_map::{MapParams, MapTilesParams, WgpuMap};
 
@@ -14,6 +16,7 @@ pub struct GuiHandlerState {
     pub tiles_height: u32,
     pub last_update: Instant,
 }
+
 impl GuiHandlerState {
     pub fn update(&mut self) {
         let now = Instant::now();
@@ -57,6 +60,29 @@ pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
     };
 
     let m = wgpu_map::get_map(gcx, &tiles_params, &map_params);
+
+    let s = TransformSet {
+        pos: Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        rot: Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        scale: Vector3 {
+            x: 0.9,
+            y: 0.9,
+            z: 0.9,
+        },
+    };
+
+    // Создаем и устанавливаем MVP-матрицу
+    let mvp_matrix = s.matrix_calculated();
+    m.update_mvp_matrix(gcx, mvp_matrix.into());
+
     GuiHandlerState {
         m,
         map_width,

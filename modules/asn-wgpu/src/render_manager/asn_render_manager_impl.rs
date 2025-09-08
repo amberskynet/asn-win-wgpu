@@ -92,9 +92,6 @@ where
         // Получаем графический контекст
         let r = self.s.as_ref().unwrap();
 
-        // Запрашиваем перерисовку окна
-        r.window.request_redraw();
-
         // Создаем контекст кадра
         let mut fcx = WgpuFrameContext::new(&r.surface, &r.device)
             .map_err(|e| render_error(&format!("draw error - {e}")))?;
@@ -102,7 +99,6 @@ where
         // Обновляем и отрисовываем GUI
         {
             let mut h = lock_handler(&self.h)?;
-            h.update(r);
             h.draw(&mut fcx);
         }
 
@@ -126,6 +122,21 @@ where
             let fps = 1.0 / avg_frame_time.as_secs_f64();
             m_trace!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time);
         }
+
+        Ok(())
+    }
+
+    fn update(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        // Получаем графический контекст
+        let r = self.s.as_ref().unwrap();
+
+        {
+            let mut h = lock_handler(&self.h)?;
+            h.update(r);
+        }
+
+        // Запрашиваем перерисовку окна
+        r.window.request_redraw();
 
         Ok(())
     }

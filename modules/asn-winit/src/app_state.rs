@@ -58,13 +58,6 @@ where
                 let w = new_window(event_loop, &conf).unwrap();
 
                 r.init(Arc::new(w)).unwrap();
-                // match r.init(Arc::new(w)) {
-                //     Ok(_) => {}
-                //     Err(e) => {
-                //         error!("RenderManagerState init error: {e}");
-                //         return;
-                //     }
-                // }
 
                 match self.proxy.send_event(UserEvents::UploadManager(r)) {
                     Ok(_) => {
@@ -93,6 +86,19 @@ where
                 Ok(_) => {}
                 Err(err) => {
                     error!("handle_resize failed: {err}");
+                    // При критической ошибке устанавливаем состояние в Zero
+                    self.s = RenderManagerState::Zero;
+                }
+            }
+        }
+    }
+
+    pub fn handle_update(&mut self) {
+        if let RenderManagerState::Loaded(ref mut r) = self.s {
+            match r.update() {
+                Ok(_) => {}
+                Err(err) => {
+                    error!("handle_redraw draw failed: {err}");
                     // При критической ошибке устанавливаем состояние в Zero
                     self.s = RenderManagerState::Zero;
                 }
@@ -142,7 +148,7 @@ where
 
     fn about_to_wait(&mut self, _event_loop: &ActiveEventLoop) {
         // trace!("ApplicationHandler about_to_wait");
-        self.handle_redraw();
+        self.handle_update();
     }
 
     fn window_event(

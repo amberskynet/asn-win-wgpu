@@ -11,9 +11,9 @@ pub const SHADER_SOURCE: &str = include_str!("map_shader.wgsl");
 pub const LOG_MODULE_NAME: &str = "wgpu_map";
 
 pub const DEFAULT_CLEAR_COLOR: wgpu::Color = wgpu::Color {
-    r: 0.1,
-    g: 0.2,
-    b: 0.3,
+    r: 0.0001,
+    g: 0.0001,
+    b: 0.0001,
     a: 1.0,
 };
 

@@ -557,6 +557,7 @@ dependencies = [
 name = "ex-web"
 version = "0.1.0"
 dependencies = [
+ "asn-core",
  "asn-gui-core",
  "asn-logger",
  "asn-wgpu",

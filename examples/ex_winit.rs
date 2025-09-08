@@ -33,6 +33,10 @@ impl TAsnRenderManager for DummyRenderManager {
         // m_info!("draw");
         Ok(())
     }
+
+    fn update(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(())
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

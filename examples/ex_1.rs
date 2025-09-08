@@ -35,6 +35,11 @@ impl TAsnRenderManager for MyRenderManager {
         m_info!("MyRenderManager::draw()");
         Ok(())
     }
+
+    fn update(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        m_info!("MyRenderManager::update()");
+        Ok(())
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

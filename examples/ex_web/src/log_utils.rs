@@ -11,12 +11,12 @@ pub fn setup_log() -> Result<(), String> {
     c.module_levels
         .insert(String::from("wgpu_hal"), AsnLogLevel::Trace);
     c.module_levels
-        .insert(String::from("naga"), AsnLogLevel::Trace);
+        .insert(String::from("naga"), AsnLogLevel::Error);
     c.module_levels
         .insert(String::from("asn-win-wgpu"), AsnLogLevel::Trace);
 
     c.module_levels
-        .insert(String::from("asn-wgpu"), AsnLogLevel::Error);
+        .insert(String::from("asn-wgpu"), AsnLogLevel::Trace);
 
     c.module_levels
         .insert(String::from("wgpu_map"), AsnLogLevel::Trace);
