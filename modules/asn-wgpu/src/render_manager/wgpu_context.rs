@@ -107,7 +107,8 @@ impl WgpuGraphContext {
                 .unwrap_or(wgpu::PresentMode::Fifo),
             alpha_mode: surface_caps
                 .alpha_modes
-                .first()
+                .iter()
+                .find(|mode| **mode == wgpu::CompositeAlphaMode::Opaque)
                 .copied()
                 .unwrap_or(wgpu::CompositeAlphaMode::Auto),
             view_formats: vec![],
