@@ -92,9 +92,6 @@ where
         // Получаем графический контекст
         let r = self.s.as_ref().unwrap();
 
-        // Запрашиваем перерисовку окна
-        r.window.request_redraw();
-
         // Создаем контекст кадра
         let mut fcx = WgpuFrameContext::new(&r.surface, &r.device)
             .map_err(|e| render_error(&format!("draw error - {e}")))?;
@@ -137,6 +134,9 @@ where
             let mut h = lock_handler(&self.h)?;
             h.update(r);
         }
+
+        // Запрашиваем перерисовку окна
+        r.window.request_redraw();
 
         Ok(())
     }
