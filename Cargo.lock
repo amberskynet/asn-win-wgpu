@@ -120,6 +120,7 @@ name = "asn-core"
 version = "0.1.0"
 dependencies = [
  "cgmath",
+ "tokio",
 ]
 
 [[package]]
@@ -132,6 +133,9 @@ dependencies = [
 [[package]]
 name = "asn-gui-core"
 version = "0.1.0"
+dependencies = [
+ "tokio",
+]
 
 [[package]]
 name = "asn-logger"

@@ -55,9 +55,20 @@ where
             let r = std::mem::replace(&mut self.s, RenderManagerState::Zero);
             if let RenderManagerState::Empty(mut r) = r {
                 let conf = AsnGuiWindowConfig::default();
-                let w = new_window(event_loop, &conf).unwrap();
+                let w = match new_window(event_loop, &conf) {
+                    Ok(w) => w,
+                    Err(err) => {
+                        error!("Failed to create window: {err}");
+                        self.s = RenderManagerState::Zero;
+                        return;
+                    }
+                };
 
-                r.init(Arc::new(w)).unwrap();
+                if let Err(err) = r.init(Arc::new(w)) {
+                    error!("Failed to initialize render manager: {err}");
+                    self.s = RenderManagerState::Zero;
+                    return;
+                }
 
                 match self.proxy.send_event(UserEvents::UploadManager(r)) {
                     Ok(_) => {
@@ -65,6 +76,7 @@ where
                     }
                     Err(err) => {
                         error!("handle_resumed error: {err}");
+                        self.s = RenderManagerState::Zero;
                     }
                 };
             }

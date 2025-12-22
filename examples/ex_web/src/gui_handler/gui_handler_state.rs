@@ -28,13 +28,15 @@ impl GuiHandlerState {
                 self.map_height,
                 self.tiles_width * self.tiles_height - 1,
             );
-            self.m.update_map(&map);
+            let _ = self.m.update_map(&map);
             // Здесь может быть дополнительная логика обновления, если она есть
         }
     }
 }
 
-pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
+pub fn new_handler_state(
+    gcx: &WgpuGraphContext,
+) -> Result<GuiHandlerState, Box<dyn std::error::Error>> {
     // let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
     // let tiles_width = 64;
     // let tiles_height = 95;
@@ -59,7 +61,7 @@ pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
         tile_indices: &map,
     };
 
-    let m = wgpu_map::get_map(gcx, &tiles_params, &map_params);
+    let m = wgpu_map::get_map(gcx, &tiles_params, &map_params)?;
 
     let s = TransformSet {
         pos: Vector3 {
@@ -83,12 +85,13 @@ pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
     let mvp_matrix = s.matrix_calculated();
     m.update_mvp_matrix(gcx, mvp_matrix.into());
 
-    GuiHandlerState {
+    let state = GuiHandlerState {
         m,
         map_width,
         map_height,
         tiles_width,
         tiles_height,
         last_update: Instant::now(),
-    }
+    };
+    Ok(state)
 }

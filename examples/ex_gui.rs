@@ -13,6 +13,7 @@ use std::{
     sync::{
         Arc, Mutex,
         atomic::{AtomicBool, Ordering},
+        mpsc,
     },
     thread::{self, sleep},
     time::Duration,
@@ -34,7 +35,7 @@ pub struct GuiList {
 }
 
 impl GuiList {
-    pub fn new(gcx: &render_manager::WgpuGraphContext) -> Self {
+    pub fn new(gcx: &render_manager::WgpuGraphContext) -> Result<Self, Box<dyn std::error::Error>> {
         let map_tiles_bytes = include_bytes!("tiles_64_95.png");
         let tiles_width = 64;
         let tiles_height = 95;
@@ -66,7 +67,7 @@ impl GuiList {
             map_height,
             tile_indices: map.as_slice(),
         };
-        let m = get_map(gcx, &tiles_params, &map_params);
+        let m = get_map(gcx, &tiles_params, &map_params)?;
 
         let s = TransformSet {
             pos: Vector3 {
@@ -90,13 +91,14 @@ impl GuiList {
         let mvp_matrix = s.matrix_calculated();
         m.update_mvp_matrix(gcx, mvp_matrix.into());
 
-        GuiList {
+        let gui_list = GuiList {
             m,
             map_width,
             map_height,
             tiles_width,
             tiles_height,
-        }
+        };
+        Ok(gui_list)
     }
 
     /// Обновляет карту случайными значениями
@@ -106,16 +108,35 @@ impl GuiList {
             self.map_height,
             self.tiles_width * self.tiles_height - 1,
         );
-        self.m.update_map(map.as_slice());
+        let _ = self.m.update_map(map.as_slice());
     }
+}
+
+pub enum GuiCommand {
+    UpdateMap,
 }
 
 pub struct MyGuiHandler {
     gui_list: Option<GuiList>,
+    command_receiver: Option<mpsc::Receiver<GuiCommand>>,
 }
 
 impl MyGuiHandler {
-    fn update_map(&mut self) {
+    fn process_commands(&mut self) {
+        // Обрабатываем команды из канала
+        let should_update = if let Some(ref receiver) = self.command_receiver {
+            receiver.try_recv().is_ok()
+        } else {
+            // Fallback для обратной совместимости
+            true
+        };
+
+        if should_update {
+            self.update_map_internal();
+        }
+    }
+
+    fn update_map_internal(&mut self) {
         let g = match self.gui_list.as_mut() {
             Some(g) => g,
             None => {
@@ -123,8 +144,7 @@ impl MyGuiHandler {
             }
         };
 
-        g.update_map();
-
+        let _ = g.update_map();
         m_info!("update")
     }
 }
@@ -137,13 +157,25 @@ impl TAsnGuiHandler for MyGuiHandler {
     type FrameContext = render_manager::WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
-        let gui_list = GuiList::new(gcx);
-        self.gui_list = Some(gui_list);
-        m_info!("init");
+        match GuiList::new(gcx) {
+            Ok(gui_list) => {
+                self.gui_list = Some(gui_list);
+                m_info!("init");
+            }
+            Err(err) => {
+                m_error!("Failed to initialize GUI: {err}");
+            }
+        }
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
-        self.gui_list.as_mut().unwrap().m.update(gcx);
+        // Обрабатываем команды
+        self.process_commands();
+
+        // Обновляем GUI элементы
+        if let Some(ref mut gui_list) = self.gui_list {
+            gui_list.m.update(gcx);
+        }
     }
 
     // fn handle_keyboard_input(
@@ -187,8 +219,13 @@ impl TAsnGuiHandler for MyGuiHandler {
     }
 }
 
-pub fn get_handler() -> MyGuiHandler {
-    MyGuiHandler { gui_list: None }
+pub fn get_handler() -> (MyGuiHandler, mpsc::Sender<GuiCommand>) {
+    let (sender, receiver) = mpsc::channel();
+    let handler = MyGuiHandler {
+        gui_list: None,
+        command_receiver: Some(receiver),
+    };
+    (handler, sender)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -199,29 +236,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let is_running = Arc::new(AtomicBool::new(true));
     let running_clone = Arc::clone(&is_running);
 
-    let h = get_handler();
+    let (h, command_sender) = get_handler();
 
     let h_safe = Arc::new(Mutex::new(h));
-    let h_thread = h_safe.clone();
+    let command_sender_thread = command_sender.clone();
 
     let r = asn_wgpu::get_manager(h_safe);
 
     let handle = thread::spawn(move || {
-        // Цикл обработки с отправкой результатов
+        // Цикл обработки с отправкой команд через канал
         while running_clone.load(Ordering::Relaxed) {
-            {
-                let mut h = match h_thread.lock() {
-                    Ok(h) => h,
-                    Err(e) => {
-                        m_error!("Error: {e}");
-                        return;
-                    }
-                };
-                h.update_map();
+            if let Err(e) = command_sender_thread.send(GuiCommand::UpdateMap) {
+                m_error!("Failed to send command: {e}");
+                break;
             }
             thread::sleep(Duration::from_millis(LOOP_MILLIS));
         }
-        m_info!("Exit from loop");
+        m_info!("Exit from command loop");
     });
 
     asn_winit::run(r)?;

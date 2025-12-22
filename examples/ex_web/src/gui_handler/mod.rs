@@ -20,8 +20,14 @@ impl TAsnGuiHandler for WebGuiHandler {
 
     fn init(&mut self, gcx: &Self::GraphContext) {
         m_info!("init");
-        let h = new_handler_state(gcx);
-        *self = WebGuiHandler::Loaded(h);
+        match new_handler_state(gcx) {
+            Ok(h) => {
+                *self = WebGuiHandler::Loaded(h);
+            }
+            Err(err) => {
+                m_error!("Failed to initialize web GUI handler: {err}");
+            }
+        }
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
