@@ -78,6 +78,7 @@ fn test_event_system() {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_async_loading_state() {
     use std::time::Duration;

@@ -172,6 +172,7 @@ fn test_window_config_builder_pattern() {
     assert_eq!(config.window_height, 768);
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn test_async_gui_operations() {
     use tokio::time::{Duration, sleep};

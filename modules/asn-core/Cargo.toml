@@ -9,5 +9,5 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 cgmath = "0.18.0"
 
-[dev-dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 tokio = { version = "1.47", features = ["full"] }
