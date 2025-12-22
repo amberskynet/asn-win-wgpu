@@ -163,6 +163,13 @@
             <button onclick="testAsyncOperation()">Асинхронная операция</button>
         </div>
 
+        <div class="button-group">
+            <h3>Расширенные возможности</h3>
+            <button onclick="getExtendedSystemInfo()">Расширенная информация</button>
+            <button onclick="getWasmFeatures()">Возможности WASM</button>
+            <button onclick="testWasmEnvironment()">Тест WASM среды</button>
+        </div>
+
         <div id="output">
             <p class="info">🚀 ASN Web Example готов к работе. Нажмите кнопки выше для тестирования функций...</p>
         </div>
@@ -239,6 +246,9 @@
             setButtonState('initApp', true);
             setButtonState('getVersion', true);
             setButtonState('greetUser', true);
+            setButtonState('getExtendedSystemInfo', true);
+            setButtonState('getWasmFeatures', true);
+            setButtonState('testWasmEnvironment', true);
         }
 
         // Глобальные функции для кнопок
@@ -368,6 +378,216 @@
             } catch (error) {
                 logMessage(`❌ Ошибка асинхронной операции: ${error.message}`, 'error');
                 console.error('Async operation error:', error);
+            }
+        };
+
+        // Новые функции для расширенных возможностей
+        window.getExtendedSystemInfo = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const info = wasmBindings.get_extended_system_info();
+                logMessage(`🔧 ${info}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения расширенной информации: ${error.message}`, 'error');
+                console.error('Extended system info error:', error);
+            }
+        };
+
+        window.getWasmFeatures = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const features = wasmBindings.get_wasm_features();
+                logMessage(`⚡ ${features}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения возможностей WASM: ${error.message}`, 'error');
+                console.error('WASM features error:', error);
+            }
+        };
+
+        window.testWasmEnvironment = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const result = wasmBindings.test_wasm_environment();
+                logMessage(`🌐 ${result}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка теста WASM среды: ${error.message}`, 'error');
+                console.error('WASM environment test error:', error);
+            }
+        };
+
+        // Новые функции для демонстрации расширенных возможностей
+        window.resizeCanvas = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const newWidth = Math.floor(Math.random() * 200) + 600;
+                const newHeight = Math.floor(Math.random() * 200) + 400;
+                wasmBindings.resize_canvas(newWidth, newHeight);
+                logMessage(`📐 Canvas изменен до ${newWidth}x${newHeight}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка изменения размера canvas: ${error.message}`, 'error');
+                console.error('Canvas resize error:', error);
+            }
+        };
+
+        window.clearCanvas = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                wasmBindings.clear_canvas();
+                logMessage('🧹 Canvas очищен', 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка очистки canvas: ${error.message}`, 'error');
+                console.error('Canvas clear error:', error);
+            }
+        };
+
+        window.drawRectangle = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const colors = ['red', 'blue', 'green', 'orange', 'purple'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                wasmBindings.draw_rectangle(50, 50, 200, 150, randomColor);
+                logMessage(`🎨 Нарисован прямоугольник цветом ${randomColor}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка рисования прямоугольника: ${error.message}`, 'error');
+                console.error('Draw rectangle error:', error);
+            }
+        };
+
+        window.drawText = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                wasmBindings.draw_text('Hello WASM!', 100, 100, 'blue', 24);
+                logMessage('✏️ Нарисован текст "Hello WASM!"', 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка рисования текста: ${error.message}`, 'error');
+                console.error('Draw text error:', error);
+            }
+        };
+
+        window.getBrowserInfo = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const info = wasmBindings.get_browser_info();
+                logMessage(`🌐 Информация о браузере получена: ${JSON.stringify(info, null, 2)}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения информации о браузере: ${error.message}`, 'error');
+                console.error('Browser info error:', error);
+            }
+        };
+
+        window.saveToStorage = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const timestamp = new Date().toISOString();
+                wasmBindings.save_to_local_storage('last_visit', timestamp);
+                logMessage(`💾 Данные сохранены в localStorage: ${timestamp}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка сохранения в localStorage: ${error.message}`, 'error');
+                console.error('Storage save error:', error);
+            }
+        };
+
+        window.loadFromStorage = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const data = wasmBindings.load_from_local_storage('last_visit');
+                logMessage(`📂 Данные загружены из localStorage: ${data}`, 'success');
+            } catch (error) {
+                if (error.message.includes('Key not found')) {
+                    logMessage('📂 Ключ не найден в localStorage', 'info');
+                } else {
+                    logMessage(`❌ Ошибка загрузки из localStorage: ${error.message}`, 'error');
+                    console.error('Storage load error:', error);
+                }
+            }
+        };
+
+        window.requestFullscreen = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                if (wasmBindings.is_fullscreen_supported()) {
+                    wasmBindings.request_fullscreen();
+                    logMessage('🖥️ Запрос на полный экран отправлен', 'success');
+                } else {
+                    logMessage('❌ Полный экран не поддерживается', 'error');
+                }
+            } catch (error) {
+                logMessage(`❌ Ошибка запроса полного экрана: ${error.message}`, 'error');
+                console.error('Fullscreen error:', error);
+            }
+        };
+
+        window.getPerformanceStats = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const stats = wasmBindings.get_performance_stats();
+                logMessage(`📊 Статистика производительности: ${JSON.stringify(stats, null, 2)}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения статистики производительности: ${error.message}`, 'error');
+                console.error('Performance stats error:', error);
+            }
+        };
+
+        window.updatePerformanceStats = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                wasmBindings.update_performance_stats();
+                logMessage('📈 Статистика производительности обновлена', 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка обновления статистики производительности: ${error.message}`, 'error');
+                console.error('Performance update error:', error);
             }
         };
 

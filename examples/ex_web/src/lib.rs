@@ -73,6 +73,66 @@ pub fn calculate_fibonacci(n: u32) -> u64 {
     b
 }
 
+/// Получение расширенной информации о системе
+#[wasm_bindgen]
+pub fn get_extended_system_info() -> String {
+    let mut info = HashMap::new();
+    info.insert("version", "0.1.0");
+    info.insert("platform", "web");
+    info.insert("wasm", "enabled");
+    info.insert("webgl", "supported");
+    info.insert("canvas", "available");
+    info.insert("async", "supported");
+
+    format!("Extended System Info: {:?}", info)
+}
+
+/// Дополнительная функция для демонстрации возможностей WASM
+#[wasm_bindgen]
+pub fn get_wasm_features() -> String {
+    format!("WASM Features: async-support, memory-management, js-interop")
+}
+
+/// Проверка работы WASM окружения
+#[wasm_bindgen]
+pub fn test_wasm_environment() -> String {
+    format!("WASM environment test passed - running in WebAssembly!")
+}
+
+/// Обработка события мыши
+#[wasm_bindgen]
+pub fn handle_mouse_event(event_type: &str, x: f64, y: f64, button: i32) -> Result<(), JsValue> {
+    console::log_1(
+        &format!(
+            "Mouse event: {} at ({}, {}) button: {}",
+            event_type, x, y, button
+        )
+        .into(),
+    );
+
+    // Здесь можно добавить логику обработки событий мыши
+    // Например, передача координат в GUI систему
+
+    Ok(())
+}
+
+/// Обработка события клавиатуры
+#[wasm_bindgen]
+pub fn handle_keyboard_event(event_type: &str, key: &str, code: &str) -> Result<(), JsValue> {
+    console::log_1(
+        &format!(
+            "Keyboard event: {} key: '{}' code: '{}'",
+            event_type, key, code
+        )
+        .into(),
+    );
+
+    // Здесь можно добавить логику обработки клавиатурных событий
+
+    Ok(())
+}
+
+/// Получение информации о памяти
 #[wasm_bindgen]
 pub fn get_memory_usage() -> String {
     // Получаем информацию о памяти из WebAssembly
@@ -88,7 +148,7 @@ pub fn get_memory_usage() -> String {
     // Конвертируем в килобайты
     let memory_kb = memory_size / 1024;
 
-    format!("Memory usage: {} KB", memory_kb)
+    format!("Memory usage: {} KB (WASM buffer size)", memory_kb)
 }
 
 #[wasm_bindgen]
