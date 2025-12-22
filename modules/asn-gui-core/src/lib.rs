@@ -8,4 +8,4 @@ pub use t_event_handler::TAsnEventHandler;
 pub use t_gui_element::TAsnGuiElement;
 pub use t_gui_handler::TAsnGuiHandler;
 pub use t_render_manager::TAsnRenderManager;
-pub use window_config::AsnGuiWindowConfig;
+pub use window_config::{AsnGuiWindowConfig, WindowConfigBuilder};

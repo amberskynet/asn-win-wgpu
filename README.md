@@ -10,6 +10,11 @@ A modern window system implementation using Winit + WGPU for the Amberskynet pro
 - 📦 **WebAssembly support** for web deployment
 - 🎨 **Texture rendering** with PNG/JPEG support
 - ⚡ **Async/await support** for modern Rust
+- 🏗️ **Builder patterns** for easy configuration
+- 🚀 **Optimized rendering** with double buffering
+- 📊 **Performance monitoring** and statistics
+- 🔄 **Channel-based communication** for thread safety
+- 🧪 **Comprehensive testing** with integration tests
 
 ## Architecture
 
@@ -122,23 +127,49 @@ For more details, see [WEB_BUILD.md](WEB_BUILD.md).
 ### Code Example
 
 ```rust
-use asn_win_wgpu::{run, asn_win_config::AppConfig};
+use asn_win_wgpu::{run, run_with_config, App, AppConfig};
+use my_handler::MyGuiHandler;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Run with default configuration
-    run()
-}
+    let handler = MyGuiHandler::new();
 
-// Or with custom configuration
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = AppConfig {
-        window_title: "My App".to_string(),
-        window_width: 1024,
-        window_height: 768
-    };
+    // Simple run with defaults
+    run(handler)?;
 
-    asn_win_wgpu::run_with_config(config)
+    // Advanced configuration with builder pattern
+    let config = AppConfig::builder()
+        .window(|w| w
+            .title("My Advanced App")
+            .size(1920, 1080)
+        )
+        .vsync(false)
+        .power_preference(asn_wgpu::wgpu::PowerPreference::HighPerformance)
+        .build();
+
+    run_with_config(handler, config)?;
+
+    // Or using the App builder
+    App::new(handler)
+        .with_config(|c| c
+            .window(|w| w.title("Builder Pattern App"))
+            .vsync(true)
+        )
+        .run()
 }
+```
+
+### Advanced Map Creation
+
+```rust
+use wgpu_map::map_builder;
+
+// Create maps using the new builder pattern
+let map = map_builder()
+    .tiles_bytes(include_bytes!("tiles.png"))
+    .tiles_size(32, 32)
+    .map_size(100, 100)
+    .tile_indices(&tile_data)
+    .build(&gcx)?;
 ```
 
 ## Configuration
@@ -154,7 +185,11 @@ The `AppConfig` struct allows you to customize:
 See the `examples/` directory for complete usage examples:
 
 - `ex_1.rs` - Basic window with textured triangle
-- Custom configurations and event handling
+- `ex_gui.rs` - GUI application with map rendering and channels
+- `ex_wgpu.rs` - Direct WGPU rendering example
+- `ex_winit.rs` - Window management and event handling
+- `advanced_usage.rs` - Advanced features with builder patterns
+- `ex_web/` - WebAssembly example with JavaScript interop
 
 ## Dependencies
 

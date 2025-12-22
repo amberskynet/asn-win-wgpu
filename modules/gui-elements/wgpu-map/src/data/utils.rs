@@ -1,4 +1,5 @@
 use asn_wgpu::wgpu;
+use asn_wgpu::wgpu::util::DeviceExt;
 
 use super::vertex::Vertex;
 
@@ -125,4 +126,67 @@ pub fn get_texture_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLa
             label: Some("texture_bind_group_layout"),
         });
     texture_bind_group_layout
+}
+
+/// Creates a uniform buffer with the given data
+///
+/// # Arguments
+/// * `device` - GPU device
+/// * `data` - Data to store in the buffer
+/// * `label` - Debug label for the buffer
+///
+/// # Returns
+/// * `wgpu::Buffer` - Created uniform buffer
+pub fn create_uniform_buffer<T: bytemuck::Pod>(
+    device: &wgpu::Device,
+    data: &[T],
+    label: &str,
+) -> wgpu::Buffer {
+    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some(label),
+        contents: bytemuck::cast_slice(data),
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+    })
+}
+
+/// Creates a vertex buffer with the given data
+///
+/// # Arguments
+/// * `device` - GPU device
+/// * `data` - Vertex data to store in the buffer
+/// * `label` - Debug label for the buffer
+///
+/// # Returns
+/// * `wgpu::Buffer` - Created vertex buffer
+pub fn create_vertex_buffer<T: bytemuck::Pod>(
+    device: &wgpu::Device,
+    data: &[T],
+    label: &str,
+) -> wgpu::Buffer {
+    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some(label),
+        contents: bytemuck::cast_slice(data),
+        usage: wgpu::BufferUsages::VERTEX,
+    })
+}
+
+/// Creates an index buffer with the given data
+///
+/// # Arguments
+/// * `device` - GPU device
+/// * `data` - Index data to store in the buffer
+/// * `label` - Debug label for the buffer
+///
+/// # Returns
+/// * `wgpu::Buffer` - Created index buffer
+pub fn create_index_buffer<T: bytemuck::Pod>(
+    device: &wgpu::Device,
+    data: &[T],
+    label: &str,
+) -> wgpu::Buffer {
+    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some(label),
+        contents: bytemuck::cast_slice(data),
+        usage: wgpu::BufferUsages::INDEX,
+    })
 }

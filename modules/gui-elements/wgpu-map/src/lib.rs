@@ -5,7 +5,10 @@ use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, wgpu};
 
 use crate::data::rgba_handler::RgbaHandler;
 use crate::data::texture::{AsnTextureFormat, WgpuTexture};
-use crate::data::utils::{get_render_pipeline, get_texture_bind_group_layout};
+use crate::data::utils::{
+    create_index_buffer, create_uniform_buffer, create_vertex_buffer, get_render_pipeline,
+    get_texture_bind_group_layout,
+};
 use crate::data::{DEFAULT_CLEAR_COLOR, INDICES, SHADER_SOURCE, VERTICES};
 
 /// Оптимизированная версия WgpuMap с двойной буферизацией для плавного рендеринга
@@ -147,6 +150,116 @@ pub struct MapParams<'a> {
     pub tile_indices: &'a [u32],
 }
 
+/// Builder для создания карт с гибкой настройкой параметров
+pub struct WgpuMapBuilder<'a> {
+    tiles_bytes: Option<&'a [u8]>,
+    tiles_width: Option<u32>,
+    tiles_height: Option<u32>,
+    map_width: Option<u32>,
+    map_height: Option<u32>,
+    tile_indices: Option<&'a [u32]>,
+}
+
+impl<'a> WgpuMapBuilder<'a> {
+    /// Creates a new builder for flexible map configuration
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use wgpu_map::map_builder;
+    ///
+    /// let builder = map_builder();
+    /// ```
+    pub fn new() -> Self {
+        Self {
+            tiles_bytes: None,
+            tiles_width: None,
+            tiles_height: None,
+            map_width: None,
+            map_height: None,
+            tile_indices: None,
+        }
+    }
+
+    /// Устанавливает данные тайлов (PNG/JPEG байты)
+    pub fn tiles_bytes(mut self, bytes: &'a [u8]) -> Self {
+        self.tiles_bytes = Some(bytes);
+        self
+    }
+
+    /// Устанавливает размеры тайлов
+    ///
+    /// # Panics
+    /// Паникует если размеры равны 0 или превышают 4096 пикселей
+    pub fn tiles_size(mut self, width: u32, height: u32) -> Self {
+        if width == 0 || height == 0 {
+            panic!("Tile dimensions cannot be zero: {}x{}", width, height);
+        }
+        if width > 4096 || height > 4096 {
+            panic!(
+                "Tile dimensions {}x{} exceed maximum allowed size 4096x4096",
+                width, height
+            );
+        }
+        self.tiles_width = Some(width);
+        self.tiles_height = Some(height);
+        self
+    }
+
+    /// Устанавливает размеры карты
+    ///
+    /// # Panics
+    /// Паникует если размеры равны 0 или превышают 16384 тайлов
+    pub fn map_size(mut self, width: u32, height: u32) -> Self {
+        if width == 0 || height == 0 {
+            panic!("Map dimensions cannot be zero: {}x{}", width, height);
+        }
+        if width > 16384 || height > 16384 {
+            panic!(
+                "Map dimensions {}x{} exceed maximum allowed size 16384x16384",
+                width, height
+            );
+        }
+        self.map_width = Some(width);
+        self.map_height = Some(height);
+        self
+    }
+
+    /// Устанавливает индексы тайлов для карты
+    pub fn tile_indices(mut self, indices: &'a [u32]) -> Self {
+        self.tile_indices = Some(indices);
+        self
+    }
+
+    /// Создает карту с текущими настройками
+    pub fn build(self, gcx: &WgpuGraphContext) -> Result<WgpuMap, Box<dyn std::error::Error>> {
+        let tiles_bytes = self.tiles_bytes.ok_or("Tiles bytes not specified")?;
+        let tiles_width = self.tiles_width.ok_or("Tiles width not specified")?;
+        let tiles_height = self.tiles_height.ok_or("Tiles height not specified")?;
+        let map_width = self.map_width.ok_or("Map width not specified")?;
+        let map_height = self.map_height.ok_or("Map height not specified")?;
+        let tile_indices = self.tile_indices.ok_or("Tile indices not specified")?;
+
+        let tiles_params = MapTilesParams {
+            map_tiles_bytes: tiles_bytes,
+            tiles_width,
+            tiles_height,
+        };
+
+        let map_params = MapParams {
+            map_width,
+            map_height,
+            tile_indices,
+        };
+
+        get_map(gcx, &tiles_params, &map_params)
+    }
+}
+
+/// Создает builder для гибкой настройки параметров карты
+pub fn map_builder() -> WgpuMapBuilder<'static> {
+    WgpuMapBuilder::new()
+}
+
 pub fn get_map(
     gcx: &WgpuGraphContext,
     tiles_params: &MapTilesParams,
@@ -171,19 +284,11 @@ pub fn get_map(
         map_params.map_width as f32,
         map_params.map_height as f32,
     ];
-    let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Tiles Info Buffer"),
-        contents: bytemuck::cast_slice(&tiles_info_data),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    let tiles_info_buffer = create_uniform_buffer(device, &tiles_info_data, "Tiles Info Buffer");
 
     // Создаем uniform-буфер для MVP-матрицы
     let mvp_matrix: [[f32; 4]; 4] = Matrix4::<f32>::identity().into();
-    let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("MVP Matrix Buffer"),
-        contents: bytemuck::cast_slice(&[mvp_matrix]),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    let mvp_matrix_buffer = create_uniform_buffer(device, &[mvp_matrix], "MVP Matrix Buffer");
 
     let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
     map_handler.set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)?;
@@ -198,17 +303,8 @@ pub fn get_map(
         AsnTextureFormat::Rgba32Uint,
     )?;
 
-    let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Map Vertex Buffer"),
-        contents: bytemuck::cast_slice(VERTICES),
-        usage: wgpu::BufferUsages::VERTEX,
-    });
-
-    let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Map Index Buffer"),
-        contents: bytemuck::cast_slice(INDICES),
-        usage: wgpu::BufferUsages::INDEX,
-    });
+    let vertex_buffer = create_vertex_buffer(device, VERTICES, "Map Vertex Buffer");
+    let index_buffer = create_index_buffer(device, INDICES, "Map Index Buffer");
 
     let num_indices = INDICES.len() as u32;
 
@@ -301,19 +397,13 @@ pub fn get_optimized_map(
         map_params.map_width as f32,
         map_params.map_height as f32,
     ];
-    let tiles_info_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Optimized Tiles Info Buffer"),
-        contents: bytemuck::cast_slice(&tiles_info_data),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    let tiles_info_buffer =
+        create_uniform_buffer(device, &tiles_info_data, "Optimized Tiles Info Buffer");
 
     // Создаем uniform-буфер для MVP-матрицы
     let mvp_matrix: [[f32; 4]; 4] = Matrix4::<f32>::identity().into();
-    let mvp_matrix_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Optimized MVP Matrix Buffer"),
-        contents: bytemuck::cast_slice(&[mvp_matrix]),
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
-    });
+    let mvp_matrix_buffer =
+        create_uniform_buffer(device, &[mvp_matrix], "Optimized MVP Matrix Buffer");
 
     let mut map_handler = RgbaHandler::new(map_params.map_width, map_params.map_height);
     map_handler.set_tile_indices(map_params.tile_indices, tiles_params.tiles_width)?;
@@ -341,17 +431,8 @@ pub fn get_optimized_map(
 
     let map_textures = [map_texture_0, map_texture_1];
 
-    let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Optimized Map Vertex Buffer"),
-        contents: bytemuck::cast_slice(VERTICES),
-        usage: wgpu::BufferUsages::VERTEX,
-    });
-
-    let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Optimized Map Index Buffer"),
-        contents: bytemuck::cast_slice(INDICES),
-        usage: wgpu::BufferUsages::INDEX,
-    });
+    let vertex_buffer = create_vertex_buffer(device, VERTICES, "Optimized Map Vertex Buffer");
+    let index_buffer = create_index_buffer(device, INDICES, "Optimized Map Index Buffer");
 
     let num_indices = INDICES.len() as u32;
     let texture_bind_group_layout = get_texture_bind_group_layout(&device);

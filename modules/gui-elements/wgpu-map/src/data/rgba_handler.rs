@@ -52,7 +52,34 @@ impl RgbaHandler {
     /// assert_eq!(handler.dimensions(), (100, 200));
     /// ```
     pub fn new(width: u32, height: u32) -> Self {
-        let size = (width * height * 4) as usize;
+        // Validate dimensions
+        if width == 0 {
+            panic!("RGBA handler width cannot be zero");
+        }
+        if height == 0 {
+            panic!("RGBA handler height cannot be zero");
+        }
+
+        // Check for potential overflow in size calculation
+        let total_pixels = match width.checked_mul(height) {
+            Some(pixels) => pixels,
+            None => panic!("Width {} * Height {} would cause overflow", width, height),
+        };
+
+        let size = match total_pixels.checked_mul(4) {
+            Some(size) => size as usize,
+            None => panic!("Total size calculation would cause overflow"),
+        };
+
+        // Check for reasonable memory limits
+        const MAX_SIZE: usize = 64 * 1024 * 1024; // 64MB limit
+        if size > MAX_SIZE {
+            panic!(
+                "Requested image size {} bytes exceeds maximum allowed size {} bytes",
+                size, MAX_SIZE
+            );
+        }
+
         let data = vec![0u32; size];
 
         Self {
@@ -225,14 +252,31 @@ impl RgbaHandler {
     /// ```
     #[allow(dead_code)]
     pub fn get_pixel(&self, x: u32, y: u32) -> Result<(u32, u32, u32, u32), String> {
-        if x >= self.width || y >= self.height {
+        // Bounds checking
+        if x >= self.width {
             return Err(format!(
-                "Координаты ({}, {}) выходят за границы изображения {}x{}",
-                x, y, self.width, self.height
+                "X coordinate {} is out of bounds for width {}",
+                x, self.width
+            ));
+        }
+        if y >= self.height {
+            return Err(format!(
+                "Y coordinate {} is out of bounds for height {}",
+                y, self.height
             ));
         }
 
         let index = ((y * self.width + x) * 4) as usize;
+
+        // Additional safety check for array bounds
+        if index + 3 >= self.data.len() {
+            return Err(format!(
+                "Pixel data access at index {} exceeds array bounds {}",
+                index,
+                self.data.len()
+            ));
+        }
+
         Ok((
             self.data[index],
             self.data[index + 1],
