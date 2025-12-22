@@ -4,6 +4,7 @@ mod wgpu_context;
 
 use std::sync::{Arc, Mutex};
 
+pub use asn_render_manager_impl::RenderManagerError;
 pub use frame_context::WgpuFrameContext;
 pub use wgpu_context::WgpuGraphContext;
 

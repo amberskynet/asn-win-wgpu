@@ -15,6 +15,7 @@ use crate::render_manager::RenderManager;
 // reexport
 pub use wgpu;
 
+pub use render_manager::RenderManagerError;
 pub use render_manager::WgpuFrameContext;
 pub use render_manager::WgpuGraphContext;
 

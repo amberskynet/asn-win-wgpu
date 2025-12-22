@@ -10,46 +10,44 @@ use asn_logger::log::info;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
-/// Ошибка инициализации менеджера рендеринга
-#[derive(Debug)]
-struct RenderManagerError(String);
-
-impl std::fmt::Display for RenderManagerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RenderManager error: {}", self.0)
-    }
-}
-
-impl std::error::Error for RenderManagerError {}
-
-/// Создает ошибку RenderManagerError из строки
-fn render_error(msg: &str) -> Box<dyn std::error::Error> {
-    Box::new(RenderManagerError(msg.to_string()))
+/// Ошибки, которые могут возникнуть при работе с менеджером рендеринга
+#[derive(Debug, thiserror::Error)]
+#[allow(dead_code)]
+pub enum RenderManagerError {
+    #[error("Manager not initialized")]
+    NotInitialized,
+    #[error("Handler lock failed: {0}")]
+    HandlerLockError(String),
+    #[error("GPU state creation failed: {0}")]
+    GpuStateError(String),
+    #[error("Resize failed: {0}")]
+    ResizeError(String),
+    #[error("Draw failed: {0}")]
+    DrawError(String),
+    #[error("Update failed: {0}")]
+    UpdateError(String),
 }
 
 /// Проверяет, что менеджер рендеринга инициализирован, и возвращает мутабельную ссылку на контекст
 fn ensure_initialized_mut<H>(
     manager: &mut RenderManager<H>,
-) -> Result<&mut WgpuGraphContext, Box<dyn std::error::Error>>
+) -> Result<&mut WgpuGraphContext, RenderManagerError>
 where
     H: WgpuGuiHandler,
 {
-    manager
-        .s
-        .as_mut()
-        .ok_or_else(|| render_error("manager not initialized"))
+    manager.s.as_mut().ok_or(RenderManagerError::NotInitialized)
 }
 
 /// Блокирует обработчик GUI и возвращает мутабельную ссылку на него
 fn lock_handler<H>(
     handler: &std::sync::Arc<std::sync::Mutex<H>>,
-) -> Result<std::sync::MutexGuard<'_, H>, Box<dyn std::error::Error>>
+) -> Result<std::sync::MutexGuard<'_, H>, RenderManagerError>
 where
     H: WgpuGuiHandler,
 {
     handler
         .lock()
-        .map_err(|e| render_error(&format!("handler cant unlock - {e}")))
+        .map_err(|e| RenderManagerError::HandlerLockError(e.to_string()))
 }
 
 impl<H> TAsnRenderManager for RenderManager<H>
@@ -63,7 +61,7 @@ where
 
         let context = pollster::block_on(WgpuGraphContext::new(w)).map_err(|e| {
             m_error!("Failed to create GPU state: {e}");
-            render_error(&format!("init error: {e}"))
+            Box::new(RenderManagerError::GpuStateError(e.to_string()))
         })?;
 
         {
@@ -77,9 +75,9 @@ where
 
     fn resize(&mut self, width: u32, height: u32) -> Result<(), Box<dyn std::error::Error>> {
         m_info!("resize {width}, {height}");
-        let s = ensure_initialized_mut(self)?;
+        let s = ensure_initialized_mut(self).map_err(|e| Box::new(e))?;
         s.resize(width, height)
-            .map_err(|e| render_error(&format!("resize error - {e}")))?;
+            .map_err(|e| Box::new(RenderManagerError::ResizeError(e.to_string())))?;
         Ok(())
     }
 
@@ -88,11 +86,11 @@ where
         let s = self
             .s
             .as_ref()
-            .ok_or_else(|| render_error("manager not initialized"))?;
+            .ok_or_else(|| Box::new(RenderManagerError::NotInitialized))?;
 
         // Создаем контекст кадра
         let mut fcx = WgpuFrameContext::new(&s.surface, &s.device)
-            .map_err(|e| render_error(&format!("draw error - {e}")))?;
+            .map_err(|e| Box::new(RenderManagerError::DrawError(e.to_string())))?;
 
         // Обновляем и отрисовываем GUI
         {
@@ -129,7 +127,7 @@ where
         let s = self
             .s
             .as_ref()
-            .ok_or_else(|| render_error("manager not initialized"))?;
+            .ok_or_else(|| Box::new(RenderManagerError::NotInitialized))?;
 
         {
             let mut h = lock_handler(&self.h)?;

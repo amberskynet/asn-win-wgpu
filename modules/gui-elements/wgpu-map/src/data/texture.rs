@@ -8,6 +8,12 @@ pub enum AsnTextureFormat {
     Rgba32Uint,
 }
 
+impl Default for AsnTextureFormat {
+    fn default() -> Self {
+        AsnTextureFormat::Rgba8Unorm
+    }
+}
+
 impl AsnTextureFormat {
     pub fn to_wgpu_format(&self) -> wgpu::TextureFormat {
         match self {
@@ -28,6 +34,8 @@ pub struct WgpuTexture {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,
     pub sampler: wgpu::Sampler,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl WgpuTexture {
@@ -38,7 +46,11 @@ impl WgpuTexture {
         label: &str,
     ) -> Result<Self> {
         let img = image::load_from_memory(bytes)?;
-        Self::from_image(device, queue, &img, Some(label))
+        let dimensions = img.dimensions();
+        let mut texture = Self::from_image(device, queue, &img, Some(label))?;
+        texture.width = dimensions.0;
+        texture.height = dimensions.1;
+        Ok(texture)
     }
 
     pub fn from_rgba(
@@ -97,6 +109,8 @@ impl WgpuTexture {
             texture,
             view,
             sampler,
+            width,
+            height,
         })
     }
 
@@ -158,6 +172,8 @@ impl WgpuTexture {
             texture,
             view,
             sampler,
+            width: dimensions.0,
+            height: dimensions.1,
         })
     }
     #[allow(dead_code)]

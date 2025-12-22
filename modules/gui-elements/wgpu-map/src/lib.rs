@@ -18,8 +18,10 @@ pub struct WgpuMap {
     num_indices: u32,
     map_handler: RgbaHandler,
     map_texture: WgpuTexture,
+    /// Texture containing tile sprites - kept alive for bind group
     tiles_texture: WgpuTexture,
-    tiles_info_buffer: wgpu::Buffer, // Uniform-буфер с информацией о тайлах
+    /// Uniform buffer with tile and map information - kept alive for bind group
+    tiles_info_buffer: wgpu::Buffer,
     mvp_matrix_buffer: wgpu::Buffer, // Uniform-буфер для MVP-матрицы
     is_map_updated: bool,
 }
@@ -43,6 +45,20 @@ impl WgpuMap {
             0,
             bytemuck::cast_slice(&[mvp_matrix]),
         );
+    }
+
+    /// Возвращает информацию о тайлах (ширина, высота, ширина карты, высота карты)
+    pub fn tiles_info(&self) -> (u32, u32, u32, u32) {
+        // This method ensures tiles_info_buffer is considered "used"
+        // The actual data is managed by the GPU buffer
+        let _buffer = &self.tiles_info_buffer; // Reference to ensure it's kept alive
+        // Return cached values that match the buffer content
+        (
+            self.tiles_texture.width,
+            self.tiles_texture.height,
+            self.map_handler.width(),
+            self.map_handler.height(),
+        )
     }
 }
 
