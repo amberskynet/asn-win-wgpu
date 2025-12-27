@@ -1,5 +1,3 @@
-extern crate asn_winit;
-
 pub mod render_manager;
 mod state_error;
 

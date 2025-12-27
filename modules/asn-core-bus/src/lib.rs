@@ -1,5 +1,3 @@
-extern crate asn_core;
-
 mod t_asn_bus;
 mod t_asn_module;
 mod t_asn_module_pool;

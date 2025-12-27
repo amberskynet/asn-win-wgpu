@@ -1,5 +1,3 @@
-extern crate asn_core;
-
 use crate::t_asn_bus::AsnReceiver;
 use crate::t_asn_bus::AsnTransmitter;
 

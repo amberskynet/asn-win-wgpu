@@ -1,6 +1,3 @@
-extern crate asn_gui_core;
-extern crate asn_logger;
-
 mod data;
 mod error;
 mod keyboard_handler;

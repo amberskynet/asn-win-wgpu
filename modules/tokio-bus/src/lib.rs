@@ -28,9 +28,6 @@
 //! For more detailed information about the API, see the [new_tokio_bus] function and the
 //! [tokio_event_bus] module documentation.
 
-extern crate asn_core;
-extern crate asn_core_bus;
-
 mod tokio_event_bus;
 
 pub use tokio_event_bus::new_tokio_bus;

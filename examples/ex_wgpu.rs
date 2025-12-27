@@ -1,6 +1,3 @@
-extern crate asn_logger;
-extern crate asn_winit;
-
 mod log_utils;
 
 use std::{

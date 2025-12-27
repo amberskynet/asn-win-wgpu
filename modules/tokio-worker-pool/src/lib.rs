@@ -1,5 +1,3 @@
-extern crate tokio;
-
 mod job;
 mod tokio_worker_pool;
 mod worker;

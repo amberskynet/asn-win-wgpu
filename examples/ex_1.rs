@@ -1,6 +1,3 @@
-extern crate asn_logger;
-extern crate asn_win_wgpu;
-
 mod log_utils;
 
 use std::sync::Arc;

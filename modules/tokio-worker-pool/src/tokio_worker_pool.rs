@@ -1,6 +1,3 @@
-extern crate asn_core_bus;
-extern crate tokio;
-
 use crate::job::Job;
 use crate::worker::Worker;
 use asn_core_bus::AsnWorkerPool;

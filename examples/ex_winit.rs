@@ -1,5 +1,3 @@
-extern crate asn_logger;
-
 mod log_utils;
 use std::{sync::Arc, thread::sleep, time::Duration};
 
